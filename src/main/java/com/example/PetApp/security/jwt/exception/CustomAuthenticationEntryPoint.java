@@ -1,4 +1,4 @@
-package com.example.PetApp.jwt.exception;
+package com.example.PetApp.security.jwt.exception;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;

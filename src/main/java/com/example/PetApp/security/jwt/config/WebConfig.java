@@ -1,4 +1,4 @@
-package com.example.PetApp.jwt.config;
+package com.example.PetApp.security.jwt.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

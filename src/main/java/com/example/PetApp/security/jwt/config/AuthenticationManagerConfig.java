@@ -1,4 +1,4 @@
-package com.example.PetApp.jwt.config;
+package com.example.PetApp.security.jwt.config;
 
 import com.example.PetApp.security.jwt.filter.JwtAuthenticationFilter;
 import com.example.PetApp.security.jwt.provider.JwtAuthenticationProvider;

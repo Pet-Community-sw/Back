@@ -1,4 +1,4 @@
-package com.example.PetApp.jwt.filter;
+package com.example.PetApp.security.jwt.filter;
 
 import com.example.PetApp.security.jwt.exception.JwtExceptionCode;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;

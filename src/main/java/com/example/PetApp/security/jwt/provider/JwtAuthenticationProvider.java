@@ -1,4 +1,4 @@
-package com.example.PetApp.jwt.provider;
+package com.example.PetApp.security.jwt.provider;
 
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;

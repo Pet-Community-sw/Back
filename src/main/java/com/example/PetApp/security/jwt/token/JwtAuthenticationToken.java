@@ -1,4 +1,4 @@
-package com.example.PetApp.jwt.token;
+package com.example.PetApp.security.jwt.token;
 
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
