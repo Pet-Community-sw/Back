@@ -52,7 +52,7 @@ public class JwtTokenizer {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey(key))
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody();
     }
 

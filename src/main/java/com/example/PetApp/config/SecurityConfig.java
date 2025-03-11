@@ -1,4 +1,4 @@
-package com.example.PetApp.security.jwt.config;
+package com.example.PetApp.config;
 
 import com.example.PetApp.security.jwt.exception.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
