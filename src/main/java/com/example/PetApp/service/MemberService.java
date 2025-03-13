@@ -2,12 +2,15 @@ package com.example.PetApp.service;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Role;
+import com.example.PetApp.redis.util.RedisUtil;
 import com.example.PetApp.repository.MemberRepository;
 import com.example.PetApp.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @Service
@@ -16,6 +19,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final RoleRepository roleRepository;
+    private final RedisUtil redisUtil;
 
     @Transactional
     public Member save(Member member) {
@@ -34,4 +38,5 @@ public class MemberService {
     public Optional<Member> findByPhoneNumber(String phoneNumber) {
         return memberRepository.findByPhoneNumber(phoneNumber);
     }
+
 }

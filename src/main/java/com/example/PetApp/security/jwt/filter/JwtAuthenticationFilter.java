@@ -1,5 +1,6 @@
 package com.example.PetApp.security.jwt.filter;
 
+import com.example.PetApp.redis.util.RedisUtil;
 import com.example.PetApp.security.jwt.exception.JwtExceptionCode;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -7,6 +8,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final RedisUtil redisUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -80,6 +83,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public String getToken(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
+        if (redisUtil.existData(authorization)) {
+            throw new BadCredentialsException("로그아웃된 토큰입니다.");
+        }
         if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer")){
             String[] arr = authorization.split(" ");
             return arr[1];

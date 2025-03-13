@@ -24,10 +24,14 @@ public class RedisUtil {
     }
 
     public Boolean existData(String key) {
+        if (key == null) {
+            return false;
+        }
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 
     public void deleteData(String key) {
+
         redisTemplate.delete(key);
     }
 

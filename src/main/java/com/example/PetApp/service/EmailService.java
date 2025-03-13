@@ -67,7 +67,7 @@ public class EmailService {
         return sb.toString();
     }
 
-    public ResponseEntity authCode(String email, String code) {
+    public ResponseEntity verifyCode(String email, String code) {
         String authCode = redisUtil.getData(email);
         if (authCode == null) {
             return ResponseEntity.badRequest().body("인증번호가 만료되었습니다. 다시 시도해주세요.");

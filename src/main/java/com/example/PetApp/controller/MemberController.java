@@ -4,6 +4,7 @@ import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RefreshToken;
 import com.example.PetApp.domain.Role;
 import com.example.PetApp.dto.*;
+import com.example.PetApp.redis.util.RedisUtil;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import com.example.PetApp.service.EmailService;
 import com.example.PetApp.service.MemberService;
@@ -31,6 +32,7 @@ public class MemberController {
     private final JwtTokenizer jwtTokenizer;
     private final RefreshTokenService refreshTokenService;
     private final EmailService emailService;
+    private final RedisUtil redisUtil;
 
 
     @PostMapping("/signup")
@@ -88,6 +90,7 @@ public class MemberController {
         Claims claims = jwtTokenizer.parseAccessToken(arr[1]);
         Long memberId = Long.valueOf((Integer) claims.get("memberId"));
         refreshTokenService.deleteByMemberId(memberId);
+        redisUtil.createData(accessToken,"blacklist", 30*60L);
         return ResponseEntity.ok().body("로그아웃 되었습니다.");
 
         //로그아웃시 redis에 accesstoken값을 저장하고 필터에서 redis에 있으면 로그아웃된 유저임. redis에 시간 설정을 하여 accesstoken값도 없어 지게함.
@@ -109,13 +112,13 @@ public class MemberController {
         Optional<Member> member = memberService.findByEmail(sendEmailDto.getEmail());
         if (member.isEmpty()) {
             return ResponseEntity.badRequest().body("존재하지 않는 이메일입니다.");
-        }//이 부분 수정이 필요할것같음 굳이 컨트롤러까지오게해야하니?
+        }
         emailService.sendMail(member.get().getEmail());
         return ResponseEntity.ok().body("해당 이메일로 인증번호 전송했습니다.");
     }
 
-    @PostMapping("/auth-code")
-    public ResponseEntity authCode(@RequestBody AuthCodeDto authCodeDto) {
-        return emailService.authCode(authCodeDto.getEmail(), authCodeDto.getCode());
+    @PostMapping("/verify-code")
+    public ResponseEntity verifyCode(@RequestBody AuthCodeDto authCodeDto) {
+        return emailService.verifyCode(authCodeDto.getEmail(), authCodeDto.getCode());
     }
 }
