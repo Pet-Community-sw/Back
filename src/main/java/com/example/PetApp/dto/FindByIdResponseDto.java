@@ -9,10 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginDto {
+public class FindByIdResponseDto {
 
     private String email;
-
-    private String password;
-
 }

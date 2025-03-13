@@ -3,11 +3,9 @@ package com.example.PetApp.controller;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RefreshToken;
 import com.example.PetApp.domain.Role;
-import com.example.PetApp.dto.LoginDto;
-import com.example.PetApp.dto.LoginResponseDto;
-import com.example.PetApp.dto.MemberSignDto;
-import com.example.PetApp.dto.MemberSignResponseDto;
+import com.example.PetApp.dto.*;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
+import com.example.PetApp.service.EmailService;
 import com.example.PetApp.service.MemberService;
 import com.example.PetApp.service.RefreshTokenService;
 import io.jsonwebtoken.Claims;
@@ -19,10 +17,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,6 +30,7 @@ public class MemberController {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
     private final RefreshTokenService refreshTokenService;
+    private final EmailService emailService;
 
 
     @PostMapping("/signup")
@@ -62,23 +59,23 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginDto loginDto) {
-        Member member = memberService.findByEmail(loginDto.getEmail());
-        if (member == null && !passwordEncoder.matches(member.getPassword(), loginDto.getPassword())) {
+        Optional<Member> member = memberService.findByEmail(loginDto.getEmail());
+        if (member == null && !passwordEncoder.matches(member.get().getPassword(), loginDto.getPassword())) {
             return ResponseEntity.badRequest().body("이메일 혹은 비밀번호가 일치하지 않습니다.");
         }
 
-        List<String> roles = member.getRoles().stream().map(Role::getName).collect(Collectors.toList());
+        List<String> roles = member.get().getRoles().stream().map(Role::getName).collect(Collectors.toList());
 
-        String accessToken = jwtTokenizer.createAccessToken(member.getMemberId(), member.getEmail(), roles);
-        String refreshToken = jwtTokenizer.createRefreshToken(member.getMemberId(), member.getEmail(), roles);
+        String accessToken = jwtTokenizer.createAccessToken(member.get().getMemberId(), member.get().getEmail(), roles);
+        String refreshToken = jwtTokenizer.createRefreshToken(member.get().getMemberId(), member.get().getEmail(), roles);
 
         RefreshToken refreshToken1 = new RefreshToken();
-        refreshToken1.setMemberId(member.getMemberId());
+        refreshToken1.setMemberId(member.get().getMemberId());
         refreshToken1.setValue(refreshToken);
         refreshTokenService.save(refreshToken1);
 
         LoginResponseDto loginResponseDto = LoginResponseDto.builder()
-                .name(member.getName())
+                .name(member.get().getName())
                 .accessToken(accessToken)
                 .build();
 
@@ -92,5 +89,33 @@ public class MemberController {
         Long memberId = Long.valueOf((Integer) claims.get("memberId"));
         refreshTokenService.deleteByMemberId(memberId);
         return ResponseEntity.ok().body("로그아웃 되었습니다.");
+
+        //로그아웃시 redis에 accesstoken값을 저장하고 필터에서 redis에 있으면 로그아웃된 유저임. redis에 시간 설정을 하여 accesstoken값도 없어 지게함.
+    }
+
+    @PostMapping("/find-id")
+    public ResponseEntity findById(@RequestBody FindByIdDto findByIdDto) {
+        Optional<Member> member = memberService.findByPhoneNumber(findByIdDto.getPhoneNumber());
+        if (member.isEmpty()) {
+            return ResponseEntity.badRequest().body("해당 유저는 없는 유저입니다. 회원가입 해주세요.");
+        }
+        FindByIdResponseDto findByIdResponseDto = new FindByIdResponseDto();
+        findByIdResponseDto.setEmail(member.get().getEmail());
+        return ResponseEntity.ok().body(findByIdResponseDto.getEmail());
+    }
+
+    @PostMapping("/send-email")
+    public ResponseEntity findByPassword(@RequestBody SendEmailDto sendEmailDto) {
+        Optional<Member> member = memberService.findByEmail(sendEmailDto.getEmail());
+        if (member.isEmpty()) {
+            return ResponseEntity.badRequest().body("존재하지 않는 이메일입니다.");
+        }//이 부분 수정이 필요할것같음 굳이 컨트롤러까지오게해야하니?
+        emailService.sendMail(member.get().getEmail());
+        return ResponseEntity.ok().body("해당 이메일로 인증번호 전송했습니다.");
+    }
+
+    @PostMapping("/auth-code")
+    public ResponseEntity authCode(@RequestBody AuthCodeDto authCodeDto) {
+        return emailService.authCode(authCodeDto.getEmail(), authCodeDto.getCode());
     }
 }
