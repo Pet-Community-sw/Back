@@ -10,6 +10,7 @@ import com.example.PetApp.service.EmailService;
 import com.example.PetApp.service.MemberService;
 import com.example.PetApp.service.RefreshTokenService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -90,7 +93,7 @@ public class MemberController {
         Claims claims = jwtTokenizer.parseAccessToken(arr[1]);
         Long memberId = Long.valueOf((Integer) claims.get("memberId"));
         refreshTokenService.deleteByMemberId(memberId);
-        redisUtil.createData(accessToken,"blacklist", 30*60L);
+        redisUtil.createData(accessToken, "blacklist", 30 * 60L);
         return ResponseEntity.ok().body("로그아웃 되었습니다.");
 
         //로그아웃시 redis에 accesstoken값을 저장하고 필터에서 redis에 있으면 로그아웃된 유저임. redis에 시간 설정을 하여 accesstoken값도 없어 지게함.
@@ -120,5 +123,29 @@ public class MemberController {
     @PostMapping("/verify-code")
     public ResponseEntity verifyCode(@RequestBody AuthCodeDto authCodeDto) {
         return emailService.verifyCode(authCodeDto.getEmail(), authCodeDto.getCode());
+    }
+
+    @PostMapping("/accessToken")
+    public ResponseEntity accessToken(@RequestHeader("Authorization") String accessToken) {
+        String[] arr = accessToken.split(" ");
+        Claims claims;
+        try {
+            claims = jwtTokenizer.parseAccessToken(arr[1]);
+        } catch (ExpiredJwtException e) {
+            claims = e.getClaims(); // 만료된 경우에도 Claims 추출 가능
+        }
+        Long memberId = Long.valueOf((Integer) claims.get("memberId"));
+        RefreshToken refreshToken = refreshTokenService.findByMemberId(memberId).orElseThrow(() -> new IllegalArgumentException("로그인 해주세요."));
+        if (jwtTokenizer.isTokenExpired(refreshToken.getValue())) {
+            return ResponseEntity.badRequest().body("다시 로그인 해주세요");
+        }else {
+            Claims claims1 = jwtTokenizer.parseRefreshToken(refreshToken.getValue());
+            String email = claims1.getSubject();
+            List<String> roles = (List<String>) claims1.get("roles");
+            Map<String, String> message = new HashMap<>();
+            message.put("accessToken", jwtTokenizer.createAccessToken(memberId, email, roles));
+            return ResponseEntity.ok().body(message);
+        }
+
     }
 }

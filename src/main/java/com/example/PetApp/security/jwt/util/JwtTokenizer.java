@@ -1,6 +1,7 @@
 package com.example.PetApp.security.jwt.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +19,8 @@ public class JwtTokenizer {
 
     private final byte[] refreshKey;
 
-    private static final Long ACCESS_TOKEN_EXPIRE_COUNT = 30 * 60 * 1000L;
-    private static final Long REFRESH_TOKEN_EXPIRE_COUNT = 7*24*60 * 60 * 1000L;
+    private static final Long ACCESS_TOKEN_EXPIRE_COUNT =  1000L;
+    private static final Long REFRESH_TOKEN_EXPIRE_COUNT = 1000L;
 
 
     public JwtTokenizer(@Value("${jwt.accessKey}") String accessKey, @Value("${jwt.refreshKey}") String refreshKey) {
@@ -54,6 +55,16 @@ public class JwtTokenizer {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public boolean isTokenExpired(String token) {
+        try{
+            return parseToken(token, refreshKey).getExpiration().before(new Date());
+        }catch (ExpiredJwtException e) {
+            return true; // 토큰이 만료되었으면 true 반환
+        } catch (Exception e) {
+            return true; // 유효하지 않은 토큰도 만료된 것으로 처리
+        }
     }
 
     public Claims parseAccessToken(String token) {

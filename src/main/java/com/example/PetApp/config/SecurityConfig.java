@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                .mvcMatchers("/members/signup", "/members/login","/members/refreshToken","/members/find-id","/members/send-email","/members/auth-code").permitAll()
+                .mvcMatchers("/members/signup", "/members/login","/members/accessToken","/members/find-id","/members/send-email","/members/auth-code").permitAll()
                 .mvcMatchers(GET, "/**").hasAnyRole("USER", "ADMIN")
                 .mvcMatchers(POST, "/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().hasAnyRole("USER", "ADMIN")

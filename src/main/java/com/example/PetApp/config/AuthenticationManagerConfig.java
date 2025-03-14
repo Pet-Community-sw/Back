@@ -16,6 +16,7 @@ public class AuthenticationManagerConfig extends AbstractHttpConfigurer<Authenti
 
     private final JwtAuthenticationProvider authenticationProvider;
     private final RedisUtil redisUtil;
+
     @Override
     public void configure(HttpSecurity builder) throws Exception {
         AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
