@@ -1,4 +1,4 @@
-package com.example.PetApp.dto;
+package com.example.PetApp.dto.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SendEmailDto {
+public class LoginDto {
 
     private String email;
+
+    private String password;
+
 }

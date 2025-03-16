@@ -1,4 +1,4 @@
-package com.example.PetApp.dto;
+package com.example.PetApp.dto.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

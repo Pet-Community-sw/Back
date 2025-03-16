@@ -1,5 +1,4 @@
-package com.example.PetApp.dto;
-
+package com.example.PetApp.dto.member;
 
 import lombok.*;
 
@@ -8,8 +7,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LoginResponseDto {
+public class MemberSignResponseDto {
+
+    private Long memberId;
 
     private String name;
-    private String accessToken;
 }

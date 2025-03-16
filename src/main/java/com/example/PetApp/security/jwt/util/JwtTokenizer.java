@@ -19,8 +19,8 @@ public class JwtTokenizer {
 
     private final byte[] refreshKey;
 
-    private static final Long ACCESS_TOKEN_EXPIRE_COUNT =  1000L;
-    private static final Long REFRESH_TOKEN_EXPIRE_COUNT = 1000L;
+    private static final Long ACCESS_TOKEN_EXPIRE_COUNT =  30*60*1000L;
+    private static final Long REFRESH_TOKEN_EXPIRE_COUNT = 7*24*60*601000L;
 
 
     public JwtTokenizer(@Value("${jwt.accessKey}") String accessKey, @Value("${jwt.refreshKey}") String refreshKey) {

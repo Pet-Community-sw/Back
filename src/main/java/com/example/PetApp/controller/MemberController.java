@@ -3,7 +3,7 @@ package com.example.PetApp.controller;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RefreshToken;
 import com.example.PetApp.domain.Role;
-import com.example.PetApp.dto.*;
+import com.example.PetApp.dto.member.*;
 import com.example.PetApp.redis.util.RedisUtil;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import com.example.PetApp.service.EmailService;

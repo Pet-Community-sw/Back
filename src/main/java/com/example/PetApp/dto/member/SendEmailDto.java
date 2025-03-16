@@ -1,4 +1,4 @@
-package com.example.PetApp.dto;
+package com.example.PetApp.dto.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FindByIdResponseDto {
+public class SendEmailDto {
 
     private String email;
 }
