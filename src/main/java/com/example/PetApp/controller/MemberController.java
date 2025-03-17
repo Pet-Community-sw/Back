@@ -123,7 +123,7 @@ public class MemberController {
     @PostMapping("/verify-code")
     public ResponseEntity verifyCode(@RequestBody AuthCodeDto authCodeDto) {
         return emailService.verifyCode(authCodeDto.getEmail(), authCodeDto.getCode());
-    }
+    }//검증을하고 비밀번호를 다시 설정해야할 것 같다.
 
     @PostMapping("/accessToken")
     public ResponseEntity accessToken(@RequestHeader("Authorization") String accessToken) {

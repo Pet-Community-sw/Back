@@ -27,8 +27,6 @@ public class Profile {
     @NotEmpty
     private String name;
 
-    @ManyToOne( fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member member;
-
+    private Long memberId;
 }

@@ -7,14 +7,17 @@ import com.example.PetApp.repository.MemberRepository;
 import com.example.PetApp.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,34 +30,56 @@ public class ProfileServiceImp implements ProfileService {
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional
     public Profile addProfile(AddProfileDto addProfileDto,String email) {
-        // 회원 정보 조회
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("이메일이 존재하지 않습니다."));
+        Member member = memberRepository.findByEmail(email).get();
 
         MultipartFile file = addProfileDto.getFile();
 
-        // 파일 이름 생성 (UUID 사용)
         UUID uuid = UUID.randomUUID();
         String imageFileName = uuid + "_" + file.getOriginalFilename();
 
         try {
             // 파일 저장
-            Path savePath = Paths.get(uploadDir, imageFileName);
-            Files.copy(file.getInputStream(), savePath);
+            Path path = Paths.get(uploadDir, imageFileName);
+            Files.copy(file.getInputStream(), path);
 
             // 새로운 프로필 생성
             Profile profile = Profile.builder()
-                    .member(member)  // Member 엔티티
+                    .memberId(member.getMemberId())
                     .imageUrl("/profile/" + imageFileName)
                     .dogBreed(addProfileDto.getDogBreed())
                     .name(addProfileDto.getName())
                     .build();
 
-            // 프로필 저장
             return profileRepository.save(profile);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
     }
+
+    @Transactional
+    @Override
+    public List<Profile> profileList(String email) {
+        Member member = memberRepository.findByEmail(email).get();
+        return  profileRepository.findByMemberId(member.getMemberId());
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity getProfile(Long profileId) {
+        Optional<Profile> profile = profileRepository.findById(profileId);
+        if (profile.isPresent()) {
+            return ResponseEntity.ok().body(profile);
+        }else
+            return ResponseEntity.badRequest().body("해당 프로필은 없습니다.");
+    }
+
+    @Override
+    public Long getCount(String email) {
+        Member member = memberRepository.findByEmail(email).get();//이미 인증된 사용자이기 때문에.
+        return profileRepository.countByMemberId(member.getMemberId());
+    }
+
+
 }
