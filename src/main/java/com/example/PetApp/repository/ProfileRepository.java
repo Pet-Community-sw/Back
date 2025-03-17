@@ -12,4 +12,5 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     List<Profile> findByMemberId(Long memberId);
 
     Long countByMemberId(Long memberId);
+
 }

@@ -6,13 +6,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.NotEmpty;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddProfileDto {
+public class ProfileDto {
     private MultipartFile file;
 
     private String dogBreed;
