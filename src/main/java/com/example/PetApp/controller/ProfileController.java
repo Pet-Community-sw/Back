@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//전체 몇개인지도 알아야 됨. 프로필 갯수 최대 몇개
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/profiles")
@@ -54,9 +53,7 @@ public class ProfileController {
         return profileService.deleteByProfileId(profileId, email);
     }
 
-
     private static String getEmail(Authentication authentication) {
-
         return authentication.getPrincipal().toString();
     }
 
