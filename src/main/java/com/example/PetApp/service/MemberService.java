@@ -5,6 +5,7 @@ import com.example.PetApp.domain.RefreshToken;
 import com.example.PetApp.domain.Role;
 import com.example.PetApp.dto.member.MemberSignDto;
 import com.example.PetApp.dto.member.MemberSignResponseDto;
+import com.example.PetApp.dto.member.ResetPasswordDto;
 import com.example.PetApp.redis.util.RedisUtil;
 import com.example.PetApp.repository.MemberRepository;
 import com.example.PetApp.repository.RoleRepository;
@@ -84,4 +85,13 @@ public class MemberService {
         }
     }
 
+    public ResponseEntity resetPassword(ResetPasswordDto resetPasswordDto) {
+        Member member = memberRepository.findByEmail(resetPasswordDto.getEmail()).get();
+        if (member.getPassword().equals(resetPasswordDto.getNewPassword())) {
+            return ResponseEntity.badRequest().body("전 비밀번호와 다르게 설정해야합니다.");
+        }else {
+            member.setPassword(resetPasswordDto.getNewPassword());
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습나다.");
+        }
+    }
 }

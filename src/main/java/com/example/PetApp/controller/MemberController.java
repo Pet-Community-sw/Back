@@ -2,8 +2,6 @@ package com.example.PetApp.controller;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.dto.member.*;
-import com.example.PetApp.redis.util.RedisUtil;
-import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import com.example.PetApp.service.EmailService;
 import com.example.PetApp.service.MemberService;
 import com.example.PetApp.service.RefreshTokenService;
@@ -85,5 +83,13 @@ public class MemberController {
     @PostMapping("/accessToken")
     public ResponseEntity accessToken(@RequestHeader("Authorization") String accessToken) {
         return memberService.accessToken(accessToken);
+    }
+
+    @PutMapping("/reset-password")
+    public ResponseEntity resetPassword(@RequestBody @Valid ResetPasswordDto resetPasswordDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
+        }
+        return memberService.resetPassword(resetPasswordDto);
     }
 }
