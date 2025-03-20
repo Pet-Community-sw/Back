@@ -1,9 +1,13 @@
 package com.example.PetApp.domain;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "profile")
@@ -21,12 +25,32 @@ public class Profile {
     @NotEmpty
     private String imageUrl;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dogBirthDate;
+
+    @NotEmpty
+    private String dogAge;
+
     @NotEmpty
     private String dogBreed;
 
     @NotEmpty
-    private String name;
+    private String dogName;
+
+    private String extraInfo;
+
+    @ManyToMany
+    @JoinTable(name = "profile_breed",
+            joinColumns = @JoinColumn(name = "profile_id"),
+            inverseJoinColumns = @JoinColumn(name = "dog_breed_id"))
+    private Set<DogBreed> avoidBreeds = new HashSet<>();
 
     @JoinColumn(name = "member_id")
     private Long memberId;
+
+
+    public void addAvoidBreeds(DogBreed dogBreed) {
+
+        avoidBreeds.add(dogBreed);
+    }
 }

@@ -40,17 +40,6 @@ public class Member {
     )
     Set<Role> roles = new HashSet<>();
 
-    @Override
-    public String toString() {
-        return "Member{" +
-                "memberId=" + memberId +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", regdate=" + regdate +
-                '}';
-    }
-
     public void addRole(Role role) {
         roles.add(role);
     }

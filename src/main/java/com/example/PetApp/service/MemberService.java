@@ -6,24 +6,18 @@ import com.example.PetApp.domain.Role;
 import com.example.PetApp.dto.member.MemberSignDto;
 import com.example.PetApp.dto.member.MemberSignResponseDto;
 import com.example.PetApp.dto.member.ResetPasswordDto;
-import com.example.PetApp.redis.util.RedisUtil;
 import com.example.PetApp.repository.MemberRepository;
 import com.example.PetApp.repository.RoleRepository;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +38,9 @@ public class MemberService {
                 .password(passwordEncoder.encode(memberSignDto.getPassword()))
                 .phoneNumber(memberSignDto.getPhoneNumber())
                 .build();
+        if (member.getRoles() == null) {
+            member.setRoles(new HashSet<>());
+        }
         member.addRole(role);
         memberRepository.save(member);
         return MemberSignResponseDto.builder()
@@ -85,9 +82,10 @@ public class MemberService {
         }
     }
 
+    @Transactional
     public ResponseEntity resetPassword(ResetPasswordDto resetPasswordDto) {
         Member member = memberRepository.findByEmail(resetPasswordDto.getEmail()).get();
-        if (member.getPassword().equals(resetPasswordDto.getNewPassword())) {
+        if (passwordEncoder.matches(member.getPassword(),resetPasswordDto.getNewPassword())) {
             return ResponseEntity.badRequest().body("전 비밀번호와 다르게 설정해야합니다.");
         }else {
             member.setPassword(resetPasswordDto.getNewPassword());

@@ -2,6 +2,7 @@ package com.example.PetApp.controller;
 
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.profile.ProfileDto;
+import com.example.PetApp.dto.profile.ProfileListResponseDto;
 import com.example.PetApp.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class ProfileController {
     @GetMapping
     public ResponseEntity profileList(Authentication authentication) {
         String email = getEmail(authentication);
-        List<Profile> list = profileService.profileList(email);
+        List<ProfileListResponseDto> list = profileService.profileList(email);
         return ResponseEntity.ok().body(list);//dogBreed를 안내보내도 될듯? 효빈이랑 얘기해봐야됨.
     }
 
@@ -31,17 +32,16 @@ public class ProfileController {
     }
 
     @PostMapping
-    public ResponseEntity createProfile(@ModelAttribute ProfileDto addProfileDto, Authentication authentication) {
+    public ResponseEntity createProfile(@ModelAttribute ProfileDto profileDto, Authentication authentication) {
         String email = getEmail(authentication);
         Long count = profileService.getCount(email);
         if (count == 4) {
             return ResponseEntity.badRequest().body("프로필은 최대 4개 입니다.");
         }
-        Profile profile = profileService.addProfile(addProfileDto, email);
-        return ResponseEntity.ok(profile);
+        return profileService.addProfile(profileDto, email);
     }
 
-    @PutMapping("/{profileId}/update-profile")
+    @PutMapping("/{profileId}")
     public ResponseEntity updateProfile(@PathVariable Long profileId, @ModelAttribute ProfileDto addProfileDto, Authentication authentication) {
         String email = getEmail(authentication);
         return profileService.updateProfile(profileId, addProfileDto, email);

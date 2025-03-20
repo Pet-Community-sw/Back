@@ -1,6 +1,10 @@
 package com.example.PetApp.dto.profile;
 
+import com.example.PetApp.domain.DogBreed;
 import lombok.*;
+
+import java.time.LocalDate;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -16,7 +20,13 @@ public class GetProfileResponseDto {
 
     private Long memberId;
 
-    private String name;
+    private String dogName;
+
+    private LocalDate dogBirthDate;
+
+    private String dogAge;
+
+    private Set<DogBreed> avoidBreeds;
 
     private boolean isOwner;
 }
