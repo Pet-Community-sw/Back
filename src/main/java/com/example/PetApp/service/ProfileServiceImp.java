@@ -30,7 +30,7 @@ import java.util.*;
 public class ProfileServiceImp implements ProfileService {
 
     @Value("${spring.dog.profile.image.upload}")
-    private String uploadDir;
+    private String profileUploadDir;
 
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
@@ -40,7 +40,7 @@ public class ProfileServiceImp implements ProfileService {
     public ResponseEntity addProfile(ProfileDto profileDto, String email) {
         Member member = getMember(email);
 
-        MultipartFile file = profileDto.getFile();
+        MultipartFile file = profileDto.getProfileImageFile();
 
         UUID uuid = UUID.randomUUID();
         String imageFileName = uuid + "_" + file.getOriginalFilename();
@@ -50,7 +50,7 @@ public class ProfileServiceImp implements ProfileService {
             return ResponseEntity.badRequest().body("종을 다시 입력해주세요.");
         }
         try {
-            Path path = Paths.get(uploadDir, imageFileName);
+            Path path = Paths.get(profileUploadDir, imageFileName);
             Files.copy(file.getInputStream(), path);
 
             Profile profile = Profile.builder()
@@ -145,7 +145,7 @@ public class ProfileServiceImp implements ProfileService {
             if (member.getMemberId() == profile.get().getMemberId()) {
                 Profile newProfile = profile.get();
                 UUID uuid = UUID.randomUUID();
-                String imageFileName = uuid + "_" + profileDto.getFile().getOriginalFilename();
+                String imageFileName = uuid + "_" + profileDto.getProfileImageFile().getOriginalFilename();
 
                 newProfile.setImageUrl("/profile/" + imageFileName);
                 newProfile.setDogName(profileDto.getDogName());

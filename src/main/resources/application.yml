@@ -37,3 +37,6 @@ spring:
     profile:
       image:
         upload: /Users/choiseonjae/Desktop/profiles
+    post:
+      image:
+        upload: /Users/choiseonjae/Desktop/posts
