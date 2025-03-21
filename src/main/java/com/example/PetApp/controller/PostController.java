@@ -25,7 +25,7 @@ public class PostController {
     }
 
     @PostMapping()
-    public ResponseEntity<Long> createPost(@ModelAttribute CreatePostDto createPostDto) {
+    public ResponseEntity<?> createPost(@ModelAttribute CreatePostDto createPostDto) {
         return postService.createPost(createPostDto);
     }
 

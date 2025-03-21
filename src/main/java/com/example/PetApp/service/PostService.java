@@ -15,7 +15,7 @@ public interface PostService {
 
     List<PostListResponseDto> getPosts(int page);
 
-    ResponseEntity<Long> createPost(CreatePostDto createPostDto);
+    ResponseEntity<?> createPost(CreatePostDto createPostDto);
 
     ResponseEntity<Post> getPost(Long postId);
 }

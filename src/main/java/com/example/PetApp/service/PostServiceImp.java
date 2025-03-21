@@ -55,9 +55,12 @@ public class PostServiceImp implements PostService {
 
     @Transactional
     @Override
-    public ResponseEntity<Long> createPost(CreatePostDto createPostDto)  {
+    public ResponseEntity<?> createPost(CreatePostDto createPostDto)  {
         MultipartFile file = createPostDto.getPostImageFile();
-
+        Optional<Profile> profile1 = profileRepository.findById(createPostDto.getProfileId());
+        if (profile1.isEmpty()) {
+            return ResponseEntity.badRequest().body("유효하지않는 profile입니다.");
+        }
         UUID uuid = UUID.randomUUID();
         String imageFileName = uuid + "_" + file.getOriginalFilename();
 
@@ -65,7 +68,7 @@ public class PostServiceImp implements PostService {
             Path path = Paths.get(postUploadDir, imageFileName);
             Files.copy(file.getInputStream(), path);
 
-            Profile profile = profileRepository.findById(createPostDto.getProfileId()).orElseThrow(() -> new RuntimeException("존재하지 않는 프로필"));
+            Profile profile = profile1.orElseThrow(() -> new RuntimeException("존재하지 않는 프로필"));
 
             Post post = Post.builder()
                     .profile(profile)
