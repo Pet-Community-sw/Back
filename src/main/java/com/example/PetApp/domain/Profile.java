@@ -48,7 +48,6 @@ public class Profile {
     @JoinColumn(name = "member_id")
     private Long memberId;
 
-
     public void addAvoidBreeds(DogBreed dogBreed) {
 
         avoidBreeds.add(dogBreed);

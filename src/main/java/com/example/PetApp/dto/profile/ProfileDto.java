@@ -1,6 +1,5 @@
 package com.example.PetApp.dto.profile;
 
-import com.example.PetApp.domain.DogBreed;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +8,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ProfileDto {
 
-    private MultipartFile file;
+    private MultipartFile profileImageFile;
 
     private String dogBreed;
 
