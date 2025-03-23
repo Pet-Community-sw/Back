@@ -2,6 +2,7 @@ package com.example.PetApp.service;
 
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.dto.post.CreatePostDto;
+import com.example.PetApp.dto.post.GetPostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
 import com.example.PetApp.projection.PostProjection;
 import org.springframework.http.ResponseEntity;
@@ -17,5 +18,5 @@ public interface PostService {
 
     ResponseEntity<?> createPost(CreatePostDto createPostDto);
 
-    ResponseEntity<Post> getPost(Long postId);
+    ResponseEntity<GetPostResponseDto> getPost(Long postId);
 }

@@ -1,9 +1,8 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.domain.Post;
 import com.example.PetApp.dto.post.CreatePostDto;
+import com.example.PetApp.dto.post.GetPostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
-import com.example.PetApp.projection.PostProjection;
 import com.example.PetApp.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,7 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<Post> getPost(@PathVariable Long postId) {
+    public ResponseEntity<GetPostResponseDto> getPost(@PathVariable Long postId) {
         return postService.getPost(postId);
     }
 }

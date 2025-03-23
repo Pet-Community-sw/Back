@@ -3,6 +3,7 @@ package com.example.PetApp.service;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.post.CreatePostDto;
+import com.example.PetApp.dto.post.GetPostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
 import com.example.PetApp.projection.PostProjection;
 import com.example.PetApp.repository.PostRepository;
@@ -85,14 +86,38 @@ public class PostServiceImp implements PostService {
     }
 
     @Transactional
-    @Override
-    public ResponseEntity<Post> getPost(Long postId) {
+    @Override//comment도 추가시켜야됨.
+    public ResponseEntity<GetPostResponseDto> getPost(Long postId) {
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) {
             return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(post.get());
         }
+        List<PostListResponseDto> comments = post.get().getComments().stream().map(
+                comment -> new PostListResponseDto(
+                        comment.getCommentId(),
+                        comment.getContent(),
+                        comment.getProfile().getImageUrl(),
+                        getTimeAgo(comment.getRegdate()),
+                        comment.getProfile().getDogName(),
+                        comment.getLikeCount(),
+                        comment.getPostId()
+                )
+        ).collect(Collectors.toList());
+
+        GetPostResponseDto getPostResponseDto=GetPostResponseDto.builder()
+                .profileId(post.get().getPostId())
+                .title(post.get().getTitle())
+                .content(post.get().getContent())
+                .imageUrl(post.get().getImageUrl())
+                .viewCount(post.get().getViewCount())
+                .likeCount(post.get().getLikeCount())
+                .postId(post.get().getPostId())
+                .profileName(post.get().getProfile().getDogName())
+                .profileImageUrl(post.get().getProfile().getImageUrl())
+                .comments(comments)
+                .build();
+
+        return ResponseEntity.ok(getPostResponseDto);
     }
 
     private String getTimeAgo(LocalDateTime createdTime) {

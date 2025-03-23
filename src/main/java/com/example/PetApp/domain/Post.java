@@ -38,10 +38,10 @@ public class Post {
     @Column(columnDefinition = "BIGINT DEFAULT 0")
     private Long likeCount;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
-    @ManyToOne(fetch = FetchType.LAZY)  // ManyToOne 관계 설정
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
