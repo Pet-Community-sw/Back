@@ -3,6 +3,7 @@ package com.example.PetApp.controller;
 import com.example.PetApp.dto.post.PostDto;
 import com.example.PetApp.dto.post.GetUpdatePostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
+import com.example.PetApp.dto.post.UpdateLikeDto;
 import com.example.PetApp.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -45,5 +46,11 @@ public class PostController {
     public ResponseEntity<Object> updatePost(@PathVariable Long postId, @ModelAttribute PostDto postDto, Authentication authentication) {
         String email = authentication.getPrincipal().toString();
         return postService.updatePost(postId, postDto, email);
+    }
+
+    @PatchMapping()
+    public ResponseEntity<Object> updateLike(@RequestBody UpdateLikeDto updateLikeDto, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return postService.updateLike(updateLikeDto, email);
     }
 }

@@ -3,6 +3,7 @@ package com.example.PetApp.service;
 import com.example.PetApp.dto.post.PostDto;
 import com.example.PetApp.dto.post.GetUpdatePostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
+import com.example.PetApp.dto.post.UpdateLikeDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -21,4 +22,6 @@ public interface PostService {
     ResponseEntity<String> deletePost(Long postId, String email);
 
     ResponseEntity<Object> updatePost(Long postId, PostDto postDto, String email);
+
+    ResponseEntity<Object> updateLike(UpdateLikeDto updateLikeDto, String email);
 }
