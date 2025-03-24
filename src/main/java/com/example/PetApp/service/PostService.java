@@ -20,5 +20,5 @@ public interface PostService {
 
     ResponseEntity<String> deletePost(Long postId, String email);
 
-    ResponseEntity<Object> updatePost(Long postId, PostDto postDto, String email) throws IOException;
+    ResponseEntity<Object> updatePost(Long postId, PostDto postDto, String email);
 }

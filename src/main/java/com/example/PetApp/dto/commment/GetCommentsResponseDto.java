@@ -22,4 +22,7 @@ public class GetCommentsResponseDto {
     private String profileImageUrl;
 
     private String createdAt;
+
+    private Long postId;
+
 }

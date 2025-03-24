@@ -11,6 +11,8 @@ public class PostListResponseDto {
 
     private Long postId;
 
+    private String postImageUrl;
+
     private Long profileId;
 
     private String profileName;
@@ -25,4 +27,7 @@ public class PostListResponseDto {
 
     private Long likeCount;
 
+    public PostListResponseDto(Long postId, Long commentId, String content, String imageUrl, String timeAgo, String dogName, Long likeCount, Long postId1) {
+        this.postId = postId;
+    }
 }

@@ -3,6 +3,7 @@ package com.example.PetApp.service;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
+import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.post.PostDto;
 import com.example.PetApp.dto.post.GetUpdatePostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
@@ -48,6 +49,7 @@ public class PostServiceImp implements PostService {
         List<Post> posts = postRepository.findByOrderByRegdateDesc(pageable).getContent();
         return posts.stream().map(post->new PostListResponseDto(
                 post.getPostId(),
+                post.getPostImageUrl(),
                 post.getProfile().getProfileId(),
                 post.getProfile().getDogName(),
                 post.getProfile().getImageUrl(),
@@ -124,7 +126,7 @@ public class PostServiceImp implements PostService {
             String imageFileName="";
             imageFileName = fileSetting(updatePostDto, updatePostDto.getPostImageFile(), imageFileName);
 
-            post.get().setPostImageUrl("/post/" + imageFileName);
+            post.get().setPostImageUrl(imageFileName);
             post.get().setTitle(updatePostDto.getTitle());
             post.get().setContent(updatePostDto.getContent());
 
@@ -133,8 +135,6 @@ public class PostServiceImp implements PostService {
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
         }
-
-
     }
 
     private String fileSetting(PostDto createPostDto, MultipartFile file, String imageFileName) {
@@ -152,17 +152,17 @@ public class PostServiceImp implements PostService {
     }
 
     private GetUpdatePostResponseDto getPostResponseDto(Member member, Optional<Post> post) {
-        List<PostListResponseDto> comments = post.get().getComments().stream().map(
-                comment -> new PostListResponseDto(
-                        comment.getPostId(),
+        List<GetCommentsResponseDto> comments = post.get().getComments().stream().map(
+                comment -> new GetCommentsResponseDto(
                         comment.getCommentId(),
                         comment.getContent(),
-                        comment.getProfile().getImageUrl(),
-                        getTimeAgo(comment.getRegdate()),
-                        comment.getProfile().getDogName(),
                         comment.getLikeCount(),
-                        comment.getPostId()
-                )
+                        comment.getPostId(),
+                        comment.getProfile().getImageUrl(),
+                        comment.getProfile().getDogName(),
+                        getTimeAgo(comment.getRegdate()),
+                        comment.getProfile().getProfileId()
+                        )
         ).collect(Collectors.toList());
 
         GetUpdatePostResponseDto getPostResponseDto = GetUpdatePostResponseDto.builder()

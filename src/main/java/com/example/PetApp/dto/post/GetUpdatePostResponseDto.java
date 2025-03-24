@@ -1,6 +1,7 @@
 package com.example.PetApp.dto.post;
 
 
+import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import lombok.*;
 
 import java.util.List;
@@ -32,6 +33,6 @@ public class GetUpdatePostResponseDto {
 
     private boolean isOwner;
 
-    List<PostListResponseDto> comments;
+    List<GetCommentsResponseDto> comments;
 
 }
