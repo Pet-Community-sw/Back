@@ -1,11 +1,12 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.dto.post.CreatePostDto;
-import com.example.PetApp.dto.post.GetPostResponseDto;
+import com.example.PetApp.dto.post.PostDto;
+import com.example.PetApp.dto.post.GetUpdatePostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
 import com.example.PetApp.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,12 +25,25 @@ public class PostController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createPost(@ModelAttribute CreatePostDto createPostDto) {
+    public ResponseEntity<Object> createPost(@ModelAttribute PostDto createPostDto) {
         return postService.createPost(createPostDto);
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<GetPostResponseDto> getPost(@PathVariable Long postId) {
-        return postService.getPost(postId);
+    public ResponseEntity<Object> getPost(@PathVariable Long postId, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return postService.getPost(postId, email);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable Long postId, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return postService.deletePost(postId, email);
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<Object> updatePost(@PathVariable Long postId, @ModelAttribute PostDto postDto, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return postService.updatePost(postId, postDto, email);
     }
 }

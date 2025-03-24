@@ -9,6 +9,8 @@ import lombok.*;
 @Builder
 public class PostListResponseDto {
 
+    private Long postId;
+
     private Long profileId;
 
     private String profileName;

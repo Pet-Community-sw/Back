@@ -30,7 +30,7 @@ public class Post {
     @NotEmpty
     private String content;
 
-    private String imageUrl;
+    private String postImageUrl;
 
     @Column(columnDefinition = "BIGINT DEFAULT 0")
     private Long viewCount;

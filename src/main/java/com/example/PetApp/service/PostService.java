@@ -1,10 +1,8 @@
 package com.example.PetApp.service;
 
-import com.example.PetApp.domain.Post;
-import com.example.PetApp.dto.post.CreatePostDto;
-import com.example.PetApp.dto.post.GetPostResponseDto;
+import com.example.PetApp.dto.post.PostDto;
+import com.example.PetApp.dto.post.GetUpdatePostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
-import com.example.PetApp.projection.PostProjection;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +14,11 @@ public interface PostService {
 
     List<PostListResponseDto> getPosts(int page);
 
-    ResponseEntity<?> createPost(CreatePostDto createPostDto);
+    ResponseEntity<Object> createPost(PostDto createPostDto);
 
-    ResponseEntity<GetPostResponseDto> getPost(Long postId);
+    ResponseEntity<Object> getPost(Long postId, String email);
+
+    ResponseEntity<String> deletePost(Long postId, String email);
+
+    ResponseEntity<Object> updatePost(Long postId, PostDto postDto, String email) throws IOException;
 }

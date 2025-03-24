@@ -3,7 +3,6 @@ package com.example.PetApp.dto.post;
 
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -11,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GetPostResponseDto {
+public class GetUpdatePostResponseDto {
 
     private Long postId;
 
@@ -19,7 +18,7 @@ public class GetPostResponseDto {
 
     private String content;
 
-    private String imageUrl;
+    private String postImageUrl;
 
     private Long viewCount;
 
@@ -30,6 +29,8 @@ public class GetPostResponseDto {
     private String profileName;
 
     private String profileImageUrl;
+
+    private boolean isOwner;
 
     List<PostListResponseDto> comments;
 
