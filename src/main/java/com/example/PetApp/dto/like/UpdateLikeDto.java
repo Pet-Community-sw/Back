@@ -1,4 +1,4 @@
-package com.example.PetApp.dto.post;
+package com.example.PetApp.dto.like;
 
 import lombok.*;
 

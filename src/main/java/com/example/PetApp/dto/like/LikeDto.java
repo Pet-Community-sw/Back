@@ -1,17 +1,17 @@
-package com.example.PetApp.dto.post;
+package com.example.PetApp.dto.like;
 
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder //좋아요 목록도 db에 저장이 되어야하네 이런 시발.
-public class UpdateLikeResponseDto {
+public class LikeDto {
 
-    private Long likeCount;
+    private Long postId;
+
+    private Long profileId;
+
 
 }

@@ -1,9 +1,8 @@
 package com.example.PetApp.controller;
 
 import com.example.PetApp.dto.post.PostDto;
-import com.example.PetApp.dto.post.GetUpdatePostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
-import com.example.PetApp.dto.post.UpdateLikeDto;
+import com.example.PetApp.dto.like.UpdateLikeDto;
 import com.example.PetApp.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

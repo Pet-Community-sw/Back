@@ -1,13 +1,11 @@
 package com.example.PetApp.service;
 
 import com.example.PetApp.dto.post.PostDto;
-import com.example.PetApp.dto.post.GetUpdatePostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
-import com.example.PetApp.dto.post.UpdateLikeDto;
+import com.example.PetApp.dto.like.UpdateLikeDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
