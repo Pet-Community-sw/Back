@@ -5,12 +5,10 @@ import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.like.LikeDto;
-import com.example.PetApp.dto.like.LikeResponseDto;
 import com.example.PetApp.repository.LikeRepository;
 import com.example.PetApp.repository.MemberRepository;
 import com.example.PetApp.repository.PostRepository;
 import com.example.PetApp.repository.ProfileRepository;
-import io.netty.handler.codec.string.StringEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,13 +38,13 @@ public class LikeServiceImp implements LikeService {
     }
 
     @Transactional//일단 좋아요 갯수만 보여줄거여서 혹시 모르니까 likeid를 함께 반환
-    public ResponseEntity<Long> createLike(Profile profile, Long postId) {
+    public ResponseEntity<Object> createLike(Profile profile, Long postId) {
             LikeT likeT = LikeT.builder()
                     .postId(postId)
                     .profile(profile)
                     .build();
             likeRepository.save(likeT);
-            return ResponseEntity.ok(likeT.getLikeId());
+            return ResponseEntity.ok().body("좋아요 생성.");
     }
 
     @Transactional
@@ -55,26 +53,29 @@ public class LikeServiceImp implements LikeService {
         Optional<Post> post = postRepository.findById(likeDto.getPostId());
         Optional<Profile> profile = profileRepository.findById(likeDto.getProfileId());
         Member member = memberRepository.findByEmail(email).get();
-        Optional<LikeT> like = likeRepository.findByProfileId(likeDto.getProfileId());
+
         if (post.isEmpty()||profile.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시물 혹은 프로필이 유효하지 않습니다.");
         }
+
+        Optional<LikeT> like = likeRepository.findByPostIdAndProfileProfileId(likeDto.getPostId(), likeDto.getProfileId());
+
         if (!profile.get().getMemberId().equals(member.getMemberId())) {
             return ResponseEntity.badRequest().body("member와 Profile이 일치하지 않습니다.");
 
         } else {
             if (like.isEmpty()) {
-                createLike(profile.get(), likeDto.getPostId());
+                return createLike(profile.get(), likeDto.getPostId());
             }else {
-                deleteLike(likeDto.getProfileId(), likeDto.getPostId());
+                return deleteLike(likeDto.getPostId(), likeDto.getProfileId());
             }
-            return ResponseEntity.ok().build();
         }
     }
 
     @Transactional
-    public void deleteLike(Long postId, Long profileId) {
+    public ResponseEntity<Object> deleteLike(Long postId, Long profileId) {
         likeRepository.deleteByPostIdAndProfileProfileId(postId, profileId);
+        return ResponseEntity.ok().body("삭제 완료.");
     }
 
 }

@@ -8,6 +8,7 @@ import com.example.PetApp.dto.post.PostDto;
 import com.example.PetApp.dto.post.GetUpdatePostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
 import com.example.PetApp.dto.like.UpdateLikeDto;
+import com.example.PetApp.repository.LikeRepository;
 import com.example.PetApp.repository.MemberRepository;
 import com.example.PetApp.repository.PostRepository;
 import com.example.PetApp.repository.ProfileRepository;
@@ -42,6 +43,7 @@ public class PostServiceImp implements PostService {
     private final PostRepository postRepository;
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
+    private final LikeRepository likeRepository;
 
     @Transactional
     @Override
@@ -57,7 +59,7 @@ public class PostServiceImp implements PostService {
                 post.getTitle(),
                 getTimeAgo(post.getRegdate()),
                 post.getViewCount(),
-                post.getLikeCount()
+                likeRepository.countByPostId(post.getPostId())
                 )).collect(Collectors.toList());
     }
 

@@ -25,6 +25,4 @@ public class LikeT {
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
-    private boolean isOnce;
-
 }
