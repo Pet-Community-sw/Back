@@ -1,6 +1,6 @@
 package com.example.PetApp.config;
 
-import com.example.PetApp.redis.util.RedisUtil;
+import com.example.PetApp.util.RedisUtil;
 import com.example.PetApp.security.jwt.filter.JwtAuthenticationFilter;
 import com.example.PetApp.security.jwt.provider.JwtAuthenticationProvider;
 import lombok.RequiredArgsConstructor;

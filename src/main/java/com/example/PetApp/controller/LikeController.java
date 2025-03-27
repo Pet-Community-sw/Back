@@ -16,7 +16,7 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    @GetMapping("/{postId}")
+    @GetMapping("/{postId}")//좋아요 갯수만 보내줘도 되나요? 좋아요 누를 때마다 페이지 새로고침하는거면 너무 성능이 낭비일 것 같은디...
     public ResponseEntity<Object> getLike(@PathVariable Long postId) {
         return likeService.getLike(postId);
     }

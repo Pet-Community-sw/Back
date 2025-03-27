@@ -12,6 +12,7 @@ import com.example.PetApp.repository.LikeRepository;
 import com.example.PetApp.repository.MemberRepository;
 import com.example.PetApp.repository.PostRepository;
 import com.example.PetApp.repository.ProfileRepository;
+import com.example.PetApp.util.TimeAgoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -26,12 +27,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +50,7 @@ public class PostServiceImp implements PostService {
     public List<PostListResponseDto> getPosts(int page) {
         Pageable pageable = PageRequest.of(page, 10);
         List<Post> posts = postRepository.findByOrderByRegdateDesc(pageable).getContent();
+        TimeAgoUtil timeAgoUtil = new TimeAgoUtil();
         return posts.stream().map(post->new PostListResponseDto(
                 post.getPostId(),
                 post.getPostImageUrl(),
@@ -57,7 +58,7 @@ public class PostServiceImp implements PostService {
                 post.getProfile().getDogName(),
                 post.getProfile().getImageUrl(),
                 post.getTitle(),
-                getTimeAgo(post.getRegdate()),
+                timeAgoUtil.getTimeAgo(post.getRegdate()),
                 post.getViewCount(),
                 likeRepository.countByPostId(post.getPostId())
                 )).collect(Collectors.toList());
@@ -88,7 +89,7 @@ public class PostServiceImp implements PostService {
 
     @Transactional//조회수 중복 허용? 방지?
     public ResponseEntity<Object> getPost(Post post, Member member, boolean isView) {
-        if (isView) {
+        if (isView) {//자기 post에 들어가는 것은 조회수안올라감.
             post.setViewCount(post.getViewCount()+1);
         }
         GetUpdatePostResponseDto getPostResponseDto = getPostResponseDto(member, post);
@@ -189,6 +190,7 @@ public class PostServiceImp implements PostService {
     }
 
     private GetUpdatePostResponseDto getPostResponseDto(Member member, Post post) {
+        TimeAgoUtil timeAgoUti = new TimeAgoUtil();
         List<GetCommentsResponseDto> comments = post.getComments().stream().map(
                 comment -> new GetCommentsResponseDto(
                         comment.getCommentId(),
@@ -197,10 +199,12 @@ public class PostServiceImp implements PostService {
                         comment.getPostId(),
                         comment.getProfile().getImageUrl(),
                         comment.getProfile().getDogName(),
-                        getTimeAgo(comment.getRegdate()),
-                        comment.getProfile().getProfileId()
+                        timeAgoUti.getTimeAgo(comment.getRegdate()),
+                        comment.getProfile().getProfileId(),
+                        comment.getProfile().getMemberId().equals(member.getMemberId())
                         )
         ).collect(Collectors.toList());
+
 
         GetUpdatePostResponseDto getPostResponseDto = GetUpdatePostResponseDto.builder()
                 .postId(post.getPostId())
@@ -213,6 +217,7 @@ public class PostServiceImp implements PostService {
                 .profileName(post.getProfile().getDogName())
                 .profileImageUrl(post.getProfile().getImageUrl())
                 .comments(comments)
+                .createdAt(timeAgoUti.getTimeAgo(post.getRegdate()))
                 .build();
         if (post.getProfile().getMemberId().equals(member.getMemberId())) {
             getPostResponseDto.setOwner(true);
@@ -221,21 +226,8 @@ public class PostServiceImp implements PostService {
         return getPostResponseDto;
     }
 
-    private String getTimeAgo(LocalDateTime localDateTime) {
-        LocalDateTime now = LocalDateTime.now();
 
-        long minutes = ChronoUnit.MINUTES.between(localDateTime, now);
-        long hours = ChronoUnit.HOURS.between(localDateTime, now);
-        long days = ChronoUnit.DAYS.between(localDateTime, now);
 
-        if (minutes < 1) {
-            return "방금 전";
-        } else if (minutes < 60) {
-            return minutes + "분 전";
-        } else if (hours < 24) {
-            return hours + "시간 전";
-        } else {
-            return days + "일 전";
-        }
-    }
+
 }
+

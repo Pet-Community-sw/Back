@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface CommentService {
-    ResponseEntity<Object> createComment(CreateCommentDto createCommentDto);
+    ResponseEntity<Object> createComment(CreateCommentDto createCommentDto, String email);
 
-//    ResponseEntity<?> updateComment(Long commentId, String email);
+
+    ResponseEntity<Object> getComment(Long commentId, String email);
 }

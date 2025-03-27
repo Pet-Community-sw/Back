@@ -1,18 +1,13 @@
 package com.example.PetApp.security.jwt.filter;
 
-import com.example.PetApp.domain.RefreshToken;
-import com.example.PetApp.redis.util.RedisUtil;
+import com.example.PetApp.util.RedisUtil;
 import com.example.PetApp.security.jwt.exception.JwtExceptionCode;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
-import com.example.PetApp.security.jwt.util.JwtTokenizer;
-import com.example.PetApp.service.RefreshTokenService;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -25,7 +20,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j

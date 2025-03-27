@@ -25,4 +25,6 @@ public class GetCommentsResponseDto {
 
     private Long postId;
 
+    private boolean isOwner;
+
 }

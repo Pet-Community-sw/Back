@@ -1,6 +1,6 @@
 package com.example.PetApp.service;
 
-import com.example.PetApp.redis.util.RedisUtil;
+import com.example.PetApp.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;

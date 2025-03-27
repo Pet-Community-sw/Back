@@ -31,6 +31,8 @@ public class GetUpdatePostResponseDto {
 
     private String profileImageUrl;
 
+    private String createdAt;
+
     private boolean isOwner;
 
     List<GetCommentsResponseDto> comments;

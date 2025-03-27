@@ -1,4 +1,4 @@
-package com.example.PetApp.redis.util;
+package com.example.PetApp.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
