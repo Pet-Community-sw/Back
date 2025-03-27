@@ -9,7 +9,7 @@ public interface LikeRepository extends JpaRepository<LikeT, Long> {
 
     Long countByPostId(Long postId);
 
-    Optional<LikeT> findByPostIdAndProfileProfileId(Long postId, Long profileId);
+    Boolean existsByPostIdAndProfileProfileId(Long postId, Long profileId);
 
     void deleteByPostIdAndProfileProfileId(Long postId, Long profileId);
 }
