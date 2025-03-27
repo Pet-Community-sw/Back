@@ -1,7 +1,8 @@
 package com.example.PetApp.controller;
 
 
-import com.example.PetApp.dto.commment.CreateCommentDto;
+import com.example.PetApp.dto.commment.CommentDto;
+import com.example.PetApp.dto.commment.UpdateCommentDto;
 import com.example.PetApp.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,14 +24,20 @@ public class CommentController {
     }
 
     @PostMapping()
-    public ResponseEntity<Object> createComment(@RequestBody CreateCommentDto createCommentDto, Authentication authentication) {
+    public ResponseEntity<Object> createComment(@RequestBody CommentDto commentDto, Authentication authentication) {
         String email = authentication.getPrincipal().toString();
-        return commentService.createComment(createCommentDto, email);
+        return commentService.createComment(commentDto, email);
     }
 
-//    @PutMapping("/{commentId}")//좋아요 개수는 따로하는게 좋을 듯
-//    public ResponseEntity<?> updateComment(@PathVariable Long commentId, Authentication authentication) {
-//        String email = authentication.getPrincipal().toString();
-//        return commentService.updateComment(commentId, email);
-//    }
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long commentId, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return commentService.deleteComment(commentId, email);
+    }
+
+    @PatchMapping("/{commentId}")//좋아요 개수는 따로하는게 좋을 듯
+    public ResponseEntity<String> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentDto updateCommentDto, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return commentService.updateComment(commentId, updateCommentDto.getContent(), email);
+    }
 }
