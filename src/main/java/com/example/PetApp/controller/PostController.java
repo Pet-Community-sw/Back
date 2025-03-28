@@ -46,10 +46,4 @@ public class PostController {
         String email = authentication.getPrincipal().toString();
         return postService.updatePost(postId, postDto, email);
     }
-
-    @PatchMapping()
-    public ResponseEntity<Object> updateLike(@RequestBody UpdateLikeDto updateLikeDto, Authentication authentication) {
-        String email = authentication.getPrincipal().toString();
-        return postService.updateLike(updateLikeDto, email);
-    }
 }

@@ -40,3 +40,7 @@ spring:
     post:
       image:
         upload: /Users/choiseonjae/Desktop/posts
+  data:
+    redis:
+      repositories:
+        enabled: false

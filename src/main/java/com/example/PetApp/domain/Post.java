@@ -35,9 +35,6 @@ public class Post {
     @Column(columnDefinition = "BIGINT DEFAULT 0")
     private Long viewCount;
 
-    @Column(columnDefinition = "BIGINT DEFAULT 0")
-    private Long likeCount;
-
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 

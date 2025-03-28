@@ -20,6 +20,4 @@ public interface PostService {
     ResponseEntity<String> deletePost(Long postId, String email);
 
     ResponseEntity<Object> updatePost(Long postId, PostDto postDto, String email);
-
-    ResponseEntity<Object> updateLike(UpdateLikeDto updateLikeDto, String email);
 }

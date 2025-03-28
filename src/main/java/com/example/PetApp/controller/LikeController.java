@@ -20,7 +20,7 @@ public class LikeController {
     public ResponseEntity<Object> getLike(@PathVariable Long postId) {
         return likeService.getLike(postId);
     }
-
+    //이상함
 
     @PostMapping()
     public ResponseEntity<Object> createAndDeleteLike(@RequestBody LikeDto likeDto, Authentication authentication) {

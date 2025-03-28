@@ -153,28 +153,6 @@ public class PostServiceImp implements PostService {
         }
     }
 
-    @Transactional
-    @Override
-    public ResponseEntity<Object> updateLike(UpdateLikeDto updateLikeDto, String email) {
-        Member member = memberRepository.findByEmail(email).get();
-        Optional<Profile> profile = profileRepository.findById(updateLikeDto.getProfileId());
-        Optional<Post> post = postRepository.findById(updateLikeDto.getPostId());
-        if ((profile.get().getMemberId().equals(member.getMemberId()))){
-            return ResponseEntity.badRequest().body("member와 profile이 다릅니다.");
-        } else if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없는 게시물입니다.");
-        } else {
-            if (updateLikeDto.isLike()) {
-                post.get().setLikeCount(post.get().getLikeCount() - 1);//like테이블 하나 만들어서 countByPostId로 계산
-                updateLikeDto.setLike(false);
-            } else {
-                post.get().setLikeCount(post.get().getLikeCount() + 1);
-                updateLikeDto.setLike(true);
-            }
-        }
-        return null;
-    }
-
     private String fileSetting(PostDto createPostDto, MultipartFile file, String imageFileName) {
         try {
             if (!(createPostDto.getPostImageFile().isEmpty())) {
@@ -212,7 +190,7 @@ public class PostServiceImp implements PostService {
                 .content(post.getContent())
                 .postImageUrl(post.getPostImageUrl())
                 .viewCount(post.getViewCount())
-                .likeCount(post.getLikeCount())
+                .likeCount(likeRepository.countByPostId(post.getPostId()))
                 .profileId(post.getProfile().getProfileId())
                 .profileName(post.getProfile().getDogName())
                 .profileImageUrl(post.getProfile().getImageUrl())
@@ -225,9 +203,6 @@ public class PostServiceImp implements PostService {
 
         return getPostResponseDto;
     }
-
-
-
 
 }
 

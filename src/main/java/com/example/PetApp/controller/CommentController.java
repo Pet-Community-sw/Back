@@ -16,7 +16,6 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    //모든 GET 요청은 Body로 보내면 안된다!
     @GetMapping("/{commentId}")
     public ResponseEntity<Object> getComment(@PathVariable Long commentId, Authentication authentication) {
         String email = authentication.getPrincipal().toString();
@@ -35,7 +34,7 @@ public class CommentController {
         return commentService.deleteComment(commentId, email);
     }
 
-    @PatchMapping("/{commentId}")//좋아요 개수는 따로하는게 좋을 듯
+    @PutMapping("/{commentId}")//좋아요 개수는 따로하는게 좋을 듯
     public ResponseEntity<String> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentDto updateCommentDto, Authentication authentication) {
         String email = authentication.getPrincipal().toString();
         return commentService.updateComment(commentId, updateCommentDto.getContent(), email);

@@ -5,6 +5,7 @@ import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.like.LikeDto;
+import com.example.PetApp.dto.like.LikeResponseDto;
 import com.example.PetApp.repository.LikeRepository;
 import com.example.PetApp.repository.MemberRepository;
 import com.example.PetApp.repository.PostRepository;
@@ -33,7 +34,9 @@ public class LikeServiceImp implements LikeService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없는 게시물입니다.");
         }else {
             Long likeCount = likeRepository.countByPostId(postId);
-            return ResponseEntity.ok(likeCount);
+            LikeResponseDto likeResponseDto = new LikeResponseDto();
+            likeResponseDto.setLikeCount(likeCount);
+            return ResponseEntity.ok(likeResponseDto);
         }
     }
 
