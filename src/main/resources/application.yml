@@ -36,10 +36,10 @@ spring:
   dog:
     profile:
       image:
-        upload: /Users/choiseonjae/Desktop/profiles
+        upload: /Users/choiseonjae/Desktop/PetApp/profiles
     post:
       image:
-        upload: /Users/choiseonjae/Desktop/posts
+        upload: /Users/choiseonjae/Desktop/PetApp/posts
   data:
     redis:
       repositories:

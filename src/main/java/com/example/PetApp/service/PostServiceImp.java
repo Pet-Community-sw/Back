@@ -7,7 +7,6 @@ import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.post.PostDto;
 import com.example.PetApp.dto.post.GetUpdatePostResponseDto;
 import com.example.PetApp.dto.post.PostListResponseDto;
-import com.example.PetApp.dto.like.UpdateLikeDto;
 import com.example.PetApp.repository.LikeRepository;
 import com.example.PetApp.repository.MemberRepository;
 import com.example.PetApp.repository.PostRepository;
@@ -28,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -66,11 +66,12 @@ public class PostServiceImp implements PostService {
 
     @Transactional
     @Override//카테고리도 해야됨.
-    public ResponseEntity<Object> createPost(PostDto createPostDto)  {
+    public ResponseEntity<Object> createPost(PostDto createPostDto, String email)  {
+        Member member = memberRepository.findByEmail(email).get();
         MultipartFile file = createPostDto.getPostImageFile();
         Optional<Profile> profile1 = profileRepository.findById(createPostDto.getProfileId());
-        if (profile1.isEmpty()) {
-            return ResponseEntity.badRequest().body("유효하지않는 profile입니다.");
+        if (profile1.isEmpty()||!(member.getMemberId().equals(profile1.get().getMemberId()))) {
+            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
         String imageFileName = "";
         imageFileName = fileSetting(createPostDto, file, imageFileName);
@@ -83,7 +84,7 @@ public class PostServiceImp implements PostService {
                     .postImageUrl(imageFileName)
                     .build();
             Post newPost = postRepository.save(post);
-            return ResponseEntity.ok(newPost.getPostId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("postId",newPost.getPostId()));
 
     }
 
@@ -103,7 +104,7 @@ public class PostServiceImp implements PostService {
         Optional<Post> post = postRepository.findById(postId);
         Member member = memberRepository.findByEmail(email).get();
         if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없는 게시물입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
         if (post.get().getProfile().getMemberId().equals(member.getMemberId())) {
             return getPost(post.get(), member, false);
@@ -120,7 +121,7 @@ public class PostServiceImp implements PostService {
         Member member = memberRepository.findByEmail(email).get();
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없는 게시물입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
         if (post.get().getProfile().getMemberId().equals(member.getMemberId())) {
             postRepository.deleteById(postId);
@@ -136,7 +137,7 @@ public class PostServiceImp implements PostService {
         Member member = memberRepository.findByEmail(email).get();
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없는 게시물입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
         if (post.get().getProfile().getMemberId().equals(member.getMemberId())&&post.get().getProfile().getProfileId().equals(updatePostDto.getProfileId())) {
             String imageFileName="";
@@ -155,16 +156,18 @@ public class PostServiceImp implements PostService {
 
     private String fileSetting(PostDto createPostDto, MultipartFile file, String imageFileName) {
         try {
-            if (!(createPostDto.getPostImageFile().isEmpty())) {
+            if (!createPostDto.getPostImageFile().isEmpty()) {
                 UUID uuid = UUID.randomUUID();
-                imageFileName = "/post/" + uuid + "_" + file.getOriginalFilename();
+                imageFileName = uuid + "_" + file.getOriginalFilename(); // 파일명만 저장
                 Path path = Paths.get(postUploadDir, imageFileName);
                 Files.copy(file.getInputStream(), path);
+
+                return "/post/"+imageFileName;
             }
         } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("파일 저장 중 오류 발생: " + e.getMessage(), e);
         }
-        return imageFileName;
+        return "";
     }
 
     private GetUpdatePostResponseDto getPostResponseDto(Member member, Post post) {

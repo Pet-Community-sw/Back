@@ -13,7 +13,7 @@ public interface PostService {
 
     List<PostListResponseDto> getPosts(int page);
 
-    ResponseEntity<Object> createPost(PostDto createPostDto);
+    ResponseEntity<Object> createPost(PostDto createPostDto, String email);
 
     ResponseEntity<Object> getPost(Long postId, String email);
 

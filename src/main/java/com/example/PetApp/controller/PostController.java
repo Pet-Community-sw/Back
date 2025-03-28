@@ -25,8 +25,9 @@ public class PostController {
     }
 
     @PostMapping()
-    public ResponseEntity<Object> createPost(@ModelAttribute PostDto createPostDto) {
-        return postService.createPost(createPostDto);
+    public ResponseEntity<Object> createPost(@ModelAttribute PostDto createPostDto, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return postService.createPost(createPostDto,email);
     }
 
     @GetMapping("/{postId}")

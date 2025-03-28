@@ -47,7 +47,7 @@ public class LikeServiceImp implements LikeService {
                     .profile(profile)
                     .build();
             likeRepository.save(likeT);
-            return ResponseEntity.ok().body("좋아요 생성.");
+            return ResponseEntity.status(HttpStatus.CREATED).body("좋아요 생성했습니다.");
     }
 
     @Transactional
@@ -57,14 +57,14 @@ public class LikeServiceImp implements LikeService {
         Optional<Profile> profile = profileRepository.findById(likeDto.getProfileId());
         Member member = memberRepository.findByEmail(email).get();
 
-        if (post.isEmpty()||profile.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("게시물 혹은 프로필이 유효하지 않습니다.");
+        if (post.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
 
         boolean isOwner = likeRepository.existsByPostIdAndProfileProfileId(likeDto.getPostId(), likeDto.getProfileId());
 
-        if (!profile.get().getMemberId().equals(member.getMemberId())) {
-            return ResponseEntity.badRequest().body("member와 Profile이 일치하지 않습니다.");
+        if (profile.isEmpty()||!profile.get().getMemberId().equals(member.getMemberId())) {
+            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
 
         } else {
             if (isOwner) {
@@ -78,7 +78,7 @@ public class LikeServiceImp implements LikeService {
     @Transactional
     public ResponseEntity<Object> deleteLike(Long postId, Long profileId) {
         likeRepository.deleteByPostIdAndProfileProfileId(postId, profileId);
-        return ResponseEntity.ok().body("삭제 완료.");
+        return ResponseEntity.ok().body("좋아요 삭제했습니다.");
     }
 
 }
