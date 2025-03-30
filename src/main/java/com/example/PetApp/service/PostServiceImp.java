@@ -147,8 +147,7 @@ public class PostServiceImp implements PostService {
             post.get().setTitle(updatePostDto.getTitle());
             post.get().setContent(updatePostDto.getContent());
 
-            GetUpdatePostResponseDto updatePostResponseDto = getPostResponseDto(member, post.get());
-            return ResponseEntity.ok(updatePostResponseDto);
+            return ResponseEntity.ok().body("수정 되었습니다.");
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
         }

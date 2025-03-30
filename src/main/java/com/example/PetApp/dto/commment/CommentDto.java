@@ -14,8 +14,6 @@ public class CommentDto {
 
     private String content;
 
-    private Long likeCount;
-
     private Long profileId;
 
 }

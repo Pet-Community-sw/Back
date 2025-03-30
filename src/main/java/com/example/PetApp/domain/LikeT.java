@@ -1,7 +1,6 @@
 package com.example.PetApp.domain;
 
 import lombok.*;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 
@@ -24,5 +23,7 @@ public class LikeT {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
+    //상속을 이용하여 comment 좋아요도 받아보자.
+    //mappedsuperclass 이용하여 regdate 및 created를 설정 해보자
 
 }

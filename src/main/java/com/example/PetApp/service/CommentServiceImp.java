@@ -34,16 +34,15 @@ public class CommentServiceImp implements CommentService {
         Member member = memberRepository.findByEmail(email).get();
         Optional<Profile> profile = profileRepository.findById(commentDto.getProfileId());
         Optional<Post> post = postRepository.findById(commentDto.getPostId());
-        if (profile.isEmpty()||post.isEmpty()) {
-            return ResponseEntity.badRequest().body("해당 프로필 혹은 해당 게시물이 없습니다.");
+        if (post.isEmpty()) {
+            return ResponseEntity.badRequest().body("해당 게시물은 없습니다.");
         }
-        if (!(profile.get().getMemberId().equals(member.getMemberId()))) {
-            return ResponseEntity.badRequest().body("일치하지 않는 사용자입니다.");
+        if (profile.isEmpty()||!(profile.get().getMemberId().equals(member.getMemberId()))) {
+            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
         Comment comment=Comment.builder()
                 .content(commentDto.getContent())
                 .postId(commentDto.getPostId())
-                .likeCount(commentDto.getLikeCount())
                 .profile(profile.get())
                 .build();
         Comment newComment = commentRepository.save(comment);
@@ -81,13 +80,13 @@ public class CommentServiceImp implements CommentService {
         Optional<Comment> comment = commentRepository.findById(commentId);
         Member member = memberRepository.findByEmail(email).get();
         if (comment.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없는 댓글입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없습니다.");
         }
         if (comment.get().getProfile().getMemberId().equals(member.getMemberId())) {
             commentRepository.deleteById(commentId);
             return ResponseEntity.ok().body("삭제 완료했습니다.");
         } else {
-            return ResponseEntity.badRequest().body("일치하지 않는 회원입니다.");
+            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
     }
 
@@ -101,8 +100,8 @@ public class CommentServiceImp implements CommentService {
         }
         if (comment.get().getProfile().getMemberId().equals(member.getMemberId())) {
             comment.get().setContent(content);
-            return ResponseEntity.ok().body("수정 완료했습니다.");
+            return ResponseEntity.ok().body("수정 되었습니다.");
         }
-        return ResponseEntity.badRequest().body("일지하지 않는 회원입니다.");
+        return ResponseEntity.badRequest().body("잘못된 요청입니다.");
     }
 }
