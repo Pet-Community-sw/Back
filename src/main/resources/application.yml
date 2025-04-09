@@ -7,7 +7,6 @@ spring:
     url : jdbc:mysql://127.0.0.1:3306/memberdb?UseUnicode=true&serverTimezone=Asia/Seoul
     username : root
     password: fpdlswj365
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -30,7 +29,7 @@ spring:
             enable: true
 
   redis:
-    host: localhost
+    host: 127.0.0.1
     port: 6379
 
   dog:
@@ -44,3 +43,5 @@ spring:
     redis:
       repositories:
         enabled: false
+    mongodb:
+      uri: mongodb+srv://chltjswo:fpdlswj365@mycluster.zzoydp8.mongodb.net/chat?retryWrites=true&w=majority&appName=myCluster

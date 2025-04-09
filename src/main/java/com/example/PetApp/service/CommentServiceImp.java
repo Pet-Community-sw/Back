@@ -46,7 +46,7 @@ public class CommentServiceImp implements CommentService {
                 .profile(profile.get())
                 .build();
         Comment newComment = commentRepository.save(comment);
-        return ResponseEntity.ok(newComment.getCommentId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(newComment.getCommentId());
     }
 
     @Transactional

@@ -35,7 +35,7 @@ public class Post {
     @Column(columnDefinition = "BIGINT DEFAULT 0")
     private Long viewCount;
 
-    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)//이거 comment에 있어야할듯.
     private List<Comment> comments;
 
     @ManyToOne(fetch = FetchType.LAZY)
