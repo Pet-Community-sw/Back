@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
 
+    @Transactional
     @Override
     public ResponseEntity<?> getChatRoomList(Long profileId, String email) {
         Member member = memberRepository.findByEmail(email).get();
@@ -36,9 +39,11 @@ public class ChatRoomServiceImp implements ChatRoomService {
         if (profile.isEmpty()||!(profile.get().getMemberId().equals(member.getMemberId()))) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
-        List<ChatRoom> chatRoomList = chatRoomRepository.findAllByProfilesContains(profile.get());
+        Set<ChatRoom> chatRoomList = chatRoomRepository.findAllByProfilesContains(profile.get());
         //redis 정보가지고와야됨.
-        return ResponseEntity.ok(chatRoomList);
+        List<ChatRoomResponseDto> chatRoomResponseDto=chatRoomList.stream().map(ChatRoomResponseDto::from)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(chatRoomResponseDto);
     }
 
     @Transactional
@@ -47,14 +52,14 @@ public class ChatRoomServiceImp implements ChatRoomService {
         Member member = memberRepository.findByEmail(email).get();
         Optional<Profile> profile = profileRepository.findById(createChatRoomDto.getProfileId());
         Optional<Post> post = postRepository.findById(createChatRoomDto.getPostId());
-        Optional<ChatRoom> chatRoom2 = chatRoomRepository.findById(createChatRoomDto.getChatRoomId());
         if (profile.isEmpty()||post.isEmpty()|| !(profile.get().getMemberId().equals(member.getMemberId()))) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
+        Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByPost(post.get());
         if (chatRoom2.isEmpty()) {//채팅방이 없으면 새로운생성 있으면 profiles에 신청자 Profile 추가
             ChatRoom chatRoom = ChatRoom.builder()
-                    .name(createChatRoomDto.getPostTitle())
-                    .limitCount(createChatRoomDto.getLimitCount())
+                    .name(post.get().getProfile().getDogName()+"님의 방")
+                    .limitCount(createChatRoomDto.getLimitCount())//나중에 게시물에서 인원 수를 고정.
                     .post(post.get())
                     //이게 수정에서 가능하려나?
                     .build();
@@ -64,7 +69,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
             return ResponseEntity.status(HttpStatus.CREATED).body(chatRoom1.getChatRoomId());
         }else {
             ChatRoom chatRoom = chatRoom2.get();
-            List<Profile> profiles = chatRoom.getProfiles();
+            Set<Profile> profiles = chatRoom.getProfiles();
             profiles.add(profile.get());
             chatRoom.setProfiles(profiles);
             return ResponseEntity.ok().build();
@@ -81,7 +86,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
         ChatRoom chatRoom1 = chatRoom.get();
-        List<Profile> profiles = chatRoom1.getProfiles();
+        Set<Profile> profiles = chatRoom1.getProfiles();
         profiles.remove(profile.get());
         chatRoom1.setProfiles(profiles);//방 사용자 수가 1이되면 채팅방 전체 삭제.
         if (chatRoomRepository.countByProfile(chatRoomId) == 1) {

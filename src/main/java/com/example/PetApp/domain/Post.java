@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
@@ -35,12 +36,15 @@ public class Post {
     @Column(columnDefinition = "BIGINT DEFAULT 0")
     private Long viewCount;
 
-    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)//이거 comment에 있어야할듯.
-    private List<Comment> comments;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    //    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)//이거 comment에 있어야할듯.
+    @JsonIgnore//직렬화 시 안에까지 직렬화 되는건 아님.
+    private List<Comment> comments;
 
     @CreationTimestamp
     private LocalDateTime regdate;

@@ -6,7 +6,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "chat")
@@ -28,14 +30,15 @@ public class ChatRoom {
     @CreationTimestamp
     private LocalDateTime localDateTime;
 
-    @OneToOne(mappedBy = "chatRoomId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne
+    @JoinColumn(name = "post_id")
     private Post post;//이게 맞는지
 
     @OneToMany
-    private List<Profile> profiles = new ArrayList<>();
+    @Builder.Default//초기화 시켜줌. 빌더가 안먹힘.
+    private Set<Profile> profiles = new HashSet<>();
 
     public void addProfiles(Profile profile) {
         this.profiles.add(profile);
     }
-
 }
