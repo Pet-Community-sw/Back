@@ -1,12 +1,9 @@
-package com.example.PetApp.service;
+package com.example.PetApp.service.chat;
 
-import com.example.PetApp.dto.ChatRoomResponseDto;
-import com.example.PetApp.dto.CreateChatRoomDto;
-import com.example.PetApp.dto.UpdateChatRoomDto;
+import com.example.PetApp.dto.chat.CreateChatRoomDto;
+import com.example.PetApp.dto.chat.UpdateChatRoomDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public interface ChatRoomService {
@@ -18,4 +15,7 @@ public interface ChatRoomService {
     ResponseEntity<?> deleteChatRoom(Long chatRoomId, Long profileId, String email);
 
     ResponseEntity<?> updateChatRoom(UpdateChatRoomDto updateChatRoomDto, String email);
+
+
+    ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, String email, int page);
 }

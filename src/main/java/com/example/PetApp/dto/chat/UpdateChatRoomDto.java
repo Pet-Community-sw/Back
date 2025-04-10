@@ -1,10 +1,12 @@
-package com.example.PetApp.dto;
+package com.example.PetApp.dto.chat;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UpdateChatRoomDto {
 
     private Long chatRoomId;

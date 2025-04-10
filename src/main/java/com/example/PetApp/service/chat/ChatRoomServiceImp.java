@@ -1,22 +1,23 @@
-package com.example.PetApp.service;
+package com.example.PetApp.service.chat;
 
-import com.example.PetApp.domain.ChatRoom;
-import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.Post;
-import com.example.PetApp.domain.Profile;
-import com.example.PetApp.dto.ChatRoomResponseDto;
-import com.example.PetApp.dto.CreateChatRoomDto;
-import com.example.PetApp.dto.UpdateChatRoomDto;
-import com.example.PetApp.repository.ChatRoomRepository;
-import com.example.PetApp.repository.MemberRepository;
-import com.example.PetApp.repository.PostRepository;
-import com.example.PetApp.repository.ProfileRepository;
+import com.example.PetApp.domain.*;
+import com.example.PetApp.dto.chat.ChatMessageDto;
+import com.example.PetApp.dto.chat.ChatRoomResponseDto;
+import com.example.PetApp.dto.chat.CreateChatRoomDto;
+import com.example.PetApp.dto.chat.UpdateChatRoomDto;
+import com.example.PetApp.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -30,6 +31,8 @@ public class ChatRoomServiceImp implements ChatRoomService {
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final StringRedisTemplate redisTemplate;
+    private final ChatMessageRepository chatMessageRepository;
 
     @Transactional
     @Override
@@ -40,10 +43,18 @@ public class ChatRoomServiceImp implements ChatRoomService {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
         Set<ChatRoom> chatRoomList = chatRoomRepository.findAllByProfilesContains(profile.get());
-        //redis 정보가지고와야됨.
-        List<ChatRoomResponseDto> chatRoomResponseDto=chatRoomList.stream().map(ChatRoomResponseDto::from)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(chatRoomResponseDto);
+        List<ChatRoomResponseDto> chatRoomResponseDtos = chatRoomList.stream().map(chatRoom -> {
+            String lastMessage = redisTemplate.opsForValue().get("chat:lastMessage" + chatRoom.getChatRoomId());
+            String lastMessageTime = redisTemplate.opsForValue().get("chat:lastMessageTime" + chatRoom.getChatRoomId());
+            String count = redisTemplate.opsForValue().get("unRead:" + chatRoom.getChatRoomId() + ":" + profileId);
+            int unReadCount = count != null ? Integer.parseInt(count) : 0;
+            LocalDateTime lastMessageLocalDateTime = null;
+            if (lastMessageTime != null) {
+                lastMessageLocalDateTime = LocalDateTime.parse(lastMessageTime);
+            }
+            return ChatRoomResponseDto.from(chatRoom, lastMessage, unReadCount, lastMessageLocalDateTime);
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(chatRoomResponseDtos);
     }
 
     @Transactional
@@ -90,7 +101,9 @@ public class ChatRoomServiceImp implements ChatRoomService {
         profiles.remove(profile.get());
         chatRoom1.setProfiles(profiles);//방 사용자 수가 1이되면 채팅방 전체 삭제.
         if (chatRoomRepository.countByProfile(chatRoomId) == 1) {
+            chatMessageRepository.deleteByChatRoomId(chatRoomId);//채팅방 삭제.
             chatRoomRepository.deleteById(chatRoomId);
+
         }
         return ResponseEntity.ok().build();
     }
@@ -111,6 +124,24 @@ public class ChatRoomServiceImp implements ChatRoomService {
         chatRoom1.setName(updateChatRoomDto.getChatRoomTitle());
         chatRoom1.setLimitCount(updateChatRoomDto.getLimitCount());
         return ResponseEntity.ok().build();
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, String email, int page) {
+        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
+        Optional<Profile> profile = profileRepository.findById(profileId);
+        Member member = memberRepository.findByEmail(email).get();
+        if (chatRoom.isEmpty() || !(profile.get().getMemberId().equals(member.getMemberId()))
+        ||!(chatRoom.get().getPost().getProfile().getProfileId().equals(profile.get().getProfileId()))) {
+            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
+        }
+        Pageable pageRequest = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "regdate"));
+        Page<ChatMessage> messages = chatMessageRepository.findByChatRoomId(chatRoomId, pageRequest);
+        String key = "unRead:" + chatRoomId + ":" + profileId;
+        redisTemplate.delete(key);
+        ChatMessageDto messagesList = new ChatMessageDto(chatRoomId, messages.getContent());
+        return ResponseEntity.ok(messagesList);
     }
 
 }

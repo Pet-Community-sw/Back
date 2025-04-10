@@ -1,4 +1,4 @@
-package com.example.PetApp.dto;
+package com.example.PetApp.dto.chat;
 
 import lombok.Getter;
 import lombok.Setter;

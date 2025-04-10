@@ -28,6 +28,5 @@ public class ChatMessage {
     private Long SenderId;
     private String senderName;
     private String message;
-    private LocalDateTime localDateTime;//포맷 필요함.
-    private ChatRoom chatRoom;//ChatRoom과 관계설정을 할 수 있을까?
+    private LocalDateTime regdate;//포맷 필요함.
 }

@@ -1,8 +1,8 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.dto.CreateChatRoomDto;
-import com.example.PetApp.dto.UpdateChatRoomDto;
-import com.example.PetApp.service.ChatRoomService;
+import com.example.PetApp.dto.chat.CreateChatRoomDto;
+import com.example.PetApp.dto.chat.UpdateChatRoomDto;
+import com.example.PetApp.service.chat.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

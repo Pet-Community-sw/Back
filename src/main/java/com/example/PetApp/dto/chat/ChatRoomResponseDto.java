@@ -1,9 +1,8 @@
-package com.example.PetApp.dto;
+package com.example.PetApp.dto.chat;
 
 import com.example.PetApp.domain.ChatRoom;
 import com.example.PetApp.domain.Profile;
 import lombok.*;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -27,10 +26,16 @@ public class ChatRoomResponseDto {
 
     private LocalDateTime regDate;
 
-    private Set<Long> profiles=new HashSet<>();
+    private Set<Long> profiles = new HashSet<>();
+
+    private String lastMessage;
+
+    private int unReadCount;
+
+    private LocalDateTime lastMessageTime;
 
 
-    public static ChatRoomResponseDto from(ChatRoom chatRoom) {
+    public static ChatRoomResponseDto from(ChatRoom chatRoom, String lastMessage, int unReadCount, LocalDateTime lastMessageTime) {
         return ChatRoomResponseDto.builder()
                 .chatRoomId(chatRoom.getChatRoomId())
                 .chatName(chatRoom.getName())
@@ -40,6 +45,9 @@ public class ChatRoomResponseDto {
                 .profiles(chatRoom.getProfiles().stream()
                         .map(Profile::getProfileId) // Profile → ID만 추출
                         .collect(Collectors.toSet()))
+                .lastMessage(lastMessage)
+                .unReadCount(unReadCount)
+                .lastMessageTime(lastMessageTime)
                 .build();
     }
 //    private int profileCount;
