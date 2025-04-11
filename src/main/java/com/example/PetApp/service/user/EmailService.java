@@ -1,4 +1,4 @@
-package com.example.PetApp.service;
+package com.example.PetApp.service.user;
 
 import com.example.PetApp.util.RedisUtil;
 import lombok.RequiredArgsConstructor;

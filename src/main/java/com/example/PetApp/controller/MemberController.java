@@ -2,9 +2,9 @@ package com.example.PetApp.controller;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.dto.member.*;
-import com.example.PetApp.service.EmailService;
-import com.example.PetApp.service.MemberService;
-import com.example.PetApp.service.RefreshTokenService;
+import com.example.PetApp.service.user.EmailService;
+import com.example.PetApp.service.user.MemberService;
+import com.example.PetApp.service.user.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenService refreshTokenService;
+    private final TokenService tokenService;
     private final EmailService emailService;
 
 
@@ -48,13 +48,13 @@ public class MemberController {
         if (member.isEmpty() && !passwordEncoder.matches(member.get().getPassword(), loginDto.getPassword())) {
             return ResponseEntity.badRequest().body("이메일 혹은 비밀번호가 일치하지 않습니다.");
         }
-        LoginResponseDto loginResponseDto = refreshTokenService.save(member.get());
+        LoginResponseDto loginResponseDto = tokenService.save(member.get());
         return ResponseEntity.ok().body(loginResponseDto);
     }
 
     @DeleteMapping("/logout")
     public ResponseEntity logout(@RequestHeader("Authorization") String accessToken) {
-        refreshTokenService.deleteRefreshToken(accessToken);
+        tokenService.deleteRefreshToken(accessToken);
         return ResponseEntity.ok().body("로그아웃 되었습니다.");
         //로그아웃시 redis에 accesstoken값을 저장하고 필터에서 redis에 있으면 로그아웃된 유저임. redis에 시간 설정을 하여 accesstoken값도 없어 지게함.
     }
@@ -74,16 +74,16 @@ public class MemberController {
         emailService.sendMail(member.get().getEmail());
         return ResponseEntity.ok().body("해당 이메일로 인증번호 전송했습니다.");
     }
+    @PostMapping("/accessToken")
+    public ResponseEntity accessToken(@RequestHeader("Authorization") String accessToken) {
+        return tokenService.accessToken(accessToken);
+    }
 
     @PostMapping("/verify-code")
     public ResponseEntity verifyCode(@RequestBody AuthCodeDto authCodeDto) {
         return emailService.verifyCode(authCodeDto.getEmail(), authCodeDto.getCode());
     }//검증을하고 비밀번호를 다시 설정해야할 것 같다.
 
-    @PostMapping("/accessToken")
-    public ResponseEntity accessToken(@RequestHeader("Authorization") String accessToken) {
-        return memberService.accessToken(accessToken);
-    }
 
     @PutMapping("/reset-password")
     public ResponseEntity resetPassword(@RequestBody @Valid ResetPasswordDto resetPasswordDto, BindingResult bindingResult) {

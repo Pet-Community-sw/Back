@@ -1,4 +1,4 @@
-package com.example.PetApp.service;
+package com.example.PetApp.service.post;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
@@ -66,11 +66,13 @@ public class PostServiceImp implements PostService {
 
     @Transactional
     @Override//카테고리도 해야됨.
-    public ResponseEntity<Object> createPost(PostDto createPostDto, String email)  {
-        Member member = memberRepository.findByEmail(email).get();
+    public ResponseEntity<Object> createPost(PostDto createPostDto, Long profileId)  {
         MultipartFile file = createPostDto.getPostImageFile();
-        Optional<Profile> profile1 = profileRepository.findById(createPostDto.getProfileId());
-        if (profile1.isEmpty()||!(member.getMemberId().equals(profile1.get().getMemberId()))) {
+        if (profileId == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        }
+        Optional<Profile> profile1 = profileRepository.findById(profileId);
+        if (profile1.isEmpty()) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
         String imageFileName = "";
@@ -89,27 +91,26 @@ public class PostServiceImp implements PostService {
     }
 
     @Transactional//조회수 중복 허용? 방지?
-    public ResponseEntity<Object> getPost(Post post, Member member, boolean isView) {
+    public ResponseEntity<Object> getPost(Post post, Long profileId, boolean isView) {
         if (isView) {//자기 post에 들어가는 것은 조회수안올라감.
             post.setViewCount(post.getViewCount()+1);
         }
-        GetUpdatePostResponseDto getPostResponseDto = getPostResponseDto(member, post);
+        GetUpdatePostResponseDto getPostResponseDto = getPostResponseDto(profileId, post);
 
-        return ResponseEntity.ok(getPostResponseDto);
+        return ResponseEntity.ok(getPostResponseDto);//이렇게하면 항상 true아님?
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Object> getPost(Long postId, String email) {
+    public ResponseEntity<Object> getPost(Long postId, Long profileId) {
         Optional<Post> post = postRepository.findById(postId);
-        Member member = memberRepository.findByEmail(email).get();
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
-        if (post.get().getProfile().getMemberId().equals(member.getMemberId())) {
-            return getPost(post.get(), member, false);
+        if (post.get().getProfile().getProfileId().equals(profileId)) {
+            return getPost(post.get(), profileId, false);
         } else {
-            return getPost(post.get(), member, true);
+            return getPost(post.get(), profileId, true);
         }
     }
 
@@ -133,13 +134,13 @@ public class PostServiceImp implements PostService {
 
     @Transactional
     @Override
-    public ResponseEntity<Object> updatePost(Long postId, PostDto updatePostDto, String email) {
+    public ResponseEntity<Object> updatePost(Long postId, PostDto updatePostDto, Long profileId, String email) {
         Member member = memberRepository.findByEmail(email).get();
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
-        if (post.get().getProfile().getMemberId().equals(member.getMemberId())&&post.get().getProfile().getProfileId().equals(updatePostDto.getProfileId())) {
+        if (post.get().getProfile().getMemberId().equals(member.getMemberId())&&post.get().getProfile().getProfileId().equals(profileId)) {
             String imageFileName="";
             imageFileName = fileSetting(updatePostDto, updatePostDto.getPostImageFile(), imageFileName);
 
@@ -169,7 +170,7 @@ public class PostServiceImp implements PostService {
         return "";
     }
 
-    private GetUpdatePostResponseDto getPostResponseDto(Member member, Post post) {
+    private GetUpdatePostResponseDto getPostResponseDto(Long profileId, Post post) {
         TimeAgoUtil timeAgoUti = new TimeAgoUtil();
         List<GetCommentsResponseDto> comments = post.getComments().stream().map(
                 comment -> new GetCommentsResponseDto(
@@ -181,7 +182,7 @@ public class PostServiceImp implements PostService {
                         comment.getProfile().getDogName(),
                         timeAgoUti.getTimeAgo(comment.getRegdate()),
                         comment.getProfile().getProfileId(),
-                        comment.getProfile().getMemberId().equals(member.getMemberId())
+                        comment.getProfile().getProfileId().equals(profileId)
                         )
         ).collect(Collectors.toList());
 
@@ -199,7 +200,7 @@ public class PostServiceImp implements PostService {
                 .comments(comments)
                 .createdAt(timeAgoUti.getTimeAgo(post.getRegdate()))
                 .build();
-        if (post.getProfile().getMemberId().equals(member.getMemberId())) {
+        if (post.getProfile().getProfileId().equals(profileId)) {
             getPostResponseDto.setOwner(true);
         }
 

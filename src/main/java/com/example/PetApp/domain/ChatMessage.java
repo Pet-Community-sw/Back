@@ -25,8 +25,8 @@ public class ChatMessage {
     private String id;
     private MessageType messageType;
     private Long chatRoomId;
-    private Long SenderId;
+    private Long senderId;
     private String senderName;
     private String message;
-    private LocalDateTime regdate;//포맷 필요함.
+    private LocalDateTime messageTime;//포맷 필요함.
 }

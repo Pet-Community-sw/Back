@@ -20,14 +20,6 @@ public class RefreshToken {
 
     private Long memberId;
 
-    private String value;
+    private String refreshToken;
 
-    @Override
-    public String toString() {
-        return "RefreshToken{" +
-                "id=" + id +
-                ", memberId=" + memberId +
-                ", value='" + value + '\'' +
-                '}';
-    }
 }

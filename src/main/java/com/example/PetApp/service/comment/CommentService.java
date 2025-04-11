@@ -1,4 +1,4 @@
-package com.example.PetApp.service;
+package com.example.PetApp.service.comment;
 
 import com.example.PetApp.dto.commment.CommentDto;
 import org.springframework.http.ResponseEntity;

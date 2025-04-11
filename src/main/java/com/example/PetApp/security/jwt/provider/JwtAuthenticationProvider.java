@@ -23,8 +23,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) authentication;
         Claims claims = jwtTokenizer.parseAccessToken(authenticationToken.getToken());
         String email = claims.getSubject();
+        Object profileId = claims.get("profileId");
         List<GrantedAuthority> authorities = getGrantedAuthority(claims);
-        return new JwtAuthenticationToken(authorities, email, null);
+        return new JwtAuthenticationToken(authorities, email, null, profileId);
     }
 
     private List<GrantedAuthority> getGrantedAuthority(Claims claims) {

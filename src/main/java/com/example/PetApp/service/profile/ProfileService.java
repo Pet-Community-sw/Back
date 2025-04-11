@@ -1,4 +1,4 @@
-package com.example.PetApp.service;
+package com.example.PetApp.service.profile;
 
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.profile.ProfileDto;

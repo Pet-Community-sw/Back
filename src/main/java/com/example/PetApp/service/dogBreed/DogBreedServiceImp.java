@@ -1,4 +1,4 @@
-package com.example.PetApp.service;
+package com.example.PetApp.service.dogBreed;
 
 import com.example.PetApp.domain.DogBreed;
 import com.example.PetApp.repository.DogBreedRepository;

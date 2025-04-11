@@ -1,9 +1,9 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.profile.ProfileDto;
 import com.example.PetApp.dto.profile.ProfileListResponseDto;
-import com.example.PetApp.service.ProfileService;
+import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
+import com.example.PetApp.service.profile.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -54,7 +54,8 @@ public class ProfileController {
     }
 
     private static String getEmail(Authentication authentication) {
-        return authentication.getPrincipal().toString();
+        JwtAuthenticationToken authentication1 = (JwtAuthenticationToken) authentication;
+        return authentication1.getPrincipal().toString();
     }
 
 }

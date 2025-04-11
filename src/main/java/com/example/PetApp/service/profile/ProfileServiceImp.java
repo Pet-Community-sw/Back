@@ -1,13 +1,15 @@
-package com.example.PetApp.service;
+package com.example.PetApp.service.profile;
 
-import com.example.PetApp.domain.DogBreed;
-import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.Profile;
+import com.example.PetApp.domain.*;
+import com.example.PetApp.dto.profile.AddProfileResponseDto;
 import com.example.PetApp.dto.profile.ProfileDto;
 import com.example.PetApp.dto.profile.GetProfileResponseDto;
 import com.example.PetApp.dto.profile.ProfileListResponseDto;
 import com.example.PetApp.repository.MemberRepository;
 import com.example.PetApp.repository.ProfileRepository;
+import com.example.PetApp.repository.RefreshRepository;
+import com.example.PetApp.security.jwt.util.JwtTokenizer;
+import com.example.PetApp.service.dogBreed.DogBreedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,7 @@ import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.Period;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,8 @@ public class ProfileServiceImp implements ProfileService {
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
     private final DogBreedService dogBreedService;
+    private final JwtTokenizer jwtTokenizer;
+    private final RefreshRepository refreshRepository;
 
     @Transactional
     public ResponseEntity addProfile(ProfileDto profileDto, String email) {
@@ -75,7 +80,15 @@ public class ProfileServiceImp implements ProfileService {
                 profile.addAvoidBreeds(avoidBreed.get());
             }
             Profile addProfile = profileRepository.save(profile);
-            return ResponseEntity.status(HttpStatus.CREATED).body(addProfile.getProfileId());
+            List<String> roles = member.getRoles().stream().map(Role::getName).collect(Collectors.toList());
+
+            String accessToken = jwtTokenizer.createAccessToken(member.getMemberId(), addProfile.getProfileId(), member.getEmail(), roles);//accessToken 추가
+            //refresh는 노.
+            AddProfileResponseDto addProfileResponseDto=AddProfileResponseDto.builder()//profileId넣어서 토큰 반환.
+                    .accessToken(accessToken)
+                    .profileId(addProfile.getProfileId())
+                    .build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(addProfileResponseDto);
         } catch (IOException e) {
 
             throw new IllegalArgumentException(e);

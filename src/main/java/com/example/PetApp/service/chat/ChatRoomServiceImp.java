@@ -59,9 +59,9 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> createChatRoom(CreateChatRoomDto createChatRoomDto, String email) {
+    public ResponseEntity<?> createChatRoom(CreateChatRoomDto createChatRoomDto, Long profileId, String email) {
         Member member = memberRepository.findByEmail(email).get();
-        Optional<Profile> profile = profileRepository.findById(createChatRoomDto.getProfileId());
+        Optional<Profile> profile = profileRepository.findById(profileId);
         Optional<Post> post = postRepository.findById(createChatRoomDto.getPostId());
         if (profile.isEmpty()||post.isEmpty()|| !(profile.get().getMemberId().equals(member.getMemberId()))) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
@@ -110,9 +110,9 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     @Transactional
     @Override//방장만 수정할 수 있도록 설정.
-    public ResponseEntity<?> updateChatRoom(UpdateChatRoomDto updateChatRoomDto, String email) {
+    public ResponseEntity<?> updateChatRoom(UpdateChatRoomDto updateChatRoomDto, Long profileId, String email) {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(updateChatRoomDto.getChatRoomId());
-        Optional<Profile> profile = profileRepository.findById(updateChatRoomDto.getProfileId());
+        Optional<Profile> profile = profileRepository.findById(profileId);
         Member member = memberRepository.findByEmail(email).get();
         if (chatRoom.isEmpty() || !(profile.get().getMemberId().equals(member.getMemberId()))) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");

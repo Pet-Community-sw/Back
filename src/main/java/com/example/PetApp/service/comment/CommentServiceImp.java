@@ -1,4 +1,4 @@
-package com.example.PetApp.service;
+package com.example.PetApp.service.comment;
 
 import com.example.PetApp.domain.Comment;
 import com.example.PetApp.domain.Member;

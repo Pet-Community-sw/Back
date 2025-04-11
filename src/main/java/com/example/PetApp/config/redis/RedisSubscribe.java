@@ -28,7 +28,7 @@ public class RedisSubscribe {
         simpMessagingTemplate.convertAndSend("/sub/chat/" + chatMessage.getChatRoomId(), chatMessage);
 
         redisTemplate.opsForValue().set("chat:lastMessage" + chatMessage.getChatRoomId(), chatMessage.getMessage());
-        redisTemplate.opsForValue().set("chat:lastMessageTime" + chatMessage.getChatRoomId(), String.valueOf(chatMessage.getLocalDateTime()));
+        redisTemplate.opsForValue().set("chat:lastMessageTime" + chatMessage.getChatRoomId(), String.valueOf(chatMessage.getMessageTime()));
         ChatRoom chatRoom = chatRoomRepository.findById(chatMessage.getChatRoomId()).orElseThrow(() -> new RuntimeException("채탕방 없음"));
         Map<Long, Long> unReadMap = new HashMap<>();
         for (Profile profile : chatRoom.getProfiles()) {
@@ -42,7 +42,7 @@ public class RedisSubscribe {
         UpdateChatRoomList updateChatRoomList = UpdateChatRoomList.builder()
                 .chatRoomId(chatRoom.getChatRoomId())
                 .lastMessage(chatMessage.getMessage())
-                .lastMessageTime(chatMessage.getLocalDateTime())
+                .lastMessageTime(chatMessage.getMessageTime())
                 .unReadCount(unReadMap)
                 .build();
 

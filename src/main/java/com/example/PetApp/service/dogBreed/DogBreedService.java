@@ -1,4 +1,4 @@
-package com.example.PetApp.service;
+package com.example.PetApp.service.dogBreed;
 
 import com.example.PetApp.domain.DogBreed;
 import org.springframework.stereotype.Service;

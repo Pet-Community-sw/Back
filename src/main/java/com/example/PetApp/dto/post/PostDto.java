@@ -11,7 +11,7 @@ public class PostDto {
 
     private String content;
 
-    private Long profileId;
+//    private Long profileId;
 
     MultipartFile postImageFile;
 }

@@ -11,8 +11,6 @@ public class UpdateChatRoomDto {
 
     private Long chatRoomId;
 
-    private Long profileId;
-
     private String chatRoomTitle;
 
     private int limitCount;

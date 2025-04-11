@@ -2,8 +2,7 @@ package com.example.PetApp.controller;
 
 
 import com.example.PetApp.dto.like.LikeDto;
-import com.example.PetApp.dto.like.LikeResponseDto;
-import com.example.PetApp.service.LikeService;
+import com.example.PetApp.service.like.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

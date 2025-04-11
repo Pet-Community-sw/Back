@@ -3,7 +3,7 @@ package com.example.PetApp.controller;
 
 import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.UpdateCommentDto;
-import com.example.PetApp.service.CommentService;
+import com.example.PetApp.service.comment.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
