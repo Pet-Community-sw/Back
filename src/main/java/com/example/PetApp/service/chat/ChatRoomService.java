@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ChatRoomService {
 
-    ResponseEntity<?> getChatRoomList(Long profileId, String email);
+    ResponseEntity<?> getChatRoomList(Long profileId);
 
-    ResponseEntity<?> createChatRoom(CreateChatRoomDto createChatRoomDto, Long profileId, String email);
+    ResponseEntity<?> createChatRoom(CreateChatRoomDto createChatRoomDto, Long profileId);
 
-    ResponseEntity<?> deleteChatRoom(Long chatRoomId, Long profileId, String email);
+    ResponseEntity<?> deleteChatRoom(Long chatRoomId, Long profileId);
 
-    ResponseEntity<?> updateChatRoom(UpdateChatRoomDto updateChatRoomDto, Long profileId, String email);
+    ResponseEntity<?> updateChatRoom(UpdateChatRoomDto updateChatRoomDto, Long profileId);
 
 
-    ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, String email, int page);
+    ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, int page);
 }

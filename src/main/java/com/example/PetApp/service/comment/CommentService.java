@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface CommentService {
-    ResponseEntity<Object> createComment(CommentDto commentDto, String email);
+    ResponseEntity<Object> createComment(CommentDto commentDto, Long profileId);
 
-    ResponseEntity<Object> getComment(Long commentId, String email);
+    ResponseEntity<Object> getComment(Long commentId, Long profileId);
 
-    ResponseEntity<String> deleteComment(Long commentId, String email);
+    ResponseEntity<String> deleteComment(Long commentId, Long profileId);
 
-    ResponseEntity<String> updateComment(Long commentId, String content, String email);
+    ResponseEntity<String> updateComment(Long commentId, String content, Long profileId);
 }

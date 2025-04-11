@@ -2,6 +2,7 @@ package com.example.PetApp.controller;
 
 
 import com.example.PetApp.dto.like.LikeDto;
+import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.like.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,8 @@ public class LikeController {
 
     @PostMapping()
     public ResponseEntity<Object> createAndDeleteLike(@RequestBody LikeDto likeDto, Authentication authentication) {
-        String email = authentication.getPrincipal().toString();
-        return likeService.createAndDeleteLike(likeDto, email);
+        JwtAuthenticationToken authentication1 = (JwtAuthenticationToken) authentication;
+        Long profileId = authentication1.getProfileId();
+        return likeService.createAndDeleteLike(likeDto, profileId);
     }
 }

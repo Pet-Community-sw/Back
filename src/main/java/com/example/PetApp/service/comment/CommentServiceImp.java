@@ -7,7 +7,6 @@ import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.repository.CommentRepository;
-import com.example.PetApp.repository.MemberRepository;
 import com.example.PetApp.repository.PostRepository;
 import com.example.PetApp.repository.ProfileRepository;
 import com.example.PetApp.util.TimeAgoUtil;
@@ -26,23 +25,21 @@ public class CommentServiceImp implements CommentService {
     private final CommentRepository commentRepository;
     private final ProfileRepository profileRepository;
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
 
     @Transactional
     @Override
-    public ResponseEntity<Object> createComment(CommentDto commentDto, String email) {
-        Member member = memberRepository.findByEmail(email).get();
-        Optional<Profile> profile = profileRepository.findById(commentDto.getProfileId());
+    public ResponseEntity<Object> createComment(CommentDto commentDto, Long profileId) {
+        Optional<Profile> profile = profileRepository.findById(profileId);
         Optional<Post> post = postRepository.findById(commentDto.getPostId());
-        if (post.isEmpty()) {
-            return ResponseEntity.badRequest().body("해당 게시물은 없습니다.");
+        if (profile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
         }
-        if (profile.isEmpty()||!(profile.get().getMemberId().equals(member.getMemberId()))) {
-            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
+        if (post.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("잘못된 요청입니다.");
         }
         Comment comment=Comment.builder()
                 .content(commentDto.getContent())
-                .postId(commentDto.getPostId())
+                .post(post.get())
                 .profile(profile.get())
                 .build();
         Comment newComment = commentRepository.save(comment);
@@ -51,9 +48,12 @@ public class CommentServiceImp implements CommentService {
 
     @Transactional
     @Override
-    public ResponseEntity<Object> getComment(Long commentId, String email) {
+    public ResponseEntity<Object> getComment(Long commentId, Long profileId) {
         Optional<Comment> comment = commentRepository.findById(commentId);
-        Member member = memberRepository.findByEmail(email).get();
+        Optional<Profile> profile = profileRepository.findById(profileId);
+        if (profile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        }
         if (comment.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없는 댓글입니다.");
         }
@@ -64,11 +64,11 @@ public class CommentServiceImp implements CommentService {
                 .profileId(comment.get().getProfile().getProfileId())
                 .profileDogName(comment.get().getProfile().getDogName())
                 .profileImageUrl(comment.get().getProfile().getImageUrl())
-                .postId(comment.get().getPostId())
+                .postId(comment.get().getPost().getPostId())
                 .likeCount(comment.get().getLikeCount())
                 .createdAt(timeAgoUtil.getTimeAgo(comment.get().getRegdate()))
                 .build();
-        if (comment.get().getProfile().getMemberId().equals(member.getMemberId())) {
+        if (comment.get().getProfile().getProfileId().equals(profileId)) {
             getCommentsResponseDto.setOwner(true);
         }
         return ResponseEntity.ok(getCommentsResponseDto);
@@ -76,13 +76,16 @@ public class CommentServiceImp implements CommentService {
 
     @Transactional
     @Override
-    public ResponseEntity<String> deleteComment(Long commentId, String email) {
+    public ResponseEntity<String> deleteComment(Long commentId, Long profileId) {
         Optional<Comment> comment = commentRepository.findById(commentId);
-        Member member = memberRepository.findByEmail(email).get();
+        Optional<Profile> profile = profileRepository.findById(profileId);
+        if (profile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        }
         if (comment.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없습니다.");
         }
-        if (comment.get().getProfile().getMemberId().equals(member.getMemberId())) {
+        if (comment.get().getProfile().getProfileId().equals(profileId)) {
             commentRepository.deleteById(commentId);
             return ResponseEntity.ok().body("삭제 완료했습니다.");
         } else {
@@ -92,13 +95,16 @@ public class CommentServiceImp implements CommentService {
 
     @Transactional
     @Override
-    public ResponseEntity<String> updateComment(Long commentId, String content, String email) {
+    public ResponseEntity<String> updateComment(Long commentId, String content, Long profileId) {
         Optional<Comment> comment = commentRepository.findById(commentId);
-        Member member = memberRepository.findByEmail(email).get();
+        Optional<Profile> profile = profileRepository.findById(profileId);
+        if (profile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        }
         if (comment.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없는 댓글입니다.");
         }
-        if (comment.get().getProfile().getMemberId().equals(member.getMemberId())) {
+        if (comment.get().getProfile().getProfileId().equals(profileId)) {
             comment.get().setContent(content);
             return ResponseEntity.ok().body("수정 되었습니다.");
         }

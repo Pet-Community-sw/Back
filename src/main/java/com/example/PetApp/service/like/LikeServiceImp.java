@@ -33,51 +33,51 @@ public class LikeServiceImp implements LikeService {
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없는 게시물입니다.");
         }else {
-            Long likeCount = likeRepository.countByPostId(postId);
+            Long likeCount = likeRepository.countByPost(post.get());
             LikeResponseDto likeResponseDto = new LikeResponseDto();
             likeResponseDto.setLikeCount(likeCount);
             return ResponseEntity.ok(likeResponseDto);
         }
     }
 
-    @Transactional//일단 좋아요 갯수만 보여줄거여서 혹시 모르니까 likeid를 함께 반환
-    public ResponseEntity<Object> createLike(Profile profile, Long postId) {
-            LikeT likeT = LikeT.builder()
-                    .postId(postId)
-                    .profile(profile)
-                    .build();
-            likeRepository.save(likeT);
-            return ResponseEntity.status(HttpStatus.CREATED).body("좋아요 생성했습니다.");
-    }
-
     @Transactional
     @Override
-    public ResponseEntity<Object> createAndDeleteLike(LikeDto likeDto, String email) {
+    public ResponseEntity<Object> createAndDeleteLike(LikeDto likeDto, Long profileId) {
         Optional<Post> post = postRepository.findById(likeDto.getPostId());
-        Optional<Profile> profile = profileRepository.findById(likeDto.getProfileId());
-        Member member = memberRepository.findByEmail(email).get();
-
-        if (post.isEmpty()) {
+        Optional<Profile> profile = profileRepository.findById(profileId);
+        if (profile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        } else if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
-
-        boolean isOwner = likeRepository.existsByPostIdAndProfileProfileId(likeDto.getPostId(), likeDto.getProfileId());
-
-        if (profile.isEmpty()||!profile.get().getMemberId().equals(member.getMemberId())) {
+        boolean isOwner = likeRepository.existsByPostAndProfile(post.get(), profile.get());
+        if (!profile.get().getProfileId().equals(profileId)) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
 
-        } else {
+        } else{
             if (isOwner) {
-                return deleteLike(likeDto.getPostId(), likeDto.getProfileId());
-            }else {
-                return createLike(profile.get(), likeDto.getPostId());
+                return deleteLike(post.get(), profile.get());
+            } else {
+                return createLike(post.get(), profile.get());
             }
         }
+
+    }
+
+    @Transactional//일단 좋아요 갯수만 보여줄거여서 혹시 모르니까 likeid를 함께 반환
+    public ResponseEntity<Object> createLike(Post post, Profile profile) {
+        LikeT likeT = LikeT.builder()
+                .post(post)
+                .profile(profile)
+                .build();
+        likeRepository.save(likeT);
+        return ResponseEntity.status(HttpStatus.CREATED).body("좋아요 생성했습니다.");
     }
 
     @Transactional
-    public ResponseEntity<Object> deleteLike(Long postId, Long profileId) {
-        likeRepository.deleteByPostIdAndProfileProfileId(postId, profileId);
+    public ResponseEntity<Object> deleteLike(Post post, Profile profile) {
+
+        likeRepository.deleteByPostAndProfile(post, profile);
         return ResponseEntity.ok().body("좋아요 삭제했습니다.");
     }
 

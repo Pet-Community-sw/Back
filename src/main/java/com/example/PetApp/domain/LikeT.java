@@ -17,10 +17,11 @@ public class LikeT {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long likeId;
 
-    @JoinColumn(name = "post_id")
-    private Long postId;
+    @ManyToOne
+    @JoinColumn(name = "post_id",nullable = false)
+    private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)//@OneToOne관계 아님?
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
     //상속을 이용하여 comment 좋아요도 받아보자.

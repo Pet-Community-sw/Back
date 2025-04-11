@@ -25,8 +25,9 @@ public class Comment {
     @Column(columnDefinition = "BIGINT DEFAULT 0")
     private Long likeCount;
 
-    @JoinColumn(name = "post_id")
-    private Long postId;//객체 지향적이 아님. 수정해야될듯.
+    @ManyToOne
+    @JoinColumn(name = "post_id",nullable = false)
+    private Post post;//객체 지향적이 아님. 수정해야될듯.
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", nullable = false)

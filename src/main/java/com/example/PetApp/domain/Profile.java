@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -47,6 +48,9 @@ public class Profile {
 
     @JoinColumn(name = "member_id")
     private Long memberId;
+
+    @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LikeT> likeTs;
 
     public void addAvoidBreeds(DogBreed dogBreed) {
 

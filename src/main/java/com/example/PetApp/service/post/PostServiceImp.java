@@ -60,7 +60,7 @@ public class PostServiceImp implements PostService {
                 post.getTitle(),
                 timeAgoUtil.getTimeAgo(post.getRegdate()),
                 post.getViewCount(),
-                likeRepository.countByPostId(post.getPostId())
+                likeRepository.countByPost(post)
                 )).collect(Collectors.toList());
     }
 
@@ -177,7 +177,7 @@ public class PostServiceImp implements PostService {
                         comment.getCommentId(),
                         comment.getContent(),
                         comment.getLikeCount(),
-                        comment.getPostId(),
+                        comment.getPost().getPostId(),
                         comment.getProfile().getImageUrl(),
                         comment.getProfile().getDogName(),
                         timeAgoUti.getTimeAgo(comment.getRegdate()),
@@ -193,7 +193,7 @@ public class PostServiceImp implements PostService {
                 .content(post.getContent())
                 .postImageUrl(post.getPostImageUrl())
                 .viewCount(post.getViewCount())
-                .likeCount(likeRepository.countByPostId(post.getPostId()))
+                .likeCount(likeRepository.countByPost(post))
                 .profileId(post.getProfile().getProfileId())
                 .profileName(post.getProfile().getDogName())
                 .profileImageUrl(post.getProfile().getImageUrl())

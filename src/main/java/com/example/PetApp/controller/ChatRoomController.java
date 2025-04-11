@@ -19,10 +19,8 @@ public class ChatRoomController {
     //변경해야됩니다. jwt토큰에 profileId집어 넣었어요
     @GetMapping()
     private ResponseEntity<?> chatRoomList(Authentication authentication) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        String email = jwtAuthenticationToken.getPrincipal().toString();
-        Long profileId = jwtAuthenticationToken.getProfileId();
-        return chatRoomService.getChatRoomList(profileId, email);
+        Long profileId = getProfileId( authentication);
+        return chatRoomService.getChatRoomList(profileId);
     }
 
     @GetMapping("/{chatRoomId}")
@@ -30,35 +28,32 @@ public class ChatRoomController {
                                           @RequestParam(defaultValue = "0") int page,
                                           Authentication authentication
     ) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        String email = jwtAuthenticationToken.getPrincipal().toString();
-        Long profileId = jwtAuthenticationToken.getProfileId();
-        return chatRoomService.getMessages(chatRoomId, profileId, email, page);
+        Long profileId = getProfileId( authentication);
+        return chatRoomService.getMessages(chatRoomId, profileId, page);
     }
 
 
     @PostMapping()
     private ResponseEntity<?> createChatRoom(@RequestBody CreateChatRoomDto createChatRoomDto, Authentication authentication) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        String email = jwtAuthenticationToken.getPrincipal().toString();
-        Long profileId = jwtAuthenticationToken.getProfileId();
-        return chatRoomService.createChatRoom(createChatRoomDto, profileId, email);
+        Long profileId = getProfileId( authentication);
+        return chatRoomService.createChatRoom(createChatRoomDto, profileId);
     }
 
     @DeleteMapping("/{chatRoomId}")
     private ResponseEntity<?> deleteChatRoom(@PathVariable Long chatRoomId,
                                              Authentication authentication) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        String email = jwtAuthenticationToken.getPrincipal().toString();
-        Long profileId = jwtAuthenticationToken.getProfileId();
-        return chatRoomService.deleteChatRoom(chatRoomId, profileId, email);
+        Long profileId = getProfileId( authentication);
+        return chatRoomService.deleteChatRoom(chatRoomId, profileId);
     }
 
     @PutMapping()
     private ResponseEntity<?> updateChatRoom(@RequestBody UpdateChatRoomDto updateChatRoomDto, Authentication authentication) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        String email = jwtAuthenticationToken.getPrincipal().toString();
-        Long profileId = jwtAuthenticationToken.getProfileId();
-        return chatRoomService.updateChatRoom(updateChatRoomDto, profileId, email);
+        Long profileId = getProfileId( authentication);
+        return chatRoomService.updateChatRoom(updateChatRoomDto, profileId);
+    }
+
+    private static Long getProfileId(Authentication authentication) {
+        JwtAuthenticationToken authentication1 = (JwtAuthenticationToken) authentication;
+        return Long.valueOf(authentication1.getProfileId().toString());
     }
 }

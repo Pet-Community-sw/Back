@@ -36,11 +36,10 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> getChatRoomList(Long profileId, String email) {
-        Member member = memberRepository.findByEmail(email).get();
+    public ResponseEntity<?> getChatRoomList(Long profileId) {
         Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isEmpty()||!(profile.get().getMemberId().equals(member.getMemberId()))) {
-            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
+        if (profile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
         }
         Set<ChatRoom> chatRoomList = chatRoomRepository.findAllByProfilesContains(profile.get());
         List<ChatRoomResponseDto> chatRoomResponseDtos = chatRoomList.stream().map(chatRoom -> {
@@ -59,11 +58,12 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> createChatRoom(CreateChatRoomDto createChatRoomDto, Long profileId, String email) {
-        Member member = memberRepository.findByEmail(email).get();
+    public ResponseEntity<?> createChatRoom(CreateChatRoomDto createChatRoomDto, Long profileId) {
         Optional<Profile> profile = profileRepository.findById(profileId);
         Optional<Post> post = postRepository.findById(createChatRoomDto.getPostId());
-        if (profile.isEmpty()||post.isEmpty()|| !(profile.get().getMemberId().equals(member.getMemberId()))) {
+        if (profile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        } else if (post.isEmpty()) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
         Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByPost(post.get());
@@ -89,11 +89,12 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> deleteChatRoom(Long chatRoomId, Long profileId, String email) {
+    public ResponseEntity<?> deleteChatRoom(Long chatRoomId, Long profileId) {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
-        Member member = memberRepository.findByEmail(email).get();
         Optional<Profile> profile = profileRepository.findById(profileId);
-        if (chatRoom.isEmpty() || !(profile.get().getMemberId().equals(member.getMemberId()))) {
+        if (profile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        } else if (chatRoom.isEmpty() || !(chatRoom.get().getProfiles().contains(profile.get()))) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
         ChatRoom chatRoom1 = chatRoom.get();
@@ -110,14 +111,13 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     @Transactional
     @Override//방장만 수정할 수 있도록 설정.
-    public ResponseEntity<?> updateChatRoom(UpdateChatRoomDto updateChatRoomDto, Long profileId, String email) {
+    public ResponseEntity<?> updateChatRoom(UpdateChatRoomDto updateChatRoomDto, Long profileId) {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(updateChatRoomDto.getChatRoomId());
         Optional<Profile> profile = profileRepository.findById(profileId);
-        Member member = memberRepository.findByEmail(email).get();
-        if (chatRoom.isEmpty() || !(profile.get().getMemberId().equals(member.getMemberId()))) {
+        if (chatRoom.isEmpty()) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
-        if (!(chatRoom.get().getPost().getProfile().getProfileId().equals(profile.get().getProfileId()))) {
+        if (profile.isEmpty()||!(chatRoom.get().getPost().getProfile().getProfileId().equals(profile.get().getProfileId()))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
         }
         ChatRoom chatRoom1 = chatRoom.get();
@@ -128,12 +128,13 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, String email, int page) {
+    public ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, int page) {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
         Optional<Profile> profile = profileRepository.findById(profileId);
-        Member member = memberRepository.findByEmail(email).get();
-        if (chatRoom.isEmpty() || !(profile.get().getMemberId().equals(member.getMemberId()))
-        ||!(chatRoom.get().getPost().getProfile().getProfileId().equals(profile.get().getProfileId()))) {
+        if (profile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        } else if (chatRoom.isEmpty()||!(chatRoom.get().getProfiles().contains(profile.get()))) {
+
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
         Pageable pageRequest = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "regdate"));
