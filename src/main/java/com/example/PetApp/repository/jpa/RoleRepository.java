@@ -1,4 +1,4 @@
-package com.example.PetApp.repository;
+package com.example.PetApp.repository.jpa;
 
 import com.example.PetApp.domain.Role;
 import org.springframework.data.jpa.repository.JpaRepository;

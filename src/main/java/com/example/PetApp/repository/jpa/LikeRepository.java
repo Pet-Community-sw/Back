@@ -1,4 +1,4 @@
-package com.example.PetApp.repository;
+package com.example.PetApp.repository.jpa;
 
 import com.example.PetApp.domain.LikeT;
 import com.example.PetApp.domain.Post;

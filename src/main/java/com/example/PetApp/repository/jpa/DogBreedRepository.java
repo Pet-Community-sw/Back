@@ -1,4 +1,4 @@
-package com.example.PetApp.repository;
+package com.example.PetApp.repository.jpa;
 
 import com.example.PetApp.domain.DogBreed;
 import org.springframework.data.jpa.repository.JpaRepository;

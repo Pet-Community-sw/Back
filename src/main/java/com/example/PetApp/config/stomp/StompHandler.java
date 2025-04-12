@@ -3,12 +3,11 @@ package com.example.PetApp.config.stomp;
 
 import com.example.PetApp.domain.ChatRoom;
 import com.example.PetApp.domain.Profile;
-import com.example.PetApp.repository.ChatRoomRepository;
-import com.example.PetApp.repository.ProfileRepository;
+import com.example.PetApp.repository.jpa.ChatRoomRepository;
+import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +17,6 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 
-import java.security.Principal;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Configuration//jwt토큰인증 해야할듯

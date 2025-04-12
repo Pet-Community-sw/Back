@@ -4,7 +4,7 @@ import com.example.PetApp.domain.ChatMessage;
 import com.example.PetApp.domain.ChatRoom;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.chat.UpdateChatRoomList;
-import com.example.PetApp.repository.ChatRoomRepository;
+import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

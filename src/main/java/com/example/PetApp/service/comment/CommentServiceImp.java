@@ -1,14 +1,13 @@
 package com.example.PetApp.service.comment;
 
 import com.example.PetApp.domain.Comment;
-import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
-import com.example.PetApp.repository.CommentRepository;
-import com.example.PetApp.repository.PostRepository;
-import com.example.PetApp.repository.ProfileRepository;
+import com.example.PetApp.repository.jpa.CommentRepository;
+import com.example.PetApp.repository.jpa.PostRepository;
+import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.util.TimeAgoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

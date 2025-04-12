@@ -1,7 +1,7 @@
 package com.example.PetApp.config.redis;
 
 import com.example.PetApp.domain.ChatMessage;
-import com.example.PetApp.repository.ChatMessageRepository;
+import com.example.PetApp.repository.mongo.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;

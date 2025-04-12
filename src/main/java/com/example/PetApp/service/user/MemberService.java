@@ -1,17 +1,14 @@
 package com.example.PetApp.service.user;
 
 import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.RefreshToken;
 import com.example.PetApp.domain.Role;
 import com.example.PetApp.dto.member.MemberSignDto;
 import com.example.PetApp.dto.member.MemberSignResponseDto;
 import com.example.PetApp.dto.member.ResetPasswordDto;
-import com.example.PetApp.repository.MemberRepository;
-import com.example.PetApp.repository.RoleRepository;
+import com.example.PetApp.repository.jpa.MemberRepository;
+import com.example.PetApp.repository.jpa.RoleRepository;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import com.example.PetApp.util.RedisUtil;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;

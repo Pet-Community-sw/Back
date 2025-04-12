@@ -1,15 +1,13 @@
 package com.example.PetApp.service.like;
 
 import com.example.PetApp.domain.LikeT;
-import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.like.LikeDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
-import com.example.PetApp.repository.LikeRepository;
-import com.example.PetApp.repository.MemberRepository;
-import com.example.PetApp.repository.PostRepository;
-import com.example.PetApp.repository.ProfileRepository;
+import com.example.PetApp.repository.jpa.LikeRepository;
+import com.example.PetApp.repository.jpa.PostRepository;
+import com.example.PetApp.repository.jpa.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

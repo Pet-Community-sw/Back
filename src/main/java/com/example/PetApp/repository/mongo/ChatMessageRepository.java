@@ -1,4 +1,4 @@
-package com.example.PetApp.repository;
+package com.example.PetApp.repository.mongo;
 
 
 import com.example.PetApp.domain.ChatMessage;

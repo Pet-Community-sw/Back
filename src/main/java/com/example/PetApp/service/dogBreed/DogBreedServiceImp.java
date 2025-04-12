@@ -1,7 +1,7 @@
 package com.example.PetApp.service.dogBreed;
 
 import com.example.PetApp.domain.DogBreed;
-import com.example.PetApp.repository.DogBreedRepository;
+import com.example.PetApp.repository.jpa.DogBreedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

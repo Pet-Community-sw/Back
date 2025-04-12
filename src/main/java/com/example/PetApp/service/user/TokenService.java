@@ -5,7 +5,7 @@ import com.example.PetApp.domain.RefreshToken;
 import com.example.PetApp.domain.Role;
 import com.example.PetApp.dto.member.LoginResponseDto;
 import com.example.PetApp.util.RedisUtil;
-import com.example.PetApp.repository.RefreshRepository;
+import com.example.PetApp.repository.jpa.RefreshRepository;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
