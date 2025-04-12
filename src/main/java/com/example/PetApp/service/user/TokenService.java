@@ -57,7 +57,7 @@ public class TokenService {
         Long memberId = Long.valueOf((Integer) claims.get("memberId"));
         Optional<RefreshToken> refreshToken = refreshRepository.findByMemberId(memberId);
 
-        if (refreshToken.isEmpty()||jwtTokenizer.isTokenExpired(refreshToken.get().getRefreshToken())) {
+        if (refreshToken.isEmpty()||jwtTokenizer.isTokenExpired("refresh",refreshToken.get().getRefreshToken())) {
             return ResponseEntity.badRequest().body("다시 로그인 해주세요");
         } else {
             Claims claims1 = jwtTokenizer.parseRefreshToken(refreshToken.get().getRefreshToken());

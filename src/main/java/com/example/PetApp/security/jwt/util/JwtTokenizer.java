@@ -61,9 +61,12 @@ public class JwtTokenizer {
                 .getBody();
     }
 
-    public boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String tokenType, String token) {
         try{
-            return parseToken(token, refreshKey).getExpiration().before(new Date());
+            if (tokenType.equals("refresh"))
+                return parseToken(token, refreshKey).getExpiration().before(new Date());
+            else
+                return parseToken(token, accessKey).getExpiration().before(new Date());
         }catch (ExpiredJwtException e) {
             return true; // 토큰이 만료되었으면 true 반환
         } catch (Exception e) {

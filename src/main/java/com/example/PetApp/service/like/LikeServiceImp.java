@@ -23,7 +23,6 @@ import java.util.Optional;
 public class LikeServiceImp implements LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
     private final ProfileRepository profileRepository;
 
     @Transactional//나중에 profile에 관련된 정보를 보낼 수 있으니까
