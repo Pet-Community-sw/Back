@@ -33,7 +33,6 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ProfileRepository profileRepository;
-    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final StringRedisTemplate redisTemplate;
     private final ChatMessageRepository chatMessageRepository;
@@ -84,33 +83,24 @@ public class ChatRoomServiceImp implements ChatRoomService {
             return ResponseEntity.status(HttpStatus.CREATED).body(chatRoom1.getChatRoomId());
         }else {
             ChatRoom chatRoom = chatRoom2.get();
-            Set<Profile> profiles = chatRoom.getProfiles();
-            profiles.add(profile.get());
-            chatRoom.setProfiles(profiles);
+            chatRoom.addProfiles(profile.get());
             return ResponseEntity.ok().build();
         }
     }
 
     @Transactional
-    @Override
-    public ResponseEntity<?> deleteChatRoom(Long chatRoomId, Long profileId) {
+    public void deleteChatRoom(Long chatRoomId, Long profileId) {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
         Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-        } else if (chatRoom.isEmpty() || !(chatRoom.get().getProfiles().contains(profile.get()))) {
-            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
-        }
         ChatRoom chatRoom1 = chatRoom.get();
-        Set<Profile> profiles = chatRoom1.getProfiles();
+        List<Profile> profiles = chatRoom1.getProfiles();
         profiles.remove(profile.get());
         chatRoom1.setProfiles(profiles);//방 사용자 수가 1이되면 채팅방 전체 삭제.
-        if (chatRoomRepository.countByProfile(chatRoomId) == 1) {
+        System.out.println(chatRoomRepository.countByProfile(chatRoomId));
+        if (chatRoomRepository.countByProfile(chatRoomId) <= 1) {
             chatMessageRepository.deleteByChatRoomId(chatRoomId);//채팅방 삭제.
             chatRoomRepository.deleteById(chatRoomId);
-
         }
-        return ResponseEntity.ok().build();
     }
 
     @Transactional
@@ -138,10 +128,9 @@ public class ChatRoomServiceImp implements ChatRoomService {
         if (profile.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
         } else if (chatRoom.isEmpty()||!(chatRoom.get().getProfiles().contains(profile.get()))) {
-
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
-        Pageable pageRequest = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "regdate"));
+        Pageable pageRequest = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "messageTime"));
         Page<ChatMessage> messages = chatMessageRepository.findByChatRoomId(chatRoomId, pageRequest);
         String key = "unRead:" + chatRoomId + ":" + profileId;
         redisTemplate.delete(key);

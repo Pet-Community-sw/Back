@@ -12,10 +12,10 @@ public interface ChatRoomService {
 
     ResponseEntity<?> createChatRoom(CreateChatRoomDto createChatRoomDto, Long profileId);
 
-    ResponseEntity<?> deleteChatRoom(Long chatRoomId, Long profileId);
-
     ResponseEntity<?> updateChatRoom(UpdateChatRoomDto updateChatRoomDto, Long profileId);
 
 
     ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, int page);
+
+    void deleteChatRoom(Long chatRoomId, Long profileId);
 }

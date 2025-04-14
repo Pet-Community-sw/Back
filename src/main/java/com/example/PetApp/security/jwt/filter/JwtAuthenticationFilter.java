@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override//filter 하지않게 하려고
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return StringUtils.startsWithIgnoreCase(request.getRequestURI(), "/ws-stomp/**");
+        return StringUtils.startsWithIgnoreCase(request.getRequestURI(), "/members/accessToken");
     }
 
     @Override

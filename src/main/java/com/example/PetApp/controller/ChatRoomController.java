@@ -39,12 +39,12 @@ public class ChatRoomController {
         return chatRoomService.createChatRoom(createChatRoomDto, profileId);
     }
 
-    @DeleteMapping("/{chatRoomId}")
-    private ResponseEntity<?> deleteChatRoom(@PathVariable Long chatRoomId,
-                                             Authentication authentication) {
-        Long profileId = getProfileId( authentication);
-        return chatRoomService.deleteChatRoom(chatRoomId, profileId);
-    }
+//    @DeleteMapping("/{chatRoomId}")
+//    private ResponseEntity<?> deleteChatRoom(@PathVariable Long chatRoomId,
+//                                             Authentication authentication) {
+//        Long profileId = getProfileId( authentication);
+//        return chatRoomService.deleteChatRoom(chatRoomId, profileId);
+//    }
 
     @PutMapping()
     private ResponseEntity<?> updateChatRoom(@RequestBody UpdateChatRoomDto updateChatRoomDto, Authentication authentication) {

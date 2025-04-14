@@ -40,6 +40,9 @@ public class Post {
     @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ChatRoom chatRoom;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)//이거 comment에 있어야할듯.
     @JsonIgnore//직렬화 시 안에까지 직렬화 되는건 아님.
     private List<Comment> comments;

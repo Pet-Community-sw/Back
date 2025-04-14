@@ -30,6 +30,7 @@
     사용자 ID:
     <input type="number" id="senderId" value="101">
 </div>
+<button onclick="sendLeaveMessage()">방 나가기</button>
 
 <button onclick="connectAndEnterRoom()">서버 연결 및 채팅방 입장</button>
 
@@ -79,6 +80,28 @@
                 document.getElementById("connectStatus").innerText = "❌ 연결 실패";
             }
         );
+    }
+    function sendLeaveMessage() {
+        const chatRoomId = document.getElementById("chatRoomId").value;
+        const senderId = document.getElementById("senderId").value;
+
+        if (!stompClient || !stompClient.connected) {
+            alert("아직 서버에 연결되어 있지 않습니다.");
+            return;
+        }
+
+        const leaveMessage = {
+            messageType: "LEAVE",
+            chatRoomId: Number(chatRoomId),
+            senderId: Number(senderId),
+            message: ""
+        };
+
+        stompClient.send("/pub/chat/message", {}, JSON.stringify(leaveMessage));
+        stompClient.disconnect(() => {
+            document.getElementById("connectStatus").innerText = "🚪 나갔습니다 (연결 종료)";
+            console.log("Disconnected from STOMP");
+        });
     }
 
     function sendMessage() {
