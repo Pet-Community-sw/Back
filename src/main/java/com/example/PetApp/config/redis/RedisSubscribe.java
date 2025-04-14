@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +24,7 @@ public class RedisSubscribe {
     private final StringRedisTemplate redisTemplate;
     private final ChatRoomRepository chatRoomRepository;
 
+    @Transactional//lazy 문제
     public void sendMessage(String message) throws JsonProcessingException {
         ChatMessage chatMessage = objectMapper.readValue(message, ChatMessage.class);
         simpMessagingTemplate.convertAndSend("/sub/chat/" + chatMessage.getChatRoomId(), chatMessage);

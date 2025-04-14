@@ -66,12 +66,12 @@
 
                 // 입장 메시지 전송
                 const enterMessage = {
-                    type: "ENTER",
+                    messageType: "ENTER",
                     chatRoomId: Number(chatRoomId),
                     senderId: Number(document.getElementById("senderId").value),
                     message: ""
                 };
-
+                console.log(enterMessage);
                 stompClient.send("/pub/chat/message", {}, JSON.stringify(enterMessage));
             },
             function (error) {
@@ -89,12 +89,12 @@
         if (!message) return;
 
         const msgObj = {
-            type: "TALK",
+            messageType: "TALK",
             chatRoomId: Number(chatRoomId),
             senderId: Number(document.getElementById("senderId").value),
             message: message
         };
-
+        console.log(JSON.stringify(msgObj));
         stompClient.send("/pub/chat/message", {}, JSON.stringify(msgObj));
         messageInput.value = "";
     }

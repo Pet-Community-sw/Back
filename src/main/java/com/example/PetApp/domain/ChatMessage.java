@@ -27,4 +27,16 @@ public class ChatMessage {
     private Long senderId;
     private String message;
     private LocalDateTime messageTime;//포맷 필요함.
+
+    @Override
+    public String toString() {
+        return "ChatMessage{" +
+                "id='" + id + '\'' +
+                ", messageType=" + messageType +
+                ", chatRoomId=" + chatRoomId +
+                ", senderId=" + senderId +
+                ", message='" + message + '\'' +
+                ", messageTime=" + messageTime +
+                '}';
+    }
 }
