@@ -19,7 +19,7 @@ public class JwtTokenizer {
 
     private final byte[] refreshKey;
 
-    private static final Long ACCESS_TOKEN_EXPIRE_COUNT = 15 * 60 * 1000L; // 15분
+    private static final Long ACCESS_TOKEN_EXPIRE_COUNT = 24*60 * 60 * 1000L; // 15분
     private static final Long REFRESH_TOKEN_EXPIRE_COUNT = 7*24*60*60*1000L;
 
 

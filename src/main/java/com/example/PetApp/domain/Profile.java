@@ -46,8 +46,14 @@ public class Profile {
             inverseJoinColumns = @JoinColumn(name = "dog_breed_id"))
     private Set<DogBreed> avoidBreeds = new HashSet<>();
 
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
+
     @JoinColumn(name = "member_id")
     private Long memberId;
+
+    @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 
     @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeT> likeTs;

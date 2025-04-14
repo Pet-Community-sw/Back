@@ -32,6 +32,8 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                .antMatchers("/ws-stomp/**").permitAll()  //WebSocket handshake 요청 허용
+                .antMatchers("/pub/**", "/sub/**").permitAll() // STOMP 메시지 라우트 허용
                 .mvcMatchers("/members/signup", "/members/login","/members/accessToken","/members/find-id","/members/send-email","/members/auth-code","/members/reset-password").permitAll()
                 .mvcMatchers(GET, "/**").hasAnyRole("USER", "ADMIN")
                 .mvcMatchers(POST, "/**").hasAnyRole("USER", "ADMIN")

@@ -35,13 +35,14 @@ public class ChatRoomResponseDto {
     private LocalDateTime lastMessageTime;
 
 
+
     public static ChatRoomResponseDto from(ChatRoom chatRoom, String lastMessage, int unReadCount, LocalDateTime lastMessageTime) {
         return ChatRoomResponseDto.builder()
                 .chatRoomId(chatRoom.getChatRoomId())
                 .chatName(chatRoom.getName())
                 .chatLimitCount(chatRoom.getLimitCount())
                 .currentCount(chatRoom.getProfiles().size())
-                .regDate(chatRoom.getLocalDateTime())
+                .regDate(chatRoom.getRegdate())
                 .profiles(chatRoom.getProfiles().stream()
                         .map(Profile::getProfileId) // Profile → ID만 추출
                         .collect(Collectors.toSet()))

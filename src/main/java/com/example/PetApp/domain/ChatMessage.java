@@ -20,13 +20,11 @@ public class ChatMessage {
         ENTER, TALK, QUIT
     }
 
-
     @Id
     private String id;
     private MessageType messageType;
     private Long chatRoomId;
     private Long senderId;
-    private String senderName;
     private String message;
     private LocalDateTime messageTime;//포맷 필요함.
 }

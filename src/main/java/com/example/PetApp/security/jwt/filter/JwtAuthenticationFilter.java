@@ -28,9 +28,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final AuthenticationManager authenticationManager;
     private final RedisUtil redisUtil;
 
-    @Override
+    @Override//filter 하지않게 하려고
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return StringUtils.startsWithIgnoreCase(request.getRequestURI(), "/members/accessToken");
+        return StringUtils.startsWithIgnoreCase(request.getRequestURI(), "/ws-stomp/**");
     }
 
     @Override
