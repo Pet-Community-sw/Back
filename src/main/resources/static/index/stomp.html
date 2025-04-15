@@ -61,7 +61,7 @@
                     const msg = JSON.parse(message.body);
                     const chatBox = document.getElementById("chat");
                     // senderName 제거 → 대신 senderId 표시
-                    chatBox.innerHTML += `<div><b>👤${msg.senderId}:</b> ${msg.message}</div>`;
+                    chatBox.innerHTML += `<div><b>👤${msg.senderName}:</b> ${msg.message}</div>`;
                     chatBox.scrollTop = chatBox.scrollHeight;
                 });
 

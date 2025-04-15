@@ -3,7 +3,9 @@ package com.example.PetApp.repository.jpa;
 import com.example.PetApp.domain.ChatRoom;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
+import org.hibernate.annotations.Parameter;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -20,4 +22,9 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     Optional<ChatRoom> findByPost(Post post);
 
     boolean existsByChatRoomIdAndProfilesContains(Long chatRoomId, Profile profile);
+
+    @Modifying
+    @Query("delete from ChatRoom c where c.chatRoomId=:chatRoomId")
+    void deleteByChatRoom(@Param("chatRoomId") Long chatRoomId);
+
 }

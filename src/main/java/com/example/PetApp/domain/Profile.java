@@ -58,6 +58,9 @@ public class Profile {
     @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeT> likeTs;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<ChatRoom> chatRooms;
+
     public void addAvoidBreeds(DogBreed dogBreed) {
 
         avoidBreeds.add(dogBreed);

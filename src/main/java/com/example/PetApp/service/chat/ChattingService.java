@@ -3,11 +3,13 @@ package com.example.PetApp.service.chat;
 import com.example.PetApp.config.redis.RedisPublish;
 import com.example.PetApp.domain.ChatMessage;
 import com.example.PetApp.domain.Profile;
+import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +22,7 @@ public class ChattingService {
     private final ProfileRepository profileRepository;
     private final StringRedisTemplate stringRedisTemplate;
     private final ChatRoomService chatRoomService;
+    private final ChatRoomRepository chatRoomRepository;
 
 
     public void sendToMessage(ChatMessage chatMessage, Long profileId) {
@@ -31,6 +34,7 @@ public class ChattingService {
 
         if (chatMessage.getMessageType() == ChatMessage.MessageType.ENTER) {
             chatMessage.setMessage(profile.getDogName() + "님이 입장하셨습니다.");
+            chatMessage.setSenderName(profile.getDogName());
             chatMessage.setMessageTime(LocalDateTime.now());
             redisPublish.publish(chatMessage);
 
@@ -39,10 +43,12 @@ public class ChattingService {
             stringRedisTemplate.delete("chat:lastMessage" + chatMessage.getChatRoomId());//해당 redis 삭제.
             stringRedisTemplate.delete("chat:lastMessageTime" + chatMessage.getChatRoomId());
             stringRedisTemplate.delete("unRead:" + chatMessage.getChatRoomId() + ":" + profile.getProfileId());
+            chatMessage.setSenderName(profile.getDogName());
             chatMessage.setMessageTime(LocalDateTime.now());//세션 제거를 해야하는데 어떻게해 ?
             redisPublish.publish(chatMessage);
             chatRoomService.deleteChatRoom(chatMessage.getChatRoomId(), profileId);//leave하는 순간 채팅방 나가게
         }else {
+            chatMessage.setSenderName(profile.getDogName());
             chatMessage.setMessageTime(LocalDateTime.now());
             redisPublish.publish(chatMessage);
         }

@@ -29,6 +29,7 @@ public class ChatMessage {
     private MessageType messageType;
     private Long chatRoomId;
     private Long senderId;
+    private String senderName;
     private String message;
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)

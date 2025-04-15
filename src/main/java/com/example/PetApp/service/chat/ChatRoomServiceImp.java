@@ -29,7 +29,8 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ChatRoomServiceImp implements ChatRoomService {
+public class
+ChatRoomServiceImp implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ProfileRepository profileRepository;
@@ -96,10 +97,11 @@ public class ChatRoomServiceImp implements ChatRoomService {
         List<Profile> profiles = chatRoom1.getProfiles();
         profiles.remove(profile.get());
         chatRoom1.setProfiles(profiles);//방 사용자 수가 1이되면 채팅방 전체 삭제.
-        System.out.println(chatRoomRepository.countByProfile(chatRoomId));
-        if (chatRoomRepository.countByProfile(chatRoomId) <= 1) {
+        if (chatRoomRepository.countByProfile(chatRoomId) == 1) {
+            profiles.clear();
+            chatRoom1.setProfiles(profiles);//여기까지되는데
             chatMessageRepository.deleteByChatRoomId(chatRoomId);//채팅방 삭제.
-            chatRoomRepository.deleteById(chatRoomId);
+            chatRoomRepository.deleteByChatRoom(chatRoomId);//이게 왜안되는교?
         }
     }
 

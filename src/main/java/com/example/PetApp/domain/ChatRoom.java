@@ -6,9 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "chatRoom")
@@ -30,11 +28,11 @@ public class ChatRoom {
     @CreationTimestamp
     private LocalDateTime regdate;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})//삭제되지 않기 위함.
+    @OneToOne()
     @JoinColumn(name = "post_id")//chatroom이 사라지면 같이 post도 삭제가됨.
     private Post post;//이게 맞는지
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(joinColumns = @JoinColumn(name = "chat_room_id"),
             inverseJoinColumns = @JoinColumn(name = "profile_id"))
     @Builder.Default//초기화 시켜줌. 빌더가 안먹힘.
