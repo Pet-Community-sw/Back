@@ -105,6 +105,17 @@ ChatRoomServiceImp implements ChatRoomService {
         }
     }
 
+    @Override
+    public List<Long> getProfiles(Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new RuntimeException("채팅방 없습니다."));
+
+        return chatRoom
+                .getProfiles()
+                .stream()
+                .map(Profile::getProfileId)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     @Override//방장만 수정할 수 있도록 설정.
     public ResponseEntity<?> updateChatRoom(UpdateChatRoomDto updateChatRoomDto, Long profileId) {

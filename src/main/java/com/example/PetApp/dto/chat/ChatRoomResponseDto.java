@@ -51,11 +51,5 @@ public class ChatRoomResponseDto {
                 .lastMessageTime(lastMessageTime)
                 .build();
     }
-//    private int profileCount;
-//
-//    private int unReadCount;
-//
-//    private String lastMessage;
-//
-//    private LocalDateTime lastMessageTime;
+
 }

@@ -4,11 +4,11 @@ import com.example.PetApp.domain.ChatMessage;
 import lombok.Getter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.messaging.MessageListenerContainer;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
@@ -24,7 +24,7 @@ public class RedisConfig {
         return new LettuceConnectionFactory();
     }
 
-    @Bean
+    @Bean//채팅을 위한 redisTemplate
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
@@ -33,9 +33,17 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    @Bean//알림을 위한 redisTemplate
+    public RedisTemplate<String, Object> notificationRedisTemplate() {
+        RedisTemplate<String, Object> notificationRedisTemplate = new RedisTemplate<>();
+        notificationRedisTemplate.setConnectionFactory(redisConnectionFactory());
+        notificationRedisTemplate.setKeySerializer(new StringRedisSerializer());
+        notificationRedisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        return notificationRedisTemplate;
+    }
     @Bean
     public ChannelTopic channelTopic() {
-        return new ChannelTopic("chatRoom");
+        return new ChannelTopic("chatRoom");//나중에 chatRoomId로 바꿔보자.
     }
 
     @Bean
@@ -47,8 +55,24 @@ public class RedisConfig {
         return redisMessageListenerContainer;
     }
 
+    @Bean//topic 설정.
+    public RedisMessageListenerContainer notificationRedisMessageListenerContainer(RedisConnectionFactory redisConnectionFactory,
+                                                                            NotificationRedisSubscriber notificationRedisSubscriber) {
+        RedisMessageListenerContainer notificationRedisMessageListenerContainer = new RedisMessageListenerContainer();
+        notificationRedisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
+        notificationRedisMessageListenerContainer.addMessageListener((message, pattern) ->
+                    notificationRedisSubscriber.onMessage(
+                            new String(message.getChannel()),
+                            new String(message.getBody()))
+        ,new PatternTopic("user:*")
+        );
+
+        return notificationRedisMessageListenerContainer;
+    }
+
+
     @Bean
-    public MessageListenerAdapter messageListenerAdapter(RedisSubscribe redisSubscribe) {
+    public MessageListenerAdapter messageListenerAdapter(RedisSubscriber redisSubscribe) {
         return new MessageListenerAdapter(redisSubscribe, "sendMessage");
     }
 }

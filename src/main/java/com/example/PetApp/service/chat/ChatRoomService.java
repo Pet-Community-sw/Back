@@ -5,6 +5,8 @@ import com.example.PetApp.dto.chat.UpdateChatRoomDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface ChatRoomService {
 
@@ -18,4 +20,6 @@ public interface ChatRoomService {
     ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, int page);
 
     void deleteChatRoom(Long chatRoomId, Long profileId);
+
+    List<Long> getProfiles(Long chatRoomId);
 }
