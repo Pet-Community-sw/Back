@@ -74,10 +74,6 @@ public class MemberController {
         emailService.sendMail(member.get().getEmail());
         return ResponseEntity.ok().body("해당 이메일로 인증번호 전송했습니다.");
     }
-    @PostMapping("/accessToken")
-    public ResponseEntity accessToken(@RequestHeader("Authorization") String accessToken) {
-        return tokenService.accessToken(accessToken);
-    }
 
     @PostMapping("/verify-code")
     public ResponseEntity verifyCode(@RequestBody AuthCodeDto authCodeDto) {

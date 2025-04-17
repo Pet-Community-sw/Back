@@ -1,6 +1,5 @@
 package com.example.PetApp.service.profile;
 
-import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.profile.ProfileDto;
 import com.example.PetApp.dto.profile.ProfileListResponseDto;
 import org.springframework.http.ResponseEntity;
@@ -21,4 +20,6 @@ public interface ProfileService {
     ResponseEntity updateProfile(Long profileId, ProfileDto addProfileDto, String email);
 
     ResponseEntity deleteByProfileId(Long profileId, String email);
+
+    ResponseEntity<?> accessTokenToProfileId(Long profileId, String email);
 }

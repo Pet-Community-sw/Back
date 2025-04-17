@@ -46,7 +46,7 @@ public class TokenService {
                 .build();
     }
     @Transactional
-    public ResponseEntity accessToken(String accessToken) {
+    public ResponseEntity<?> accessToken(String accessToken) {
         String[] arr = accessToken.split(" ");
         Claims claims;
         try {

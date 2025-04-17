@@ -1,10 +1,7 @@
 package com.example.PetApp.service.profile;
 
 import com.example.PetApp.domain.*;
-import com.example.PetApp.dto.profile.AddProfileResponseDto;
-import com.example.PetApp.dto.profile.ProfileDto;
-import com.example.PetApp.dto.profile.GetProfileResponseDto;
-import com.example.PetApp.dto.profile.ProfileListResponseDto;
+import com.example.PetApp.dto.profile.*;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.jpa.RefreshRepository;
@@ -199,6 +196,30 @@ public class ProfileServiceImp implements ProfileService {
         }else {
             return ResponseEntity.badRequest().body("없는 프로필입니다.");
         }
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<?> accessTokenToProfileId(Long profileId, String email) {
+        Optional<Profile> profile = profileRepository.findById(profileId);
+        Member member = memberRepository.findByEmail(email).get();
+        if (profile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 프로필은 없습니다.");
+        } else if (!(profile.get().getMemberId().equals(member.getMemberId()))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        }
+        List<String> roles = member
+                .getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(Collectors.toList());
+
+        String accessToken = jwtTokenizer.createAccessToken(member.getMemberId(), profileId, member.getEmail(), roles);
+        AccessTokenToProfileIdResponseDto accessTokenToProfileIdResponseDto = AccessTokenToProfileIdResponseDto.builder()
+                .profileId(profileId)
+                .accessToken(accessToken)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(accessTokenToProfileIdResponseDto);
     }
 
     @Transactional

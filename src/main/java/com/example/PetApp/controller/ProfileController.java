@@ -53,6 +53,12 @@ public class ProfileController {
         return profileService.deleteByProfileId(profileId, email);
     }
 
+    @PostMapping("/token/{profileId}")
+    public ResponseEntity<?> accessTokenToProfileId(@PathVariable Long profileId, Authentication authentication) {
+        String email = getEmail(authentication);
+        return profileService.accessTokenToProfileId(profileId, email);
+    }
+
     private static String getEmail(Authentication authentication) {
         JwtAuthenticationToken authentication1 = (JwtAuthenticationToken) authentication;
         return authentication1.getPrincipal().toString();
