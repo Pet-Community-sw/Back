@@ -1,7 +1,6 @@
 jwt :
   accessKey : 45124589562312457845134679461312
   refreshKey : 13462356794613462356897946132346
-
 spring:
   datasource:
     url : jdbc:mysql://127.0.0.1:3306/memberdb?UseUnicode=true&serverTimezone=Asia/Seoul
@@ -47,3 +46,7 @@ spring:
         enabled: false
     mongodb:
       uri: mongodb+srv://chltjswo:fpdlswj365@mycluster.zzoydp8.mongodb.net/chat?retryWrites=true&w=majority&appName=myCluster
+
+server:
+  address: 0.0.0.0
+  port: 8080

@@ -47,7 +47,7 @@ public class ProfileServiceImp implements ProfileService {
         UUID uuid = UUID.randomUUID();
         String imageFileName = uuid + "_" + file.getOriginalFilename();
 
-        Optional<DogBreed> dogBreed = dogBreedService.findByName(profileDto.getDogBreed());
+        Optional<DogBreed> dogBreed = dogBreedService.findByName(profileDto.getPetBreed());
         if (dogBreed.isEmpty()) {
             return ResponseEntity.badRequest().body("종을 다시 입력해주세요.");
         }
@@ -60,9 +60,9 @@ public class ProfileServiceImp implements ProfileService {
                     .imageUrl("/profile/" + imageFileName)
                     .dogBirthDate(profileDto.getDogBirthDate())
                     .extraInfo(profileDto.getExtraInfo())
-                    .dogBreed(profileDto.getDogBreed())
+                    .dogBreed(profileDto.getPetBreed())
                     .dogAge(CalculateAge(profileDto.getDogBirthDate())+"살")
-                    .dogName(profileDto.getDogName())
+                    .dogName(profileDto.getPetName())
                     .build();
             String[] arr = profileDto.getAvoidBreeds().split(",");
             for (String breeds : arr) {
@@ -102,7 +102,7 @@ public class ProfileServiceImp implements ProfileService {
             ProfileListResponseDto profileListResponseDto = ProfileListResponseDto.builder()
                     .profileId(list.getProfileId())
                     .imageUrl(list.getImageUrl())
-                    .dogName(list.getDogName())
+                    .petName(list.getDogName())
                     .hasBirthday(false)
                     .build();
             if (MonthDay.from(LocalDate.now()).equals(MonthDay.from(list.getDogBirthDate()))) {
@@ -121,12 +121,12 @@ public class ProfileServiceImp implements ProfileService {
         if (profile.isPresent()) {
             GetProfileResponseDto getProfileResponseDto = GetProfileResponseDto.builder()
                     .profileId(profile.get().getProfileId())
-                    .dogBreed(profile.get().getDogBreed())
+                    .petBreed(profile.get().getDogBreed())
                     .imageUrl(profile.get().getImageUrl())
                     .memberId(profile.get().getMemberId())
-                    .dogName(profile.get().getDogName())
-                    .dogAge(profile.get().getDogAge())
-                    .dogBirthDate(profile.get().getDogBirthDate())
+                    .petName(profile.get().getDogName())
+                    .petAge(profile.get().getDogAge())
+                    .petBirthDate(profile.get().getDogBirthDate())
                     .avoidBreeds(profile.get().getAvoidBreeds())
                     .isOwner(false)
                     .build();
@@ -145,7 +145,7 @@ public class ProfileServiceImp implements ProfileService {
     public ResponseEntity updateProfile(Long profileId, ProfileDto profileDto, String email) {
         Member member = getMember(email);
         Optional<Profile> profile = profileRepository.findById(profileId);
-        Optional<DogBreed> dogBreed = dogBreedService.findByName(profileDto.getDogBreed());
+        Optional<DogBreed> dogBreed = dogBreedService.findByName(profileDto.getPetBreed());
         if (dogBreed.isEmpty()) {
             return ResponseEntity.badRequest().body("종을 다시 입력해주세요.");
         }
@@ -158,10 +158,10 @@ public class ProfileServiceImp implements ProfileService {
                 String imageFileName = uuid + "_" + profileDto.getProfileImageFile().getOriginalFilename();
 
                 newProfile.setImageUrl("/profile/" + imageFileName);
-                newProfile.setDogName(profileDto.getDogName());
+                newProfile.setDogName(profileDto.getPetName());
                 newProfile.setDogBirthDate(profileDto.getDogBirthDate());
                 newProfile.setDogAge(CalculateAge(profileDto.getDogBirthDate()) + "살");
-                newProfile.setDogBreed(profileDto.getDogBreed());
+                newProfile.setDogBreed(profileDto.getPetBreed());
                 newProfile.setExtraInfo(profileDto.getExtraInfo());
                 newProfile.getAvoidBreeds().clear();
                 String[] arr = profileDto.getAvoidBreeds().split(",");
@@ -200,7 +200,8 @@ public class ProfileServiceImp implements ProfileService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> accessTokenToProfileId(Long profileId, String email) {
+    public ResponseEntity<?> accessTokenToProfileId(Long profileId, String email) {//요청했을 당시 토큰을 redis에 저장시켜서 이전 토큰으로 요청 시 인증이 안되게 끔 해야됨.
+
         Optional<Profile> profile = profileRepository.findById(profileId);
         Member member = memberRepository.findByEmail(email).get();
         if (profile.isEmpty()) {

@@ -12,7 +12,7 @@ public class ProfileListResponseDto {
 
     private String imageUrl;
 
-    private String dogName;
+    private String petName;
 
     private Long profileId;
 

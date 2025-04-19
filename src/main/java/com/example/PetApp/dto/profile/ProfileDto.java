@@ -17,9 +17,9 @@ public class ProfileDto {
 
     private MultipartFile profileImageFile;
 
-    private String dogBreed;
+    private String petBreed;
 
-    private String dogName;
+    private String petName;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dogBirthDate;

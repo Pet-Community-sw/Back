@@ -1,5 +1,6 @@
 package com.example.PetApp.service.comment;
 
+import com.example.PetApp.config.redis.NotificationRedisPublisher;
 import com.example.PetApp.domain.Comment;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
@@ -10,12 +11,15 @@ import com.example.PetApp.repository.jpa.PostRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.util.TimeAgoUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +28,8 @@ public class CommentServiceImp implements CommentService {
     private final CommentRepository commentRepository;
     private final ProfileRepository profileRepository;
     private final PostRepository postRepository;
+    private final NotificationRedisPublisher notificationRedisPublisher;
+    private final RedisTemplate<String, Object> notificationRedisTemplate;
 
     @Transactional
     @Override
@@ -42,6 +48,10 @@ public class CommentServiceImp implements CommentService {
                 .profile(profile.get())
                 .build();
         Comment newComment = commentRepository.save(comment);
+        String message = profile.get().getDogName() + "님이 회원님의 게시물에 댓글을 달았습니다.";
+        String key = "notifications:" + profileId + ":" + UUID.randomUUID();//알림 설정 최대 3일.
+        notificationRedisTemplate.opsForValue().set(key, message, Duration.ofDays(3));
+        notificationRedisPublisher.publish("user:"+post.get().getProfile().getProfileId(), message);
         return ResponseEntity.status(HttpStatus.CREATED).body(newComment.getCommentId());
     }
 

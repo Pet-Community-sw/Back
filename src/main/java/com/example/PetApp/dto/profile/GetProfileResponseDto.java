@@ -14,17 +14,17 @@ import java.util.Set;
 public class GetProfileResponseDto {
     private Long profileId;
 
-    private String dogBreed;
+    private String petBreed;
 
     private String imageUrl;
 
     private Long memberId;
 
-    private String dogName;
+    private String petName;
 
-    private LocalDate dogBirthDate;
+    private LocalDate petBirthDate;
 
-    private String dogAge;
+    private String petAge;
 
     private Set<DogBreed> avoidBreeds;
 

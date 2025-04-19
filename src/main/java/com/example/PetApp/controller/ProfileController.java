@@ -47,13 +47,13 @@ public class ProfileController {
         return profileService.updateProfile(profileId, addProfileDto, email);
     }
 
-    @DeleteMapping("/{profileId}")
+    @DeleteMapping("/{profileId}")//삭제 수정도 authentication에 profileId가 추가되어있어야함.
     public ResponseEntity deleteProfile(@PathVariable Long profileId, Authentication authentication) {
         String email = getEmail(authentication);
         return profileService.deleteByProfileId(profileId, email);
     }
 
-    @PostMapping("/token/{profileId}")
+    @PostMapping("/token/{profileId}")//리팩토링 시에 authentication 말고 accesstoken을 받아서 이전 토큰 무효화 처리해야됨.
     public ResponseEntity<?> accessTokenToProfileId(@PathVariable Long profileId, Authentication authentication) {
         String email = getEmail(authentication);
         return profileService.accessTokenToProfileId(profileId, email);

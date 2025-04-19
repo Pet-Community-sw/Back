@@ -6,6 +6,7 @@ import com.example.PetApp.service.user.EmailService;
 import com.example.PetApp.service.user.MemberService;
 import com.example.PetApp.service.user.TokenService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,13 +33,12 @@ public class MemberController {
     public ResponseEntity signUp(@RequestBody @Valid MemberSignDto memberSignDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errorMessages = bindingResult.getFieldErrors().stream()
-                    .map(error -> error.getDefaultMessage()).collect(Collectors.toList());
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
             return ResponseEntity.badRequest().body(errorMessages);
         }
         if (memberService.findByEmail(memberSignDto.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("이미 가입된 회원입니다.");
         }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(memberService.save(memberSignDto));
     }
 
