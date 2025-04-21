@@ -10,6 +10,7 @@ import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TokenService {
 
     private final RefreshRepository refreshRepository;
@@ -35,11 +37,11 @@ public class TokenService {
         String refreshToken = jwtTokenizer.createRefreshToken(member.getMemberId(), member.getEmail(), roles);
 
         RefreshToken refreshToken1 = RefreshToken.builder()
-                .memberId(member.getMemberId())
+                .member(member)
                 .refreshToken(refreshToken)
                 .build();
         refreshRepository.save(refreshToken1);
-
+        log.info("로그인 요청 성공");
         return LoginResponseDto.builder()
                 .name(member.getName())
                 .accessToken(accessToken)
@@ -55,7 +57,7 @@ public class TokenService {
             claims = e.getClaims(); // 만료된 경우에도 Claims 추출 가능
         }
         Long memberId = Long.valueOf((Integer) claims.get("memberId"));
-        Optional<RefreshToken> refreshToken = refreshRepository.findByMemberId(memberId);
+        Optional<RefreshToken> refreshToken = refreshRepository.findByMemberMemberId(memberId);
 
         if (refreshToken.isEmpty()||jwtTokenizer.isTokenExpired("refresh",refreshToken.get().getRefreshToken())) {
             return ResponseEntity.badRequest().body("다시 로그인 해주세요");
@@ -80,12 +82,12 @@ public class TokenService {
         String[] arr = accessToken.split(" ");
         Claims claims = jwtTokenizer.parseAccessToken(arr[1]);
         Long memberId = Long.valueOf((Integer) claims.get("memberId"));
-        refreshRepository.deleteByMemberId(memberId);
+        refreshRepository.deleteByMemberMemberId(memberId);
         redisUtil.createData(accessToken, "blacklist", 30 * 60L);//access시간이랑 같게 해야됨.
     }
 
     @Transactional
     public Optional<RefreshToken> findByMemberId(long memberId) {
-        return refreshRepository.findByMemberId(memberId);
+        return refreshRepository.findByMemberMemberId(memberId);
     }
 }

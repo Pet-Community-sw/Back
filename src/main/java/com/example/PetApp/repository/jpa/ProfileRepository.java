@@ -9,8 +9,8 @@ import java.util.Optional;
 
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
-    List<Profile> findByMemberId(Long memberId);
+    List<Profile> findByMemberMemberId(Long memberId);
 
-    Long countByMemberId(Long memberId);
+    Long countByMember(Member member);
 
 }

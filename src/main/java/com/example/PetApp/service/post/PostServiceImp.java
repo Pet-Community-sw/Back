@@ -55,8 +55,8 @@ public class PostServiceImp implements PostService {
                 post.getPostId(),
                 post.getPostImageUrl(),
                 post.getProfile().getProfileId(),
-                post.getProfile().getDogName(),
-                post.getProfile().getImageUrl(),
+                post.getProfile().getPetName(),
+                post.getProfile().getPetImageUrl(),
                 post.getTitle(),
                 timeAgoUtil.getTimeAgo(post.getRegdate()),
                 post.getViewCount(),
@@ -124,7 +124,7 @@ public class PostServiceImp implements PostService {
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
-        if (post.get().getProfile().getMemberId().equals(member.getMemberId())) {
+        if (post.get().getProfile().getMember().equals(member)) {
             postRepository.deleteById(postId);
             return ResponseEntity.ok("삭제 되었습니다.");
         } else {
@@ -140,7 +140,7 @@ public class PostServiceImp implements PostService {
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
-        if (post.get().getProfile().getMemberId().equals(member.getMemberId())&&post.get().getProfile().getProfileId().equals(profileId)) {
+        if (post.get().getProfile().getMember().equals(member)&&post.get().getProfile().getProfileId().equals(profileId)) {
             String imageFileName="";
             imageFileName = fileSetting(updatePostDto, updatePostDto.getPostImageFile(), imageFileName);
 
@@ -178,8 +178,8 @@ public class PostServiceImp implements PostService {
                         comment.getContent(),
                         comment.getLikeCount(),
                         comment.getPost().getPostId(),
-                        comment.getProfile().getImageUrl(),
-                        comment.getProfile().getDogName(),
+                        comment.getProfile().getPetImageUrl(),
+                        comment.getProfile().getPetName(),
                         timeAgoUti.getTimeAgo(comment.getRegdate()),
                         comment.getProfile().getProfileId(),
                         comment.getProfile().getProfileId().equals(profileId)
@@ -195,8 +195,8 @@ public class PostServiceImp implements PostService {
                 .viewCount(post.getViewCount())
                 .likeCount(likeRepository.countByPost(post))
                 .profileId(post.getProfile().getProfileId())
-                .profileName(post.getProfile().getDogName())
-                .profileImageUrl(post.getProfile().getImageUrl())
+                .profileName(post.getProfile().getPetName())
+                .profileImageUrl(post.getProfile().getPetImageUrl())
                 .comments(comments)
                 .createdAt(timeAgoUti.getTimeAgo(post.getRegdate()))
                 .build();

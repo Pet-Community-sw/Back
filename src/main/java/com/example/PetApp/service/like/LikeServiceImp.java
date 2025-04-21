@@ -47,12 +47,12 @@ public class LikeServiceImp implements LikeService {
         } else if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
-        boolean isOwner = likeRepository.existsByPostAndProfile(post.get(), profile.get());
+        boolean isCheck = likeRepository.existsByPostAndProfile(post.get(), profile.get());
         if (!profile.get().getProfileId().equals(profileId)) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
 
         } else{
-            if (isOwner) {
+            if (isCheck) {
                 return deleteLike(post.get(), profile.get());
             } else {
                 return createLike(post.get(), profile.get());

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Builder
 public class ProfileListResponseDto {
 
-    private String imageUrl;
+    private String petImageUrl;
 
     private String petName;
 

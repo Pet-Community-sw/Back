@@ -31,7 +31,7 @@ public class ChattingService {
         Profile profile = profileRepository.findById(profileId).get();
         log.info("messageType : {}", chatMessage);
 
-        String dogName = profile.getDogName();
+        String dogName = profile.getPetName();
         chatMessage.setSenderName(dogName);
         chatMessage.setMessageTime(LocalDateTime.now());
 

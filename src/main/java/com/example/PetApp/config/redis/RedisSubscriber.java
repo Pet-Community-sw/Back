@@ -37,7 +37,7 @@ public class RedisSubscriber {
             if (!(profile.getProfileId().equals(chatMessage.getSenderId()))) {
                 String key = "unRead:" + chatMessage.getChatRoomId() + ":" + profile.getProfileId();
                 Long count = redisTemplate.opsForValue().increment(key);
-                unReadMap.put(profile.getMemberId(), count);
+                unReadMap.put(profile.getMember().getMemberId(), count);
             }
         }
 

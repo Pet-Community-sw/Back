@@ -41,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             token = getToken(request);
             if (StringUtils.hasText(token)) {
+                log.info("token : {}", token);
                 authenticationToken(token);
             }
             filterChain.doFilter(request, response);

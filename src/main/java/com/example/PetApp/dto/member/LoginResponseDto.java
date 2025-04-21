@@ -10,6 +10,7 @@ import lombok.*;
 @Builder
 public class LoginResponseDto {
 
+
     private String name;
     private String accessToken;
 }

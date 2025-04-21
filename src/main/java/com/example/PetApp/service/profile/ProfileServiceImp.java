@@ -4,7 +4,6 @@ import com.example.PetApp.domain.*;
 import com.example.PetApp.dto.profile.*;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
-import com.example.PetApp.repository.jpa.RefreshRepository;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import com.example.PetApp.service.dogBreed.DogBreedService;
 import lombok.RequiredArgsConstructor;
@@ -36,18 +35,17 @@ public class ProfileServiceImp implements ProfileService {
     private final MemberRepository memberRepository;
     private final DogBreedService dogBreedService;
     private final JwtTokenizer jwtTokenizer;
-    private final RefreshRepository refreshRepository;
 
-    @Transactional
+    @Transactional//accesstoken 수정 필요 이름이 같은지 확인해야됨.
     public ResponseEntity addProfile(ProfileDto profileDto, String email) {
         Member member = getMember(email);
 
-        MultipartFile file = profileDto.getProfileImageFile();
+        MultipartFile file = profileDto.getPetImageUrl();
 
         UUID uuid = UUID.randomUUID();
         String imageFileName = uuid + "_" + file.getOriginalFilename();
 
-        Optional<DogBreed> dogBreed = dogBreedService.findByName(profileDto.getPetBreed());
+        Optional<PetBreed> dogBreed = dogBreedService.findByName(profileDto.getPetBreed());
         if (dogBreed.isEmpty()) {
             return ResponseEntity.badRequest().body("종을 다시 입력해주세요.");
         }
@@ -56,18 +54,18 @@ public class ProfileServiceImp implements ProfileService {
             Files.copy(file.getInputStream(), path);
 
             Profile profile = Profile.builder()
-                    .memberId(member.getMemberId())
-                    .imageUrl("/profile/" + imageFileName)
-                    .dogBirthDate(profileDto.getDogBirthDate())
+                    .member(member)
+                    .petImageUrl("/profile/" + imageFileName)
+                    .petBirthDate(profileDto.getPetBirthDate())
                     .extraInfo(profileDto.getExtraInfo())
-                    .dogBreed(profileDto.getPetBreed())
-                    .dogAge(CalculateAge(profileDto.getDogBirthDate())+"살")
-                    .dogName(profileDto.getPetName())
+                    .petBreed(profileDto.getPetBreed())
+                    .petAge(CalculateAge(profileDto.getPetBirthDate())+"살")
+                    .petName(profileDto.getPetName())
                     .build();
             String[] arr = profileDto.getAvoidBreeds().split(",");
             for (String breeds : arr) {
                 breeds=breeds.trim();
-                Optional<DogBreed> avoidBreed = dogBreedService.findByName(breeds);
+                Optional<PetBreed> avoidBreed = dogBreedService.findByName(breeds);
                 if (avoidBreed.isEmpty()) {
                     return ResponseEntity.badRequest().body("피해야하는 종을 다시 입력해주세요.");
                 }
@@ -96,16 +94,16 @@ public class ProfileServiceImp implements ProfileService {
     @Override
     public List<ProfileListResponseDto> profileList(String email) {
         Member member = getMember(email);
-        List<Profile> lists = profileRepository.findByMemberId(member.getMemberId());
+        List<Profile> lists = profileRepository.findByMemberMemberId(member.getMemberId());
         List<ProfileListResponseDto> profileListResponseDtos = new ArrayList<>();
         for (Profile list : lists) {
             ProfileListResponseDto profileListResponseDto = ProfileListResponseDto.builder()
                     .profileId(list.getProfileId())
-                    .imageUrl(list.getImageUrl())
-                    .petName(list.getDogName())
+                    .petImageUrl(list.getPetImageUrl())
+                    .petName(list.getPetName())
                     .hasBirthday(false)
                     .build();
-            if (MonthDay.from(LocalDate.now()).equals(MonthDay.from(list.getDogBirthDate()))) {
+            if (MonthDay.from(LocalDate.now()).equals(MonthDay.from(list.getPetBirthDate()))) {
                 profileListResponseDto.setHasBirthday(true);
             }
             profileListResponseDtos.add(profileListResponseDto);
@@ -121,17 +119,17 @@ public class ProfileServiceImp implements ProfileService {
         if (profile.isPresent()) {
             GetProfileResponseDto getProfileResponseDto = GetProfileResponseDto.builder()
                     .profileId(profile.get().getProfileId())
-                    .petBreed(profile.get().getDogBreed())
-                    .imageUrl(profile.get().getImageUrl())
-                    .memberId(profile.get().getMemberId())
-                    .petName(profile.get().getDogName())
-                    .petAge(profile.get().getDogAge())
-                    .petBirthDate(profile.get().getDogBirthDate())
+                    .petBreed(profile.get().getPetBreed())
+                    .petImageUrl(profile.get().getPetImageUrl())
+                    .memberId(profile.get().getMember().getMemberId())
+                    .petName(profile.get().getPetName())
+                    .petAge(profile.get().getPetAge())
+                    .petBirthDate(profile.get().getPetBirthDate())
                     .avoidBreeds(profile.get().getAvoidBreeds())
                     .isOwner(false)
                     .build();
 
-            if (member.getMemberId() == profile.get().getMemberId()) {
+            if (member.equals(profile.get().getMember())) {
                 getProfileResponseDto.setOwner(true);
             }
             return ResponseEntity.ok().body(getProfileResponseDto);
@@ -145,28 +143,28 @@ public class ProfileServiceImp implements ProfileService {
     public ResponseEntity updateProfile(Long profileId, ProfileDto profileDto, String email) {
         Member member = getMember(email);
         Optional<Profile> profile = profileRepository.findById(profileId);
-        Optional<DogBreed> dogBreed = dogBreedService.findByName(profileDto.getPetBreed());
+        Optional<PetBreed> dogBreed = dogBreedService.findByName(profileDto.getPetBreed());
         if (dogBreed.isEmpty()) {
             return ResponseEntity.badRequest().body("종을 다시 입력해주세요.");
         }
         if (profile.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 프로필은 없습니다.");
         } else {
-            if (member.getMemberId() == profile.get().getMemberId()) {
+            if (member.equals(profile.get().getMember())) {
                 Profile newProfile = profile.get();
                 UUID uuid = UUID.randomUUID();
-                String imageFileName = uuid + "_" + profileDto.getProfileImageFile().getOriginalFilename();
+                String imageFileName = uuid + "_" + profileDto.getPetImageUrl().getOriginalFilename();
 
-                newProfile.setImageUrl("/profile/" + imageFileName);
-                newProfile.setDogName(profileDto.getPetName());
-                newProfile.setDogBirthDate(profileDto.getDogBirthDate());
-                newProfile.setDogAge(CalculateAge(profileDto.getDogBirthDate()) + "살");
-                newProfile.setDogBreed(profileDto.getPetBreed());
+                newProfile.setPetImageUrl("/profile/" + imageFileName);
+                newProfile.setPetName(profileDto.getPetName());
+                newProfile.setPetBirthDate(profileDto.getPetBirthDate());
+                newProfile.setPetAge(CalculateAge(profileDto.getPetBirthDate()) + "살");
+                newProfile.setPetBreed(profileDto.getPetBreed());
                 newProfile.setExtraInfo(profileDto.getExtraInfo());
                 newProfile.getAvoidBreeds().clear();
                 String[] arr = profileDto.getAvoidBreeds().split(",");
                 for (String breeds : arr) {
-                    Optional<DogBreed> avoidBreed = dogBreedService.findByName(breeds);
+                    Optional<PetBreed> avoidBreed = dogBreedService.findByName(breeds);
                     if (avoidBreed.isEmpty()) {
                         return ResponseEntity.badRequest().body("피해야하는 종을 다시 입력해주세요.");
                     }
@@ -187,7 +185,7 @@ public class ProfileServiceImp implements ProfileService {
         Member member = getMember(email);
         Optional<Profile> profile = profileRepository.findById(profileId);
         if (profile.isPresent()) {
-            if (member.getMemberId() == profile.get().getMemberId()) {
+            if (member.equals(profile.get().getMember())) {
                 profileRepository.deleteById(profileId);
                 return ResponseEntity.ok().body("삭제 되었습니다.");
             } else {
@@ -206,7 +204,7 @@ public class ProfileServiceImp implements ProfileService {
         Member member = memberRepository.findByEmail(email).get();
         if (profile.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 프로필은 없습니다.");
-        } else if (!(profile.get().getMemberId().equals(member.getMemberId()))) {
+        } else if (!(profile.get().getMember().equals(member))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
         }
         List<String> roles = member
@@ -227,7 +225,7 @@ public class ProfileServiceImp implements ProfileService {
     @Override
     public Long getCount(String email) {
         Member member = getMember(email);
-        return profileRepository.countByMemberId(member.getMemberId());
+        return profileRepository.countByMember(member);
     }
 
     private Member getMember(String email) {

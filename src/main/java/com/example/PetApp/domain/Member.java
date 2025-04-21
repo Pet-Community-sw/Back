@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,30 +16,41 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Member {
+public class Member {//수정 필요
 
     @Id
     @Column(name = "member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
+    @NotEmpty
     private String phoneNumber;
 
+    @NotEmpty
     private String name;
 
+    @NotEmpty
     private String email;
 
+    @NotEmpty
     private String password;
 
     @CreationTimestamp
     private LocalDateTime regdate;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "member_role",
             joinColumns = @JoinColumn(name = "member_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     Set<Role> roles = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Profile> profile;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private RefreshToken refreshToken;
+
 
     public void addRole(Role role) {
         roles.add(role);

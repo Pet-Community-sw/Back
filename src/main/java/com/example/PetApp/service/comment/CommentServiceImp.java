@@ -48,7 +48,7 @@ public class CommentServiceImp implements CommentService {
                 .profile(profile.get())
                 .build();
         Comment newComment = commentRepository.save(comment);
-        String message = profile.get().getDogName() + "님이 회원님의 게시물에 댓글을 달았습니다.";
+        String message = profile.get().getPetName() + "님이 회원님의 게시물에 댓글을 달았습니다.";
         String key = "notifications:" + profileId + ":" + UUID.randomUUID();//알림 설정 최대 3일.
         notificationRedisTemplate.opsForValue().set(key, message, Duration.ofDays(3));
         notificationRedisPublisher.publish("user:"+post.get().getProfile().getProfileId(), message);
@@ -71,8 +71,8 @@ public class CommentServiceImp implements CommentService {
                 .commentId(commentId)
                 .content(comment.get().getContent())
                 .profileId(comment.get().getProfile().getProfileId())
-                .profileDogName(comment.get().getProfile().getDogName())
-                .profileImageUrl(comment.get().getProfile().getImageUrl())
+                .profileDogName(comment.get().getProfile().getPetName())
+                .profileImageUrl(comment.get().getProfile().getPetImageUrl())
                 .postId(comment.get().getPost().getPostId())
                 .likeCount(comment.get().getLikeCount())
                 .createdAt(timeAgoUtil.getTimeAgo(comment.get().getRegdate()))

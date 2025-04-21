@@ -15,14 +15,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ProfileDto {
 
-    private MultipartFile profileImageFile;
+    private MultipartFile petImageUrl;
 
     private String petBreed;
 
     private String petName;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dogBirthDate;
+    private LocalDate petBirthDate;
 
     private String avoidBreeds;
 

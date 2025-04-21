@@ -24,19 +24,19 @@ public class Profile {
     private Long profileId;
 
     @NotEmpty
-    private String imageUrl;
+    private String petImageUrl;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dogBirthDate;
+    private LocalDate petBirthDate;
 
     @NotEmpty
-    private String dogAge;
+    private String petAge;
 
     @NotEmpty
-    private String dogBreed;
+    private String petBreed;
 
     @NotEmpty
-    private String dogName;
+    private String petName;
 
     private String extraInfo;
 
@@ -44,24 +44,25 @@ public class Profile {
     @JoinTable(name = "profile_breed",
             joinColumns = @JoinColumn(name = "profile_id"),
             inverseJoinColumns = @JoinColumn(name = "dog_breed_id"))
-    private Set<DogBreed> avoidBreeds = new HashSet<>();
+    private Set<PetBreed> avoidBreeds = new HashSet<>();
 
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Long memberId;
+    private Member member;
 
-    @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeT> likeTs;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ChatRoom> chatRooms;
 
-    public void addAvoidBreeds(DogBreed dogBreed) {
+    public void addAvoidBreeds(PetBreed dogBreed) {
 
         avoidBreeds.add(dogBreed);
     }

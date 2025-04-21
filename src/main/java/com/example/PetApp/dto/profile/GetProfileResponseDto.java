@@ -1,6 +1,6 @@
 package com.example.PetApp.dto.profile;
 
-import com.example.PetApp.domain.DogBreed;
+import com.example.PetApp.domain.PetBreed;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -16,7 +16,7 @@ public class GetProfileResponseDto {
 
     private String petBreed;
 
-    private String imageUrl;
+    private String petImageUrl;
 
     private Long memberId;
 
@@ -26,7 +26,7 @@ public class GetProfileResponseDto {
 
     private String petAge;
 
-    private Set<DogBreed> avoidBreeds;
+    private Set<PetBreed> avoidBreeds;
 
     private boolean isOwner;
 }

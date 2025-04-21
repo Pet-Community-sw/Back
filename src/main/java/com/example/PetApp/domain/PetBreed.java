@@ -9,14 +9,13 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "dogbreed")
+@Table(name = "pet_breed")
 @Builder
-public class DogBreed {
+public class PetBreed {
 
     @Id
-    @Column(name = "dog_breed_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long dogBreedId;
+    private Long petBreedId;
 
     private String name;
 

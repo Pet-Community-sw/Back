@@ -39,7 +39,7 @@ public class PostController {
         return postService.getPost(postId, profileId);
     }
 
-    @DeleteMapping("/{postId}")
+    @DeleteMapping("/{postId}")//수정해야됨 profileId전달해야할듯.
     public ResponseEntity<String> deletePost(@PathVariable Long postId, Authentication authentication) {
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         String email = jwtAuthenticationToken.getPrincipal().toString();

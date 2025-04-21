@@ -73,7 +73,7 @@ ChatRoomServiceImp implements ChatRoomService {
         Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByPost(post.get());
         if (chatRoom2.isEmpty()) {//채팅방이 없으면 새로운생성 있으면 profiles에 신청자 Profile 추가
             ChatRoom chatRoom = ChatRoom.builder()
-                    .name(post.get().getProfile().getDogName()+"님의 방")
+                    .name(post.get().getProfile().getPetName()+"님의 방")
                     .limitCount(createChatRoomDto.getLimitCount())//나중에 게시물에서 인원 수를 고정.
                     .post(post.get())
                     //이게 수정에서 가능하려나?
