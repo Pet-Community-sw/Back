@@ -33,12 +33,11 @@ public class Post {
 
     private String postImageUrl;
 
+    @ManyToOne
+    private Member member;
+
     @Column(columnDefinition = "BIGINT DEFAULT 0")
     private Long viewCount;
-
-    @ManyToOne
-    @JoinColumn(name = "profile_id", nullable = false)
-    private Profile profile;
 
     @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private ChatRoom chatRoom;
@@ -51,7 +50,7 @@ public class Post {
     private List<LikeT> likeTs;
 
     @CreationTimestamp
-    private LocalDateTime regdate;
+    private LocalDateTime postTime;
 
 
 }

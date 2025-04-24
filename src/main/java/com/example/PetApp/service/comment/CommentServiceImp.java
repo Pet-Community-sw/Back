@@ -2,15 +2,18 @@ package com.example.PetApp.service.comment;
 
 import com.example.PetApp.config.redis.NotificationRedisPublisher;
 import com.example.PetApp.domain.Comment;
+import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.repository.jpa.CommentRepository;
+import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.util.TimeAgoUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,48 +24,48 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor//memberId를 받아서 유효성 검사해야할듯.
 public class CommentServiceImp implements CommentService {
 
     private final CommentRepository commentRepository;
-    private final ProfileRepository profileRepository;
     private final PostRepository postRepository;
     private final NotificationRedisPublisher notificationRedisPublisher;
     private final RedisTemplate<String, Object> notificationRedisTemplate;
+    private final MemberRepository memberRepository;
 
     @Transactional
     @Override
-    public ResponseEntity<Object> createComment(CommentDto commentDto, Long profileId) {
-        Optional<Profile> profile = profileRepository.findById(profileId);
+    public ResponseEntity<Object> createComment(CommentDto commentDto, String email) {
+        log.info("댓글 작성 요청.");
         Optional<Post> post = postRepository.findById(commentDto.getPostId());
-        if (profile.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        Member member = memberRepository.findByEmail(email).get();
+        if (!(commentDto.getMemberId()).equals(member.getMemberId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청입니다");
         }
         if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("잘못된 요청입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
-        Comment comment=Comment.builder()
+        Comment comment = Comment.builder()
                 .content(commentDto.getContent())
                 .post(post.get())
-                .profile(profile.get())
+                .member(member)
                 .build();
         Comment newComment = commentRepository.save(comment);
-        String message = profile.get().getPetName() + "님이 회원님의 게시물에 댓글을 달았습니다.";
-        String key = "notifications:" + profileId + ":" + UUID.randomUUID();//알림 설정 최대 3일.
+        String message = member.getName() + "님이 회원님의 게시물에 댓글을 달았습니다.";
+        String key = "notifications:" + post.get().getMember().getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
         notificationRedisTemplate.opsForValue().set(key, message, Duration.ofDays(3));
-        notificationRedisPublisher.publish("user:"+post.get().getProfile().getProfileId(), message);
+        notificationRedisPublisher.publish("user:" + post.get().getMember().getMemberId(), message);
         return ResponseEntity.status(HttpStatus.CREATED).body(newComment.getCommentId());
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Object> getComment(Long commentId, Long profileId) {
+    public ResponseEntity<Object> getComment(Long commentId,String email) {
+        log.info("댓글 상세 요청");
         Optional<Comment> comment = commentRepository.findById(commentId);
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-        }
+        Member member = memberRepository.findByEmail(email).get();
         if (comment.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없는 댓글입니다.");
         }
@@ -70,14 +73,12 @@ public class CommentServiceImp implements CommentService {
         GetCommentsResponseDto getCommentsResponseDto = GetCommentsResponseDto.builder()
                 .commentId(commentId)
                 .content(comment.get().getContent())
-                .profileId(comment.get().getProfile().getProfileId())
-                .profileDogName(comment.get().getProfile().getPetName())
-                .profileImageUrl(comment.get().getProfile().getPetImageUrl())
-                .postId(comment.get().getPost().getPostId())
+                .memberId(comment.get().getMember().getMemberId())
+                .memberName(comment.get().getMember().getName())
                 .likeCount(comment.get().getLikeCount())
-                .createdAt(timeAgoUtil.getTimeAgo(comment.get().getRegdate()))
+                .createdAt(timeAgoUtil.getTimeAgo(comment.get().getCommentTime()))
                 .build();
-        if (comment.get().getProfile().getProfileId().equals(profileId)) {
+        if (comment.get().getMember().equals(member)) {
             getCommentsResponseDto.setOwner(true);
         }
         return ResponseEntity.ok(getCommentsResponseDto);
@@ -85,38 +86,35 @@ public class CommentServiceImp implements CommentService {
 
     @Transactional
     @Override
-    public ResponseEntity<String> deleteComment(Long commentId, Long profileId) {
+    public ResponseEntity<String> deleteComment(Long commentId, String email) {
+        log.info("댓글 삭제 요청");
+        Member member = memberRepository.findByEmail(email).get();
         Optional<Comment> comment = commentRepository.findById(commentId);
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-        }
         if (comment.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없습니다.");
         }
-        if (comment.get().getProfile().getProfileId().equals(profileId)) {
+        if (comment.get().getMember().equals(member)) {
             commentRepository.deleteById(commentId);
             return ResponseEntity.ok().body("삭제 완료했습니다.");
         } else {
-            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청입니다.");
         }
     }
 
     @Transactional
     @Override
-    public ResponseEntity<String> updateComment(Long commentId, String content, Long profileId) {
+    public ResponseEntity<String> updateComment(Long commentId, String content, String email) {
+        log.info("댓글 수정 요청");
         Optional<Comment> comment = commentRepository.findById(commentId);
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-        }
+        Member member = memberRepository.findByEmail(email).get();
         if (comment.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없는 댓글입니다.");
         }
-        if (comment.get().getProfile().getProfileId().equals(profileId)) {
+        if (comment.get().getMember().equals(member)) {
             comment.get().setContent(content);
             return ResponseEntity.ok().body("수정 되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청입니다.");
         }
-        return ResponseEntity.badRequest().body("잘못된 요청입니다.");
     }
 }

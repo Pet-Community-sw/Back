@@ -25,11 +25,9 @@ public class GetUpdatePostResponseDto {
 
     private Long likeCount;
 
-    private Long profileId;
+    private Long memberId;
 
-    private String profileName;
-
-    private String profileImageUrl;
+    private String memberName;
 
     private String createdAt;
 

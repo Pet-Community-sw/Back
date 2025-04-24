@@ -12,11 +12,11 @@ public interface PostService {
 
     List<PostListResponseDto> getPosts(int page);
 
-    ResponseEntity<Object> createPost(PostDto createPostDto, Long profileId);
+    ResponseEntity<?> createPost(PostDto createPostDto, String email);
 
-    ResponseEntity<Object> getPost(Long postId, Long profileId);
+    ResponseEntity<?> getPost(Long postId, String email);
 
     ResponseEntity<String> deletePost(Long postId, String email);
 
-    ResponseEntity<Object> updatePost(Long postId, PostDto postDto, Long profileId, String email);
+    ResponseEntity<?> updatePost(Long postId, PostDto postDto, String email);
 }

@@ -1,6 +1,7 @@
 package com.example.PetApp.repository.jpa;
 
 import com.example.PetApp.domain.LikeT;
+import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +12,7 @@ public interface LikeRepository extends JpaRepository<LikeT, Long> {
 
     Long countByPost(Post post);
 
-    Boolean existsByPostAndProfile(Post post, Profile profile);
+    Boolean existsByPostAndMember(Post post, Member member);
 
-    void deleteByPostAndProfile(Post post, Profile profile);
+    void deleteByPostAndMember(Post post, Member member);
 }

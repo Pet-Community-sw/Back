@@ -11,5 +11,7 @@ public class LikeDto {
 
     private Long postId;
 
+    private Long memberId;
+
 
 }

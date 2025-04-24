@@ -30,9 +30,9 @@ public class Comment {
     private Post post;//객체 지향적이 아님. 수정해야될듯.
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "profile_id", nullable = false)
-    private Profile profile;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @CreationTimestamp
-    private LocalDateTime regdate;
+    private LocalDateTime commentTime;
 }

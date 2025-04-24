@@ -15,15 +15,11 @@ public class GetCommentsResponseDto {
 
     private Long likeCount;
 
-    private Long profileId;
+    private Long memberId;
 
-    private String profileDogName;
-
-    private String profileImageUrl;
+    private String memberName;
 
     private String createdAt;
-
-    private Long postId;
 
     private boolean isOwner;
 

@@ -46,18 +46,9 @@ public class Profile {
             inverseJoinColumns = @JoinColumn(name = "dog_breed_id"))
     private Set<PetBreed> avoidBreeds = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LikeT> likeTs;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ChatRoom> chatRooms;

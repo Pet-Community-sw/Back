@@ -52,7 +52,6 @@ public class MemberService {
 
     @Transactional
     public Optional<Member> findByEmail(String email) {
-        log.info("이메일 찾기 요청");
         return memberRepository.findByEmail(email);
     }
 
@@ -64,10 +63,10 @@ public class MemberService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 유저는 없는 유저입니다. 회원가입 해주세요.");
         }else{
             return ResponseEntity.ok(Map.of("email", member.get().getEmail()));
-
         }
 
     }
+
 
     @Transactional
     public ResponseEntity resetPassword(ResetPasswordDto resetPasswordDto) {

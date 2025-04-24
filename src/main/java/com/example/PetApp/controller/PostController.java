@@ -25,33 +25,26 @@ public class PostController {
     }
 
     @PostMapping()
-    public ResponseEntity<Object> createPost(@ModelAttribute PostDto createPostDto, Authentication authentication) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        Long profileId = jwtAuthenticationToken.getProfileId();
-        System.out.println("profileId = " + profileId);
-        return postService.createPost(createPostDto, profileId);
+    public ResponseEntity<?> createPost(@ModelAttribute PostDto createPostDto, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return postService.createPost(createPostDto, email);
     }
 
-    @GetMapping("/{postId}")
-    public ResponseEntity<Object> getPost(@PathVariable Long postId, Authentication authentication) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        Long profileId = jwtAuthenticationToken.getProfileId();
-        return postService.getPost(postId, profileId);
+    @GetMapping("/{postId}")//요청시 댓글까지 한번에 반환. 상세게시물을 보면 무조건 댓글까지 보이게 할거임 그리고 댓글수가 많지않은 커뮤니티라 판단함.
+    public ResponseEntity<?> getPost(@PathVariable Long postId, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return postService.getPost(postId, email);
     }
 
     @DeleteMapping("/{postId}")//수정해야됨 profileId전달해야할듯.
     public ResponseEntity<String> deletePost(@PathVariable Long postId, Authentication authentication) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        String email = jwtAuthenticationToken.getPrincipal().toString();
-        Long profileId = jwtAuthenticationToken.getProfileId();
+        String email = authentication.getPrincipal().toString();
         return postService.deletePost(postId, email);
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<Object> updatePost(@PathVariable Long postId, @ModelAttribute PostDto postDto, Authentication authentication) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        String email = jwtAuthenticationToken.getPrincipal().toString();
-        Long profileId = jwtAuthenticationToken.getProfileId();
-        return postService.updatePost(postId, postDto, profileId, email);
+    public ResponseEntity<?> updatePost(@PathVariable Long postId, @ModelAttribute PostDto postDto, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return postService.updatePost(postId, postDto, email);
     }
 }

@@ -24,8 +24,7 @@ public class LikeController {
 
     @PostMapping()
     public ResponseEntity<Object> createAndDeleteLike(@RequestBody LikeDto likeDto, Authentication authentication) {
-        JwtAuthenticationToken authentication1 = (JwtAuthenticationToken) authentication;
-        Long profileId = authentication1.getProfileId();
-        return likeService.createAndDeleteLike(likeDto, profileId);
+        String email = authentication.getPrincipal().toString();
+        return likeService.createAndDeleteLike(likeDto, email);
     }
 }

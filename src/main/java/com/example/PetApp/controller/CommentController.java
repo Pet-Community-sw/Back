@@ -18,31 +18,26 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/{commentId}")
-    public ResponseEntity<Object> getComment(@PathVariable Long commentId, Authentication authentication) {
-        Long profileId = getProfileId(authentication);
-        return commentService.getComment(commentId, profileId);
+    public ResponseEntity<?> getComment(@PathVariable Long commentId, Authentication authentication) {
+        return commentService.getComment(commentId, getEmail(authentication));
     }
 
     @PostMapping()
-    public ResponseEntity<Object> createComment(@RequestBody CommentDto commentDto, Authentication authentication) {
-        Long profileId = getProfileId(authentication);
-        return commentService.createComment(commentDto, profileId);
+    public ResponseEntity<?> createComment(@RequestBody CommentDto commentDto, Authentication authentication) {
+        return commentService.createComment(commentDto, getEmail(authentication));
     }
 
     @DeleteMapping("/{commentId}")
     public ResponseEntity<String> deleteComment(@PathVariable Long commentId, Authentication authentication) {
-        Long profileId = getProfileId(authentication);
-        return commentService.deleteComment(commentId, profileId);
+        return commentService.deleteComment(commentId, getEmail(authentication));
     }
 
     @PutMapping("/{commentId}")//좋아요 개수는 따로하는게 좋을 듯
     public ResponseEntity<String> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentDto updateCommentDto, Authentication authentication) {
-        Long profileId = getProfileId(authentication);
-        return commentService.updateComment(commentId, updateCommentDto.getContent(), profileId);
+        return commentService.updateComment(commentId, updateCommentDto.getContent(), getEmail(authentication));
     }
 
-    private static Long getProfileId(Authentication authentication) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        return jwtAuthenticationToken.getProfileId();
+    private String getEmail(Authentication authentication) {
+        return authentication.getPrincipal().toString();
     }
 }

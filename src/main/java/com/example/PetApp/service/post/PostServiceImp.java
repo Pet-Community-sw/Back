@@ -1,8 +1,8 @@
 package com.example.PetApp.service.post;
 
+import com.example.PetApp.domain.Comment;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
-import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.post.PostDto;
 import com.example.PetApp.dto.post.GetUpdatePostResponseDto;
@@ -13,6 +13,7 @@ import com.example.PetApp.repository.jpa.PostRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.util.TimeAgoUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,13 +36,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostServiceImp implements PostService {
 
     @Value("${spring.dog.post.image.upload}")
     private String postUploadDir;
 
     private final PostRepository postRepository;
-    private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
 
@@ -49,38 +50,34 @@ public class PostServiceImp implements PostService {
     @Override
     public List<PostListResponseDto> getPosts(int page) {
         Pageable pageable = PageRequest.of(page, 10);
-        List<Post> posts = postRepository.findByOrderByRegdateDesc(pageable).getContent();
+        List<Post> posts = postRepository.findByOrderByPostTimeDesc(pageable).getContent();
         TimeAgoUtil timeAgoUtil = new TimeAgoUtil();
         return posts.stream().map(post->new PostListResponseDto(
                 post.getPostId(),
                 post.getPostImageUrl(),
-                post.getProfile().getProfileId(),
-                post.getProfile().getPetName(),
-                post.getProfile().getPetImageUrl(),
-                post.getTitle(),
-                timeAgoUtil.getTimeAgo(post.getRegdate()),
+                post.getMember().getMemberId(),
+                post.getMember().getName(),
+                timeAgoUtil.getTimeAgo(post.getPostTime()),
                 post.getViewCount(),
-                likeRepository.countByPost(post)
+                likeRepository.countByPost(post),
+                post.getTitle()
                 )).collect(Collectors.toList());
     }
 
     @Transactional
     @Override//카테고리도 해야됨.
-    public ResponseEntity<Object> createPost(PostDto createPostDto, Long profileId)  {
+    public ResponseEntity<?> createPost(PostDto createPostDto, String email)  {
+        log.info("게시물 작성 요청");
         MultipartFile file = createPostDto.getPostImageFile();
-        if (profileId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-        }
-        Optional<Profile> profile1 = profileRepository.findById(profileId);
-        if (profile1.isEmpty()) {
-            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
+        Member member = memberRepository.findByEmail(email).get();
+        if (!(createPostDto.getMemberId().equals(member.getMemberId()))) {
+            log.error("잘못된 요청");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청입니다.");
         }
         String imageFileName = "";
         imageFileName = fileSetting(createPostDto, file, imageFileName);
-        Profile profile = profile1.get();
 
             Post post = Post.builder()
-                    .profile(profile)
                     .content(createPostDto.getContent())
                     .title(createPostDto.getTitle())
                     .postImageUrl(imageFileName)
@@ -90,28 +87,21 @@ public class PostServiceImp implements PostService {
 
     }
 
-    @Transactional//조회수 중복 허용? 방지?
-    public ResponseEntity<Object> getPost(Post post, Long profileId, boolean isView) {
-        if (isView) {//자기 post에 들어가는 것은 조회수안올라감.
-            post.setViewCount(post.getViewCount()+1);
-        }
-        GetUpdatePostResponseDto getPostResponseDto = getPostResponseDto(profileId, post);
-
-        return ResponseEntity.ok(getPostResponseDto);//이렇게하면 항상 true아님?
-    }
-
     @Transactional
-    @Override
-    public ResponseEntity<Object> getPost(Long postId, Long profileId) {
+    @Override//memberId받아야 할듯?
+    public ResponseEntity<?> getPost(Long postId, String email) {
         Optional<Post> post = postRepository.findById(postId);
+        Member member = memberRepository.findByEmail(email).get();
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
-        if (post.get().getProfile().getProfileId().equals(profileId)) {
-            return getPost(post.get(), profileId, false);
-        } else {
-            return getPost(post.get(), profileId, true);
+        if (!(post.get().getMember().equals(member))) {//조회수
+            post.get().setViewCount(post.get().getViewCount()+1);
         }
+        GetUpdatePostResponseDto getPostResponseDto = getPostResponseDto(post.get(), member);
+
+        return ResponseEntity.ok(getPostResponseDto);
+
     }
 
 
@@ -124,7 +114,7 @@ public class PostServiceImp implements PostService {
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
-        if (post.get().getProfile().getMember().equals(member)) {
+        if (post.get().getMember().equals(member)) {
             postRepository.deleteById(postId);
             return ResponseEntity.ok("삭제 되었습니다.");
         } else {
@@ -134,13 +124,13 @@ public class PostServiceImp implements PostService {
 
     @Transactional
     @Override
-    public ResponseEntity<Object> updatePost(Long postId, PostDto updatePostDto, Long profileId, String email) {
+    public ResponseEntity<Object> updatePost(Long postId, PostDto updatePostDto, String email) {
         Member member = memberRepository.findByEmail(email).get();
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
-        if (post.get().getProfile().getMember().equals(member)&&post.get().getProfile().getProfileId().equals(profileId)) {
+        if (updatePostDto.getMemberId().equals(member.getMemberId())||post.get().getMember().equals(member)) {
             String imageFileName="";
             imageFileName = fileSetting(updatePostDto, updatePostDto.getPostImageFile(), imageFileName);
 
@@ -154,7 +144,7 @@ public class PostServiceImp implements PostService {
         }
     }
 
-    private String fileSetting(PostDto createPostDto, MultipartFile file, String imageFileName) {
+    private String fileSetting(PostDto createPostDto, MultipartFile file, String imageFileName) {//별도의 파일 분리해야할듯.
         try {
             if (!createPostDto.getPostImageFile().isEmpty()) {
                 UUID uuid = UUID.randomUUID();
@@ -170,22 +160,19 @@ public class PostServiceImp implements PostService {
         return "";
     }
 
-    private GetUpdatePostResponseDto getPostResponseDto(Long profileId, Post post) {
+    private GetUpdatePostResponseDto getPostResponseDto(Post post, Member member) {
         TimeAgoUtil timeAgoUti = new TimeAgoUtil();
         List<GetCommentsResponseDto> comments = post.getComments().stream().map(
                 comment -> new GetCommentsResponseDto(
                         comment.getCommentId(),
                         comment.getContent(),
                         comment.getLikeCount(),
-                        comment.getPost().getPostId(),
-                        comment.getProfile().getPetImageUrl(),
-                        comment.getProfile().getPetName(),
-                        timeAgoUti.getTimeAgo(comment.getRegdate()),
-                        comment.getProfile().getProfileId(),
-                        comment.getProfile().getProfileId().equals(profileId)
-                        )
+                        comment.getMember().getMemberId(),
+                        comment.getMember().getName(),
+                        timeAgoUti.getTimeAgo(comment.getCommentTime()),
+                        checkOwner(comment,comment.getMember())
+                )
         ).collect(Collectors.toList());
-
 
         GetUpdatePostResponseDto getPostResponseDto = GetUpdatePostResponseDto.builder()
                 .postId(post.getPostId())
@@ -194,17 +181,26 @@ public class PostServiceImp implements PostService {
                 .postImageUrl(post.getPostImageUrl())
                 .viewCount(post.getViewCount())
                 .likeCount(likeRepository.countByPost(post))
-                .profileId(post.getProfile().getProfileId())
-                .profileName(post.getProfile().getPetName())
-                .profileImageUrl(post.getProfile().getPetImageUrl())
+                .memberId(post.getMember().getMemberId())
+                .memberName(post.getMember().getName())
                 .comments(comments)
-                .createdAt(timeAgoUti.getTimeAgo(post.getRegdate()))
+                .createdAt(timeAgoUti.getTimeAgo(post.getPostTime()))
                 .build();
-        if (post.getProfile().getProfileId().equals(profileId)) {
+
+        if (post.getMember().equals(member)) {
             getPostResponseDto.setOwner(true);
         }
 
         return getPostResponseDto;
+    }
+
+    private boolean checkOwner(Comment comment, Member member) {
+
+        if (comment.getMember().equals(member)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
