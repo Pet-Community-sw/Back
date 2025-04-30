@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .mvcMatchers("/ws-stomp/**", "/pub/**", "/sub/**").permitAll()
                 .mvcMatchers("/hello","/members/signup", "/members/accessToken", "/members/login",
-                        "/members/find-id", "/members/send-email", "/members/auth-code",
+                        "/members/find-id", "/members/send-email", "/members/verify-code",
                         "/members/reset-password").permitAll()
                 .mvcMatchers(GET, "/**").hasAnyRole("USER", "ADMIN")
                 .mvcMatchers(POST, "/**").hasAnyRole("USER", "ADMIN")

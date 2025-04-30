@@ -2,6 +2,7 @@ package com.example.PetApp.service.user;
 
 import com.example.PetApp.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class EmailService {
 
@@ -69,6 +71,7 @@ public class EmailService {
 
     public ResponseEntity verifyCode(String email, String code) {
         String authCode = redisUtil.getData(email);
+        log.info("email : {}, code : {}",email,code);
         if (authCode == null) {
             return ResponseEntity.badRequest().body("인증번호가 만료되었습니다. 다시 시도해주세요.");
         } else if (code.equals(authCode)) {

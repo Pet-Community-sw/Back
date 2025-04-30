@@ -31,6 +31,10 @@ public class MemberService {
 
     @Transactional
     public MemberSignResponseDto save(MemberSignDto memberSignDto) {
+        log.info("signup requset email:{}", memberSignDto.getEmail());
+        log.info("signup requset phoneNumber:{}", memberSignDto.getPhoneNumber());
+        log.info("signup requset Name:{}", memberSignDto.getName());
+        log.info("signup requset Password:{}", memberSignDto.getPassword());
         Role role = roleRepository.findByName("ROLE_USER").get();
         Member member = Member.builder()
                 .name(memberSignDto.getName())
@@ -58,6 +62,7 @@ public class MemberService {
     @Transactional
     public ResponseEntity<?> findByPhoneNumber(String phoneNumber) {
         log.info("아이디 찾기 요청.");
+        log.info("phoneNumber:{}",phoneNumber);
         Optional<Member> member = memberRepository.findByPhoneNumber(phoneNumber);
         if (member.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 유저는 없는 유저입니다. 회원가입 해주세요.");
@@ -71,10 +76,10 @@ public class MemberService {
     @Transactional
     public ResponseEntity resetPassword(ResetPasswordDto resetPasswordDto) {
         Member member = memberRepository.findByEmail(resetPasswordDto.getEmail()).get();
-        if (passwordEncoder.matches(member.getPassword(), resetPasswordDto.getNewPassword())) {
+        if (passwordEncoder.matches(resetPasswordDto.getNewPassword(),member.getPassword())) {
             return ResponseEntity.badRequest().body("전 비밀번호와 다르게 설정해야합니다.");
         } else {
-            member.setPassword(resetPasswordDto.getNewPassword());
+            member.setPassword(passwordEncoder.encode(resetPasswordDto.getNewPassword()));
             return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습나다.");
         }
     }

@@ -30,6 +30,7 @@ public class LikeServiceImp implements LikeService {
 
     @Transactional//나중에 profile에 관련된 정보를 보낼 수 있으니까
     @Override//LikeResponseDto를 반환하자.
+    //좋아요는 redis가 아니라 누르는순간 요청을 보내는게 맞고 새로고침할 때 마다 좋아요 리셋하는게 맞을듯.
     public ResponseEntity<Object> getLike(Long postId) {
         log.info("좋아요 상세 요청");
         Optional<Post> post = postRepository.findById(postId);

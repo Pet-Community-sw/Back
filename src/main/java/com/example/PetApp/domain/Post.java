@@ -34,13 +34,11 @@ public class Post {
     private String postImageUrl;
 
     @ManyToOne
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @Column(columnDefinition = "BIGINT DEFAULT 0")
     private Long viewCount;
-
-    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private ChatRoom chatRoom;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)//이거 comment에 있어야할듯.
     @JsonIgnore//직렬화 시 안에까지 직렬화 되는건 아님.
@@ -51,6 +49,5 @@ public class Post {
 
     @CreationTimestamp
     private LocalDateTime postTime;
-
 
 }

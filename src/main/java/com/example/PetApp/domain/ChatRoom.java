@@ -26,7 +26,7 @@ public class ChatRoom {
     private int limitCount;
 
     @CreationTimestamp
-    private LocalDateTime regdate;
+    private LocalDateTime chatRoomTime;
 
     @OneToOne()
     @JoinColumn(name = "post_id")//chatroom이 사라지면 같이 post도 삭제가됨.

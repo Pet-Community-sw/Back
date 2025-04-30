@@ -49,6 +49,7 @@ public class PostServiceImp implements PostService {
     @Transactional
     @Override
     public List<PostListResponseDto> getPosts(int page) {
+        log.info("게시물 리스트 요청");
         Pageable pageable = PageRequest.of(page, 10);
         List<Post> posts = postRepository.findByOrderByPostTimeDesc(pageable).getContent();
         TimeAgoUtil timeAgoUtil = new TimeAgoUtil();
@@ -68,6 +69,7 @@ public class PostServiceImp implements PostService {
     @Override//카테고리도 해야됨.
     public ResponseEntity<?> createPost(PostDto createPostDto, String email)  {
         log.info("게시물 작성 요청");
+        log.info("email : {}",email);
         MultipartFile file = createPostDto.getPostImageFile();
         Member member = memberRepository.findByEmail(email).get();
         if (!(createPostDto.getMemberId().equals(member.getMemberId()))) {
@@ -81,6 +83,7 @@ public class PostServiceImp implements PostService {
                     .content(createPostDto.getContent())
                     .title(createPostDto.getTitle())
                     .postImageUrl(imageFileName)
+                    .member(member)
                     .build();
             Post newPost = postRepository.save(post);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("postId",newPost.getPostId()));
@@ -107,7 +110,7 @@ public class PostServiceImp implements PostService {
 
 
     @Transactional
-    @Override//principal을 profileId로 바꿔보자
+    @Override
     public ResponseEntity<String> deletePost(Long postId, String email) {
         Member member = memberRepository.findByEmail(email).get();
         Optional<Post> post = postRepository.findById(postId);

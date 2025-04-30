@@ -36,9 +36,9 @@ public class Member {//수정 필요
     private String password;
 
     @CreationTimestamp
-    private LocalDateTime regdate;
+    private LocalDateTime memberTime;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "member_role",
             joinColumns = @JoinColumn(name = "member_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
@@ -48,10 +48,8 @@ public class Member {//수정 필요
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Profile> profile;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private RefreshToken refreshToken;
-
-
     public void addRole(Role role) {
         roles.add(role);
     }
