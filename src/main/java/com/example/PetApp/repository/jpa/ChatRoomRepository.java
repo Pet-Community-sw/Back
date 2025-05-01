@@ -1,6 +1,7 @@
 package com.example.PetApp.repository.jpa;
 
 import com.example.PetApp.domain.ChatRoom;
+import com.example.PetApp.domain.MatchPost;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
 import org.hibernate.annotations.Parameter;
@@ -19,7 +20,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     Set<ChatRoom> findAllByProfilesContains(Profile profile);// 이거 검사해봐야할듯.
 
-    Optional<ChatRoom> findByPost(Post post);
+    Optional<ChatRoom> findByMatchPost(MatchPost matchPost);
 
     boolean existsByChatRoomIdAndProfilesContains(Long chatRoomId, Profile profile);
 

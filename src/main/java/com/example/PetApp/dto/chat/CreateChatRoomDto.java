@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateChatRoomDto {
-    private Long postId;
+    private Long matchPostId;
     private int limitCount;
 }

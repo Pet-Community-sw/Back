@@ -2,6 +2,7 @@ package com.example.PetApp.domain;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -28,9 +29,9 @@ public class ChatRoom {
     @CreationTimestamp
     private LocalDateTime chatRoomTime;
 
-    @OneToOne()
-    @JoinColumn(name = "post_id")//chatroom이 사라지면 같이 post도 삭제가됨.
-    private Post post;//이게 맞는지
+    @OneToOne
+    @JoinColumn(name = "match_post_id")
+    private MatchPost matchPost;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(joinColumns = @JoinColumn(name = "chat_room_id"),

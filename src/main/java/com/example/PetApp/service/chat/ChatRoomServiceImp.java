@@ -6,6 +6,7 @@ import com.example.PetApp.dto.chat.ChatRoomResponseDto;
 import com.example.PetApp.dto.chat.CreateChatRoomDto;
 import com.example.PetApp.dto.chat.UpdateChatRoomDto;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
+import com.example.PetApp.repository.jpa.MatchPostRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatRoomServiceImp implements ChatRoomService {
 
+    private final MatchPostRepository matchPostRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ProfileRepository profileRepository;
     private final StringRedisTemplate redisTemplate;
@@ -59,25 +61,31 @@ public class ChatRoomServiceImp implements ChatRoomService {
     @Transactional
     @Override
     public ResponseEntity<?> createChatRoom(CreateChatRoomDto createChatRoomDto, Long profileId) {
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-        } else if (post.isEmpty()) {
-            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
+
+        if (profileId == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청.");
         }
-        Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByPost(post.get());
+        Optional<MatchPost> matchPost = matchPostRepository.findById(createChatRoomDto.getMatchPostId());
+        if (matchPost.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 매칭글 없음.");
+        }
+        Optional<Profile> profile = profileRepository.findById(profileId);
+        Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByMatchPost(matchPost.get());
         if (chatRoom2.isEmpty()) {//채팅방이 없으면 새로운생성 있으면 profiles에 신청자 Profile 추가
             ChatRoom chatRoom = ChatRoom.builder()
-//                    .name(post.get().getProfile().getPetName()+"님의 방")
+                    .name(matchPost.get().getProfile().getPetName()+"님의 방")
                     .limitCount(createChatRoomDto.getLimitCount())//나중에 게시물에서 인원 수를 고정.
-                    .post(post.get())
+                    .matchPost(matchPost.get())
                     //이게 수정에서 가능하려나?
                     .build();
+            chatRoom.addProfiles(matchPost.get().getProfile());//글 작성자.
             chatRoom.addProfiles(profile.get());//신청하는사람.
-            chatRoom.addProfiles(post.get().getProfile());//글 작성자.
             ChatRoom chatRoom1 = chatRoomRepository.save(chatRoom);
             return ResponseEntity.status(HttpStatus.CREATED).body(chatRoom1.getChatRoomId());
-        }else {
+        } else {
+            if (matchPost.get().getLimitCount() <= chatRoom2.get().getProfiles().size()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("인원초과");//채팅방 limitCount설정.
+            }
             ChatRoom chatRoom = chatRoom2.get();
             chatRoom.addProfiles(profile.get());
             return ResponseEntity.ok().build();
@@ -119,7 +127,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
         if (chatRoom.isEmpty()) {
             return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
-        if (profile.isEmpty()||!(chatRoom.get().getPost().getProfile().getProfileId().equals(profile.get().getProfileId()))) {
+        if (profile.isEmpty()||!(chatRoom.get().getMatchPost().getProfile().getProfileId().equals(profile.get().getProfileId()))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
         }
         ChatRoom chatRoom1 = chatRoom.get();
