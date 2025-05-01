@@ -6,8 +6,6 @@ import com.example.PetApp.dto.chat.ChatRoomResponseDto;
 import com.example.PetApp.dto.chat.CreateChatRoomDto;
 import com.example.PetApp.dto.chat.UpdateChatRoomDto;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
-import com.example.PetApp.repository.jpa.MemberRepository;
-import com.example.PetApp.repository.jpa.PostRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,12 +27,10 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class
-ChatRoomServiceImp implements ChatRoomService {
+public class ChatRoomServiceImp implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ProfileRepository profileRepository;
-    private final PostRepository postRepository;
     private final StringRedisTemplate redisTemplate;
     private final ChatMessageRepository chatMessageRepository;
 

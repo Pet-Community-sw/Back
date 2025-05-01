@@ -50,6 +50,11 @@ public class Profile {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "match_post_id")
+    private List<MatchPost> matchPost;
+
+
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ChatRoom> chatRooms;
 

@@ -1,8 +1,11 @@
 package com.example.PetApp.util;
 
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+@Component
 public class TimeAgoUtil {
     public String getTimeAgo(LocalDateTime localDateTime) {
         LocalDateTime now = LocalDateTime.now();
