@@ -7,5 +7,4 @@ import lombok.Setter;
 @Setter
 public class CreateChatRoomDto {
     private Long matchPostId;
-    private int limitCount;
 }

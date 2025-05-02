@@ -2,13 +2,11 @@ package com.example.PetApp.repository.jpa;
 
 import com.example.PetApp.domain.MatchPost;
 import io.lettuce.core.dynamic.annotation.Param;
-import org.aspectj.weaver.ast.Literal;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface MatchPostRepository extends JpaRepository<MatchPost, Long> {
@@ -23,7 +21,7 @@ public interface MatchPostRepository extends JpaRepository<MatchPost, Long> {
     );
 
     @Query(value = "select * from match_post m " +
-            "where m.longitude between :minLongitude and :maxLongitue " +
+            "where m.longitude between :minLongitude and :maxLongitude " +
             "and m.latitude between :minLatitude and :maxLatitude " +
             "order by m.matchPostTime desc ",
             nativeQuery = true)

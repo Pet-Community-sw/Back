@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public interface DogBreedService {
+public interface PetBreedService {
 
     Optional<PetBreed> findByName(String name);
 

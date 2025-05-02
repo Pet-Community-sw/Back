@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -31,27 +32,27 @@ public class MatchPost {
     private int limitCount;
 
     @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_id")
     private Profile profile;
 
     @CreationTimestamp
     private LocalDateTime matchPostTime;
 
     @ElementCollection
-    @CollectionTable(name = "match_post_prifles",
-            joinColumns = @JoinColumn(name = "match_post_id"))
-    private Set<Long> profiles;
+    @CollectionTable(name = "match_post_profiles")
+    @Builder.Default
+    private Set<Long> profiles=new HashSet<>();
 
     @ElementCollection
-    @CollectionTable(name = "match_post_avoid_Breeds",
-            joinColumns = @JoinColumn(name = "match_post_id"))
-    private Set<Long> avoidBreeds;
-
+    @CollectionTable(name = "match_post_avoid_Breeds")
+    @Builder.Default
+    private Set<Long> avoidBreeds=new HashSet<>();
     public void addMatchPostProfiles(Long profileId) {
         this.profiles.add(profileId);
     }
 
-    public void addAvoidBreeds(Long avoidBreedsId) {
-        this.avoidBreeds.add(avoidBreedsId);
+    public void addAvoidBreeds(Profile profile) {
+        profile.getAvoidBreeds().forEach(avoidBreeds -> this.avoidBreeds.add(avoidBreeds.getPetBreedId()));
     }
 }
 

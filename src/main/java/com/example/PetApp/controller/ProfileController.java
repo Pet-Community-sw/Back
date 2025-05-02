@@ -54,9 +54,9 @@ public class ProfileController {
     }
 
     @PostMapping("/token/{profileId}")//리팩토링 시에 authentication 말고 accesstoken을 받아서 이전 토큰 무효화 처리해야됨.
-    public ResponseEntity<?> accessTokenToProfileId(@PathVariable Long profileId, Authentication authentication) {
+    public ResponseEntity<?> accessTokenToProfileId(@RequestHeader("Authorization") String accessToken, @PathVariable Long profileId, Authentication authentication) {
         String email = getEmail(authentication);
-        return profileService.accessTokenToProfileId(profileId, email);
+        return profileService.accessTokenToProfileId(accessToken, profileId, email);
     }
 
     private static String getEmail(Authentication authentication) {

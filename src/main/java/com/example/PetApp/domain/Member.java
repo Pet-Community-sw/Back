@@ -48,8 +48,6 @@ public class Member {//수정 필요
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Profile> profile;
 
-    @OneToOne(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
-    private RefreshToken refreshToken;
     public void addRole(Role role) {
         roles.add(role);
     }

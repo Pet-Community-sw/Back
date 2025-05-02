@@ -36,7 +36,7 @@ public class ChatRoom {
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(joinColumns = @JoinColumn(name = "chat_room_id"),
             inverseJoinColumns = @JoinColumn(name = "profile_id"))
-    @Builder.Default//초기화 시켜줌. 빌더가 안먹힘.
+    @Builder.Default//빌더는 생성자를 this.profiles=profiles라 해서 리스틑 초기화가안됨 그래서 default로 설정.
     private List<Profile> profiles=new ArrayList<>();
 
     public void addProfiles(Profile profile) {

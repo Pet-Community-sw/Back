@@ -5,7 +5,8 @@ import com.example.PetApp.dto.profile.*;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
-import com.example.PetApp.service.dogBreed.DogBreedService;
+import com.example.PetApp.service.dogBreed.PetBreedService;
+import com.example.PetApp.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -33,9 +34,11 @@ public class ProfileServiceImp implements ProfileService {
 
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
-    private final DogBreedService dogBreedService;
+    private final PetBreedService petBreedService;
     private final JwtTokenizer jwtTokenizer;
+    private final RedisUtil redisUtil;
 
+    @Override
     @Transactional//accesstoken 수정 필요 이름이 같은지 확인해야됨.
     public ResponseEntity addProfile(ProfileDto profileDto, String email) {
         Member member = getMember(email);
@@ -45,7 +48,7 @@ public class ProfileServiceImp implements ProfileService {
         UUID uuid = UUID.randomUUID();
         String imageFileName = uuid + "_" + file.getOriginalFilename();
 
-        Optional<PetBreed> dogBreed = dogBreedService.findByName(profileDto.getPetBreed());
+        Optional<PetBreed> dogBreed = petBreedService.findByName(profileDto.getPetBreed());
         if (dogBreed.isEmpty()) {
             return ResponseEntity.badRequest().body("종을 다시 입력해주세요.");
         }
@@ -65,7 +68,7 @@ public class ProfileServiceImp implements ProfileService {
             String[] arr = profileDto.getAvoidBreeds().split(",");
             for (String breeds : arr) {
                 breeds=breeds.trim();
-                Optional<PetBreed> avoidBreed = dogBreedService.findByName(breeds);
+                Optional<PetBreed> avoidBreed = petBreedService.findByName(breeds);
                 if (avoidBreed.isEmpty()) {
                     return ResponseEntity.badRequest().body("피해야하는 종을 다시 입력해주세요.");
                 }
@@ -75,15 +78,15 @@ public class ProfileServiceImp implements ProfileService {
                 profile.addAvoidBreeds(avoidBreed.get());
             }
             Profile addProfile = profileRepository.save(profile);
-            List<String> roles = member.getRoles().stream().map(Role::getName).collect(Collectors.toList());
-
-            String accessToken = jwtTokenizer.createAccessToken(member.getMemberId(), addProfile.getProfileId(), member.getEmail(), roles);//accessToken 추가
-            //refresh는 노.
-            AddProfileResponseDto addProfileResponseDto=AddProfileResponseDto.builder()//profileId넣어서 토큰 반환.
-                    .accessToken(accessToken)
-                    .profileId(addProfile.getProfileId())
-                    .build();
-            return ResponseEntity.status(HttpStatus.CREATED).body(addProfileResponseDto);
+//            List<String> roles = member.getRoles().stream().map(Role::getName).collect(Collectors.toList());
+//
+//            String accessToken = jwtTokenizer.createAccessToken(member.getMemberId(), addProfile.getProfileId(), member.getEmail(), roles);//accessToken 추가
+//            //refresh는 노.
+//            AddProfileResponseDto addProfileResponseDto=AddProfileResponseDto.builder()//profileId넣어서 토큰 반환.
+//                    .accessToken(accessToken)
+//                    .profileId(addProfile.getProfileId())
+//                    .build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("profileId",addProfile.getProfileId()));
         } catch (IOException e) {
 
             throw new IllegalArgumentException(e);
@@ -143,7 +146,7 @@ public class ProfileServiceImp implements ProfileService {
     public ResponseEntity updateProfile(Long profileId, ProfileDto profileDto, String email) {
         Member member = getMember(email);
         Optional<Profile> profile = profileRepository.findById(profileId);
-        Optional<PetBreed> dogBreed = dogBreedService.findByName(profileDto.getPetBreed());
+        Optional<PetBreed> dogBreed = petBreedService.findByName(profileDto.getPetBreed());
         if (dogBreed.isEmpty()) {
             return ResponseEntity.badRequest().body("종을 다시 입력해주세요.");
         }
@@ -164,7 +167,7 @@ public class ProfileServiceImp implements ProfileService {
                 newProfile.getAvoidBreeds().clear();
                 String[] arr = profileDto.getAvoidBreeds().split(",");
                 for (String breeds : arr) {
-                    Optional<PetBreed> avoidBreed = dogBreedService.findByName(breeds);
+                    Optional<PetBreed> avoidBreed = petBreedService.findByName(breeds);
                     if (avoidBreed.isEmpty()) {
                         return ResponseEntity.badRequest().body("피해야하는 종을 다시 입력해주세요.");
                     }
@@ -198,7 +201,7 @@ public class ProfileServiceImp implements ProfileService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> accessTokenToProfileId(Long profileId, String email) {//요청했을 당시 토큰을 redis에 저장시켜서 이전 토큰으로 요청 시 인증이 안되게 끔 해야됨.
+    public ResponseEntity<?> accessTokenToProfileId(String accessToken, Long profileId, String email) {//요청했을 당시 토큰을 redis에 저장시켜서 이전 토큰으로 요청 시 인증이 안되게 끔 해야됨.
 
         Optional<Profile> profile = profileRepository.findById(profileId);
         Member member = memberRepository.findByEmail(email).get();
@@ -213,10 +216,11 @@ public class ProfileServiceImp implements ProfileService {
                 .map(Role::getName)
                 .collect(Collectors.toList());
 
-        String accessToken = jwtTokenizer.createAccessToken(member.getMemberId(), profileId, member.getEmail(), roles);
+        String accessToken1 = jwtTokenizer.createAccessToken(member.getMemberId(), profileId, member.getEmail(), roles);
+        redisUtil.createData(accessToken, "blacklist", 30 * 60L);//에세스토큰 유효시간
         AccessTokenToProfileIdResponseDto accessTokenToProfileIdResponseDto = AccessTokenToProfileIdResponseDto.builder()
                 .profileId(profileId)
-                .accessToken(accessToken)
+                .accessToken(accessToken1)
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(accessTokenToProfileIdResponseDto);
     }

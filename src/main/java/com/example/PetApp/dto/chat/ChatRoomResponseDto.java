@@ -24,7 +24,7 @@ public class ChatRoomResponseDto {
 
     private int currentCount;
 
-    private LocalDateTime regDate;
+    private LocalDateTime chatRoomTime;
 
     private Set<Long> profiles = new HashSet<>();
 
@@ -42,7 +42,7 @@ public class ChatRoomResponseDto {
                 .chatName(chatRoom.getName())
                 .chatLimitCount(chatRoom.getLimitCount())
                 .currentCount(chatRoom.getProfiles().size())
-                .regDate(chatRoom.getRegdate())
+                .chatRoomTime(chatRoom.getChatRoomTime())
                 .profiles(chatRoom.getProfiles().stream()
                         .map(Profile::getProfileId) // Profile → ID만 추출
                         .collect(Collectors.toSet()))

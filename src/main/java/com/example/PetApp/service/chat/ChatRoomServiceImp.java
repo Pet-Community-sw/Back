@@ -59,35 +59,26 @@ public class ChatRoomServiceImp implements ChatRoomService {
     }
 
     @Transactional
-    @Override
-    public ResponseEntity<?> createChatRoom(CreateChatRoomDto createChatRoomDto, Long profileId) {
-
-        if (profileId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청.");
-        }
-        Optional<MatchPost> matchPost = matchPostRepository.findById(createChatRoomDto.getMatchPostId());
-        if (matchPost.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 매칭글 없음.");
-        }
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByMatchPost(matchPost.get());
+    @Override//채팅방 생성은 두 가지 일듯 매칭글에서 채팅하기 or 그냥 메시지 보내기
+    public ResponseEntity<?> createChatRoom(MatchPost matchPost, Profile profile) {
+        Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByMatchPost(matchPost);
         if (chatRoom2.isEmpty()) {//채팅방이 없으면 새로운생성 있으면 profiles에 신청자 Profile 추가
             ChatRoom chatRoom = ChatRoom.builder()
-                    .name(matchPost.get().getProfile().getPetName()+"님의 방")
-                    .limitCount(createChatRoomDto.getLimitCount())//나중에 게시물에서 인원 수를 고정.
-                    .matchPost(matchPost.get())
+                    .name(matchPost.getProfile().getPetName()+"님의 방")
+                    .limitCount(matchPost.getLimitCount())//나중에 게시물에서 인원 수를 고정.
+                    .matchPost(matchPost)
                     //이게 수정에서 가능하려나?
                     .build();
-            chatRoom.addProfiles(matchPost.get().getProfile());//글 작성자.
-            chatRoom.addProfiles(profile.get());//신청하는사람.
+            chatRoom.addProfiles(matchPost.getProfile());//글 작성자.
+            chatRoom.addProfiles(profile);//신청하는사람.
             ChatRoom chatRoom1 = chatRoomRepository.save(chatRoom);
             return ResponseEntity.status(HttpStatus.CREATED).body(chatRoom1.getChatRoomId());
         } else {
-            if (matchPost.get().getLimitCount() <= chatRoom2.get().getProfiles().size()) {
+            if (matchPost.getLimitCount() <= chatRoom2.get().getProfiles().size()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("인원초과");//채팅방 limitCount설정.
             }
             ChatRoom chatRoom = chatRoom2.get();
-            chatRoom.addProfiles(profile.get());
+            chatRoom.addProfiles(profile);
             return ResponseEntity.ok().build();
         }
     }

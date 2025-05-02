@@ -14,7 +14,7 @@ public class NotificationRedisSubscriber {
     public void onMessage(String channel, String message) {
         log.info("notification channel:{}, message:{}", channel, message);
 
-        Long profileId = Long.valueOf(channel.split(":")[1]);
-        sseEmitterManager.sendNotification(profileId, message);
+        Long memberId = Long.valueOf(channel.split(":")[1]);
+        sseEmitterManager.sendNotification(memberId, message);
     }
 }

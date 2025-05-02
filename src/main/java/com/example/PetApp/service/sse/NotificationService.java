@@ -1,8 +1,11 @@
 package com.example.PetApp.service.sse;
 
+import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.notification.NotificationListDto;
+import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
+import com.fasterxml.classmate.MemberResolver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,17 +23,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class NotificationService {
 
-    private final ProfileRepository profileRepository;
+    private final MemberRepository memberRepository;
     private final RedisTemplate<String, Object> notificationRedisTemplate;
     private final ObjectMapper objectMapper;
 
 
-    public ResponseEntity<?> getNotifications(Long profileId) {
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if ( profile.isEmpty()) {
+
+    public ResponseEntity<?> getNotifications(Long memberId, String email) {
+        Member member = memberRepository.findByEmail(email).get();
+        if (!memberId.equals(member.getMemberId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
         }
-        Set<String> keys = notificationRedisTemplate.keys("notifications:" + profileId + ":*");
+        Set<String> keys = notificationRedisTemplate.keys("notifications:" + memberId + ":*");
         List<NotificationListDto> list = keys.stream()
                 .map(key -> notificationRedisTemplate.opsForValue().get(key))
                 .map(message -> {

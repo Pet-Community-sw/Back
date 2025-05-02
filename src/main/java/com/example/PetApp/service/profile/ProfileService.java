@@ -21,5 +21,5 @@ public interface ProfileService {
 
     ResponseEntity deleteByProfileId(Long profileId, String email);
 
-    ResponseEntity<?> accessTokenToProfileId(Long profileId, String email);
+    ResponseEntity<?> accessTokenToProfileId(String accessToken, Long profileId, String email);
 }

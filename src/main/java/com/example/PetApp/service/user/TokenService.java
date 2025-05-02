@@ -49,6 +49,7 @@ public class TokenService {
     }
     @Transactional
     public ResponseEntity<?> accessToken(String accessToken) {
+        log.info("에세스 토큰 재요청.");
         String[] arr = accessToken.split(" ");
         Claims claims;
         try {
@@ -64,15 +65,14 @@ public class TokenService {
         } else {
             Claims claims1 = jwtTokenizer.parseRefreshToken(refreshToken.get().getRefreshToken());
             String email = claims1.getSubject();
-            Long profileId = Long.valueOf(claims.get("profileId").toString());//refresh에서 profileId를 꺼내는것이 보안상 좋을 듯한데
-            //accesstoken주기 시간을 줄이면 될것같은데 성능 문제?
+            Optional<Object> profileId = Optional.ofNullable(claims.get("profileId"));//refresh에서 profileId를 꺼내는것이 보안상 좋을 듯한데
             List<String> roles = (List<String>) claims1.get("roles");
             Map<String, String> message = new HashMap<>();//getProfileId를 했을 때 null이면 일반 토큰 있으면 profile토큰
             redisUtil.createData(accessToken, "blacklist", 30 * 60L);//access시간이랑 같게 해야됨. 받았던 accesstoken을 유효하지 않게함.
-            if (profileId == null) {
+            if (profileId.isEmpty()) {
                 message.put("accessToken", jwtTokenizer.createAccessToken(memberId, null, email, roles));
             }else
-                message.put("accessToken", jwtTokenizer.createAccessToken(memberId, profileId, email, roles));//profile이있으면 붙혀서 반환.
+                message.put("accessToken", jwtTokenizer.createAccessToken(memberId, Long.valueOf(profileId.toString()), email, roles));//profile이있으면 붙혀서 반환.
             return ResponseEntity.ok().body(message);
         }
     }

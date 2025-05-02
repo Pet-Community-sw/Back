@@ -21,4 +21,5 @@ public interface MatchPostService {
     ResponseEntity<?> getMatchPostsByLocation(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, Long profileId);
 
 
+    ResponseEntity<?> startMatch(Long matchPostId, Long profileId);
 }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/matchPosts")
+@RequestMapping("/match-posts")
 public class MatchPostController {
 
     private final MatchPostService matchPostService;
@@ -45,6 +45,12 @@ public class MatchPostController {
     private ResponseEntity<?> createMatchPost(@RequestBody CreateMatchPostDto createMatchPostDto, Authentication authentication) {
         Long profileId = getProfileId(authentication);
         return matchPostService.createMatchPost(createMatchPostDto, profileId);
+    }
+
+    @PostMapping("/{matchPostId}")
+    private ResponseEntity<?> startMatch(@PathVariable Long matchPostId, Authentication authentication) {
+        Long profileId = getProfileId(authentication);
+        return matchPostService.startMatch(matchPostId, profileId);
     }
 
     @PutMapping

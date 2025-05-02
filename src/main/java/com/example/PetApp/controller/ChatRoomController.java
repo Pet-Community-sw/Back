@@ -33,11 +33,11 @@ public class ChatRoomController {
     }
 
 
-    @PostMapping()
-    private ResponseEntity<?> createChatRoom(@RequestBody CreateChatRoomDto createChatRoomDto, Authentication authentication) {
-        Long profileId = getProfileId( authentication);
-        return chatRoomService.createChatRoom(createChatRoomDto, profileId);
-    }
+//    @PostMapping()
+//    private ResponseEntity<?> createChatRoom(@RequestBody CreateChatRoomDto createChatRoomDto, Authentication authentication) {
+//        Long profileId = getProfileId( authentication);
+//        return chatRoomService.createChatRoom(createChatRoomDto, profileId);
+//    }
 
 
     @PutMapping()

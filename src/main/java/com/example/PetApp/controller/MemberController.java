@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/members")
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
@@ -46,6 +47,7 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginDto loginDto) {
+        log.info("로그인 요청");
         Optional<Member> member = memberService.findByEmail(loginDto.getEmail());
         if (member.isEmpty() && !passwordEncoder.matches(member.get().getPassword(), loginDto.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("이메일 혹은 비밀번호가 일치하지 않습니다.");

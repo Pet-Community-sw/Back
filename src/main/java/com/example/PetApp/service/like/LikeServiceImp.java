@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -37,9 +38,10 @@ public class LikeServiceImp implements LikeService {
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없는 게시물입니다.");
         }else {
-            Long likeCount = likeRepository.countByPost(post.get());
+            List<LikeT> likeList = likeRepository.findAllByPost(post.get());
             LikeResponseDto likeResponseDto = new LikeResponseDto();
-            likeResponseDto.setLikeCount(likeCount);
+            likeList.forEach(likeT -> likeResponseDto.getMembers().add(likeT.getMember()));
+            likeResponseDto.setLikeCount((long) likeResponseDto.getMembers().size());
             return ResponseEntity.ok(likeResponseDto);
         }
     }
@@ -57,10 +59,10 @@ public class LikeServiceImp implements LikeService {
         }
         boolean isCheck = likeRepository.existsByPostAndMember(post.get(), member);
             if (isCheck) {
-                log.info("좋아요 생성");
+                log.info("좋아요 삭제");
                 return deleteLike(post.get(),member);
             } else {
-                log.info("좋아요 삭제");
+                log.info("좋아요 생성");
                 return createLike(post.get(), member);
             }
 

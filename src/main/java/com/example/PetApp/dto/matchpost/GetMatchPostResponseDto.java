@@ -18,6 +18,8 @@ public class GetMatchPostResponseDto {
 
     private String locationName;
 
+    private int currentCount;
+
     private int limitCount;
 
     private String createdAt;

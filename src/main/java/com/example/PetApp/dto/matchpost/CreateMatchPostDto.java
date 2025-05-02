@@ -8,9 +8,9 @@ import lombok.Setter;
 public class CreateMatchPostDto {
     private Long profileId;
 
-    private Double latitude;
-
     private Double longitude;
+
+    private Double latitude;
 
     private String locationName;
 

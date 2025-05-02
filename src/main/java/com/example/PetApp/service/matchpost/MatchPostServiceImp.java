@@ -11,6 +11,7 @@ import com.example.PetApp.dto.matchpost.UpdateMatchPostDto;
 import com.example.PetApp.repository.jpa.MatchPostRepository;
 import com.example.PetApp.repository.jpa.PetBreedRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
+import com.example.PetApp.service.chat.ChatRoomService;
 import com.example.PetApp.util.TimeAgoUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MatchPostServiceImp implements MatchPostService {
 
+    private final ChatRoomService chatRoomService;
     private final MatchPostRepository matchPostRepository;
     private final ProfileRepository profileRepository;
     private final PetBreedRepository petBreedRepository;
@@ -58,7 +58,7 @@ public class MatchPostServiceImp implements MatchPostService {
         if (profileId == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요");
         }
-        List<MatchPost> matchPosts = matchPostRepository.findByMatchPostByLocation(minLongitude, minLatitude, maxLongitude, maxLatitude);
+        List<MatchPost> matchPosts = matchPostRepository.findByMatchPostByLocation(minLongitude-0.001, minLatitude-0.001, maxLongitude+0.001, maxLatitude+0.001);
         List<GetMatchPostListResponseDto> getMatchPostListResponseDtoList = matchPosts.stream()
                 .map(matchPost -> new GetMatchPostListResponseDto(
                         matchPost.getLocationName(),
@@ -89,6 +89,7 @@ public class MatchPostServiceImp implements MatchPostService {
                 .petImageUrl(matchPost.get().getProfile().getPetImageUrl())
                 .content(matchPost.get().getContent())
                 .locationName(matchPost.get().getLocationName())
+                .currentCount(matchPost.get().getProfiles().size())
                 .limitCount(matchPost.get().getLimitCount())
                 .createdAt(timeAgoUtil.getTimeAgo(matchPost.get().getMatchPostTime()))
                 .build();
@@ -118,10 +119,34 @@ public class MatchPostServiceImp implements MatchPostService {
                 .locationName(createMatchPostDto.getLocationName())
                 .build();
         matchPost.addMatchPostProfiles(profileId);
-        profile.getAvoidBreeds().forEach(avoidBreeds -> matchPost.addAvoidBreeds(avoidBreeds.getPetBreedId()));
+        matchPost.addAvoidBreeds(profile);
         MatchPost saveMatchPost = matchPostRepository.save(matchPost);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("matchPostId", saveMatchPost.getMatchPostId()));
         //굳이 반환값을 id로 줘야하나? 낭비가 심한것같음.
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<?> startMatch(Long matchPostId, Long profileId) {
+        log.info("스타트 매칭");
+        if (profileId == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요");
+        }
+        Optional<MatchPost> matchPost = matchPostRepository.findById(matchPostId);
+        if (matchPost.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 매칭게시물은 없습니다");
+        }
+        if (matchPost.get().getProfiles().contains(profileId)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 채팅방에 들어가있습니다.");
+        }
+        Profile profile = profileRepository.findById(profileId).get();
+        Optional<PetBreed> petBreed = petBreedRepository.findByName(profile.getPetBreed());
+        if (matchPost.get().getAvoidBreeds().contains(petBreed.get().getPetBreedId())){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("해당 종은 참여할 수 없습니다.");
+        }
+        matchPost.get().addMatchPostProfiles(profileId);
+        matchPost.get().addAvoidBreeds(profile);
+        return chatRoomService.createChatRoom(matchPost.get(), profile);
     }
 
     @Transactional

@@ -64,7 +64,7 @@ public class RedisConfig {
                     notificationRedisSubscriber.onMessage(
                             new String(message.getChannel()),
                             new String(message.getBody()))
-        ,new PatternTopic("user:*")
+        ,new PatternTopic("member:*")
         );
 
         return notificationRedisMessageListenerContainer;
