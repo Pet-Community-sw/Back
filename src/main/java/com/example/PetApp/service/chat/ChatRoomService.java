@@ -2,7 +2,6 @@ package com.example.PetApp.service.chat;
 
 import com.example.PetApp.domain.MatchPost;
 import com.example.PetApp.domain.Profile;
-import com.example.PetApp.dto.chat.CreateChatRoomDto;
 import com.example.PetApp.dto.chat.UpdateChatRoomDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

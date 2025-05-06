@@ -5,8 +5,10 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -37,6 +39,9 @@ public class Member {//수정 필요
 
     @CreationTimestamp
     private LocalDateTime memberTime;
+
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "member_role",

@@ -7,6 +7,7 @@ import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
+import com.example.PetApp.dto.commment.UpdateCommentDto;
 import com.example.PetApp.repository.jpa.CommentRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
@@ -56,33 +57,33 @@ public class CommentServiceImp implements CommentService {
         String message = member.getName() + "님이 회원님의 게시물에 댓글을 달았습니다.";
         String key = "notifications:" + post.get().getMember().getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
         notificationRedisTemplate.opsForValue().set(key, message, Duration.ofDays(3));
-        notificationRedisPublisher.publish("user:" + post.get().getMember().getMemberId(), message);
+        notificationRedisPublisher.publish("member:" + post.get().getMember().getMemberId(), message);
         return ResponseEntity.status(HttpStatus.CREATED).body(newComment.getCommentId());
     }
 
-    @Transactional
-    @Override
-    public ResponseEntity<Object> getComment(Long commentId,String email) {
-        log.info("댓글 상세 요청");
-        Optional<Comment> comment = commentRepository.findById(commentId);
-        Member member = memberRepository.findByEmail(email).get();
-        if (comment.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없는 댓글입니다.");
-        }
-        TimeAgoUtil timeAgoUtil = new TimeAgoUtil();
-        GetCommentsResponseDto getCommentsResponseDto = GetCommentsResponseDto.builder()
-                .commentId(commentId)
-                .content(comment.get().getContent())
-                .memberId(comment.get().getMember().getMemberId())
-                .memberName(comment.get().getMember().getName())
-                .likeCount(comment.get().getLikeCount())
-                .createdAt(timeAgoUtil.getTimeAgo(comment.get().getCommentTime()))
-                .build();
-        if (comment.get().getMember().equals(member)) {
-            getCommentsResponseDto.setOwner(true);
-        }
-        return ResponseEntity.ok(getCommentsResponseDto);
-    }
+//    @Transactional
+//    @Override
+//    public ResponseEntity<Object> getComment(Long commentId,String email) {
+//        log.info("댓글 상세 요청");
+//        Optional<Comment> comment = commentRepository.findById(commentId);
+//        Member member = memberRepository.findByEmail(email).get();
+//        if (comment.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없는 댓글입니다.");
+//        }
+//        TimeAgoUtil timeAgoUtil = new TimeAgoUtil();
+//        GetCommentsResponseDto getCommentsResponseDto = GetCommentsResponseDto.builder()
+//                .commentId(commentId)
+//                .content(comment.get().getContent())
+//                .memberId(comment.get().getMember().getMemberId())
+//                .memberName(comment.get().getMember().getName())
+//                .likeCount(comment.get().getLikeCount())
+//                .createdAt(timeAgoUtil.getTimeAgo(comment.get().getCommentTime()))
+//                .build();
+//        if (comment.get().getMember().equals(member)) {
+//            getCommentsResponseDto.setOwner(true);
+//        }
+//        return ResponseEntity.ok(getCommentsResponseDto);
+//    }
 
     @Transactional
     @Override
@@ -103,7 +104,7 @@ public class CommentServiceImp implements CommentService {
 
     @Transactional
     @Override
-    public ResponseEntity<String> updateComment(Long commentId, String content, String email) {
+    public ResponseEntity<String> updateComment(Long commentId, UpdateCommentDto updateCommentDto, String email) {
         log.info("댓글 수정 요청");
         Optional<Comment> comment = commentRepository.findById(commentId);
         Member member = memberRepository.findByEmail(email).get();
@@ -111,7 +112,7 @@ public class CommentServiceImp implements CommentService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없는 댓글입니다.");
         }
         if (comment.get().getMember().equals(member)) {
-            comment.get().setContent(content);
+            comment.get().setContent(updateCommentDto.getContent());
             return ResponseEntity.ok().body("수정 되었습니다.");
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청입니다.");

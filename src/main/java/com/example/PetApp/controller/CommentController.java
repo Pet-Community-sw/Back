@@ -17,11 +17,6 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @GetMapping("/{commentId}")
-    public ResponseEntity<?> getComment(@PathVariable Long commentId, Authentication authentication) {
-        return commentService.getComment(commentId, getEmail(authentication));
-    }
-
     @PostMapping()
     public ResponseEntity<?> createComment(@RequestBody CommentDto commentDto, Authentication authentication) {
         return commentService.createComment(commentDto, getEmail(authentication));
@@ -34,7 +29,7 @@ public class CommentController {
 
     @PutMapping("/{commentId}")//좋아요 개수는 따로하는게 좋을 듯
     public ResponseEntity<String> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentDto updateCommentDto, Authentication authentication) {
-        return commentService.updateComment(commentId, updateCommentDto.getContent(), getEmail(authentication));
+        return commentService.updateComment(commentId,updateCommentDto, getEmail(authentication));
     }
 
     private String getEmail(Authentication authentication) {

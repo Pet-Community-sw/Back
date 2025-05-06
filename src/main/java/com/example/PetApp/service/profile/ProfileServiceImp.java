@@ -78,14 +78,6 @@ public class ProfileServiceImp implements ProfileService {
                 profile.addAvoidBreeds(avoidBreed.get());
             }
             Profile addProfile = profileRepository.save(profile);
-//            List<String> roles = member.getRoles().stream().map(Role::getName).collect(Collectors.toList());
-//
-//            String accessToken = jwtTokenizer.createAccessToken(member.getMemberId(), addProfile.getProfileId(), member.getEmail(), roles);//accessToken 추가
-//            //refresh는 노.
-//            AddProfileResponseDto addProfileResponseDto=AddProfileResponseDto.builder()//profileId넣어서 토큰 반환.
-//                    .accessToken(accessToken)
-//                    .profileId(addProfile.getProfileId())
-//                    .build();
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("profileId",addProfile.getProfileId()));
         } catch (IOException e) {
 
@@ -222,7 +214,7 @@ public class ProfileServiceImp implements ProfileService {
                 .profileId(profileId)
                 .accessToken(accessToken1)
                 .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(accessTokenToProfileIdResponseDto);
+        return ResponseEntity.ok().body(accessTokenToProfileIdResponseDto);
     }
 
     @Transactional

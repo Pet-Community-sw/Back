@@ -24,9 +24,15 @@ public class ChatMessage {
         ENTER, TALK, LEAVE
     }
 
+    public enum ChatRoomType {
+        ONE, MANY
+    }
+
+
     @Id
     private String id;
     private MessageType messageType;
+    private ChatRoomType chatRoomType;
     private Long chatRoomId;
     private Long senderId;
     private String senderName;

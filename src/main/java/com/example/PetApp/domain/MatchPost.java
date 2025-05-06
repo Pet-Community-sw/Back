@@ -1,6 +1,7 @@
 package com.example.PetApp.domain;
 
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -40,13 +41,16 @@ public class MatchPost {
 
     @ElementCollection
     @CollectionTable(name = "match_post_profiles")
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE)
     @Builder.Default
     private Set<Long> profiles=new HashSet<>();
 
     @ElementCollection
     @CollectionTable(name = "match_post_avoid_Breeds")
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE)
     @Builder.Default
     private Set<Long> avoidBreeds=new HashSet<>();
+
     public void addMatchPostProfiles(Long profileId) {
         this.profiles.add(profileId);
     }

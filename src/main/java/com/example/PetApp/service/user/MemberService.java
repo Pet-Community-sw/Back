@@ -7,10 +7,9 @@ import com.example.PetApp.dto.member.MemberSignResponseDto;
 import com.example.PetApp.dto.member.ResetPasswordDto;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RoleRepository;
-import com.example.PetApp.security.jwt.util.JwtTokenizer;
-import com.example.PetApp.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -82,5 +81,26 @@ public class MemberService {
             member.setPassword(passwordEncoder.encode(resetPasswordDto.getNewPassword()));
             return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습나다.");
         }
+    }
+
+    @Transactional//상세 멤버 프로필 추가랑 어떤거 해야할지 해야됨.
+    public ResponseEntity<?> getMember(Long memberId, String email) {
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        }
+        Optional<Member> member = memberRepository.findById(memberId);
+        if (member.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 유저는 없습니다.");
+        }
+    }
+
+    public ResponseEntity<?> deleteMember(Long memberId, String email) {
+        log.info("회원 삭제 요청 memberId:{}", memberId);
+        Member member = memberRepository.findByEmail(email).get();
+        if (!memberId.equals(member.getMemberId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        }
+        memberRepository.deleteById(memberId);
+        return ResponseEntity.ok().body("삭제 완료.");
     }
 }

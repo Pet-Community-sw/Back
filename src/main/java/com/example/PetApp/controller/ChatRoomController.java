@@ -1,6 +1,5 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.dto.chat.CreateChatRoomDto;
 import com.example.PetApp.dto.chat.UpdateChatRoomDto;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.chat.ChatRoomService;
@@ -31,14 +30,6 @@ public class ChatRoomController {
         Long profileId = getProfileId( authentication);
         return chatRoomService.getMessages(chatRoomId, profileId, page);
     }
-
-
-//    @PostMapping()
-//    private ResponseEntity<?> createChatRoom(@RequestBody CreateChatRoomDto createChatRoomDto, Authentication authentication) {
-//        Long profileId = getProfileId( authentication);
-//        return chatRoomService.createChatRoom(createChatRoomDto, profileId);
-//    }
-
 
     @PutMapping()
     private ResponseEntity<?> updateChatRoom(@RequestBody UpdateChatRoomDto updateChatRoomDto, Authentication authentication) {

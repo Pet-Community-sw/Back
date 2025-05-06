@@ -40,10 +40,10 @@ public class Profile {
 
     private String extraInfo;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "profile_breed",
             joinColumns = @JoinColumn(name = "profile_id"),
-            inverseJoinColumns = @JoinColumn(name = "dog_breed_id"))
+            inverseJoinColumns = @JoinColumn(name = "pet_breed_id"))
     private Set<PetBreed> avoidBreeds = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

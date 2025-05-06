@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class MemberController {
         if (bindingResult.hasErrors()) {
             List<String> errorMessages = bindingResult.getFieldErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
-            return ResponseEntity.badRequest().body(Map.of("errors",errorMessages));
+            return ResponseEntity.badRequest().body(Map.of("errors", errorMessages));
         }
         if (memberService.findByEmail(memberSignDto.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body("이미 가입된 회원입니다.");
@@ -65,7 +66,7 @@ public class MemberController {
 
     @GetMapping("/find-id")
     public ResponseEntity findById(@RequestParam String phoneNumber) {
-     return memberService.findByPhoneNumber(phoneNumber);
+        return memberService.findByPhoneNumber(phoneNumber);
 
     }
 
@@ -82,7 +83,7 @@ public class MemberController {
     @PostMapping("/verify-code")
     public ResponseEntity verifyCode(@RequestBody AuthCodeDto authCodeDto) {
         return emailService.verifyCode(authCodeDto.getEmail(), authCodeDto.getCode());
-    }//검증을하고 비밀번호를 다시 설정해야할 것 같다.
+    }
 
 
     @PutMapping("/reset-password")
@@ -91,5 +92,18 @@ public class MemberController {
             return ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
         }
         return memberService.resetPassword(resetPasswordDto);
+    }
+
+    @GetMapping("/{memberId}")
+    public ResponseEntity<?> getMember(@PathVariable Long memberId, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return memberService.getMember(memberId, email);
+    }
+
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity<?> deleteMember(@PathVariable Long memberId, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return memberService.deleteMember(memberId, email);
+
     }
 }

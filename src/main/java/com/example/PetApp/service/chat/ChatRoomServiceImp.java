@@ -3,10 +3,8 @@ package com.example.PetApp.service.chat;
 import com.example.PetApp.domain.*;
 import com.example.PetApp.dto.chat.ChatMessageDto;
 import com.example.PetApp.dto.chat.ChatRoomResponseDto;
-import com.example.PetApp.dto.chat.CreateChatRoomDto;
 import com.example.PetApp.dto.chat.UpdateChatRoomDto;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
-import com.example.PetApp.repository.jpa.MatchPostRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +28,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatRoomServiceImp implements ChatRoomService {
 
-    private final MatchPostRepository matchPostRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ProfileRepository profileRepository;
     private final StringRedisTemplate redisTemplate;
@@ -128,7 +125,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
     }
 
     @Transactional
-    @Override
+    @Override//이렇게 하면 채팅방에 적속해 있을 때 unread 증가하는데 이러면 안됨.
     public ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, int page) {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
         Optional<Profile> profile = profileRepository.findById(profileId);

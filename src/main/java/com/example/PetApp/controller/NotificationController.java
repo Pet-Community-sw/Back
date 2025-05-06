@@ -19,14 +19,15 @@ public class NotificationController {
     private final SseEmitterManager sseEmitterManager;
     private final NotificationService notificationService;
 
-    @GetMapping(value = "/subscribe/{memberId}", produces = "text/event-stream")//sse 서버에서 클라이언트로 실시간으로 보내기 위함.
-    public SseEmitter subscribe(@PathVariable Long memberId) {
-        return sseEmitterManager.subscribe(memberId);
+    @GetMapping(value = "/subscribe", produces = "text/event-stream")//sse 서버에서 클라이언트로 실시간으로 보내기 위함.
+    public SseEmitter subscribe(Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        return sseEmitterManager.subscribe(email);
     }
 
-    @GetMapping("/{memberId}")
-    public ResponseEntity<?> getNotifications(@PathVariable Long memberId, Authentication authentication) {
+    @GetMapping
+    public ResponseEntity<?> getNotifications(Authentication authentication) {
         String email = authentication.getPrincipal().toString();
-        return notificationService.getNotifications(memberId, email);
+        return notificationService.getNotifications(email);
     }
 }

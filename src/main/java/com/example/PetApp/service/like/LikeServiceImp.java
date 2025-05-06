@@ -1,5 +1,6 @@
 package com.example.PetApp.service.like;
 
+import com.example.PetApp.config.redis.NotificationRedisPublisher;
 import com.example.PetApp.domain.LikeT;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
@@ -13,13 +14,16 @@ import com.example.PetApp.repository.jpa.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -28,9 +32,10 @@ public class LikeServiceImp implements LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-
-    @Transactional//나중에 profile에 관련된 정보를 보낼 수 있으니까
-    @Override//LikeResponseDto를 반환하자.
+    private final NotificationRedisPublisher notificationRedisPublisher;
+    private final RedisTemplate<String, Object> notificationRedisTemplate;
+    @Transactional
+    @Override//member의 이름 과 사진으로
     //좋아요는 redis가 아니라 누르는순간 요청을 보내는게 맞고 새로고침할 때 마다 좋아요 리셋하는게 맞을듯.
     public ResponseEntity<Object> getLike(Long postId) {
         log.info("좋아요 상세 요청");
@@ -40,7 +45,7 @@ public class LikeServiceImp implements LikeService {
         }else {
             List<LikeT> likeList = likeRepository.findAllByPost(post.get());
             LikeResponseDto likeResponseDto = new LikeResponseDto();
-            likeList.forEach(likeT -> likeResponseDto.getMembers().add(likeT.getMember()));
+            likeList.forEach(likeT -> likeResponseDto.getMembers().add(likeT.getMember()));//수정해야됨.
             likeResponseDto.setLikeCount((long) likeResponseDto.getMembers().size());
             return ResponseEntity.ok(likeResponseDto);
         }
@@ -51,9 +56,6 @@ public class LikeServiceImp implements LikeService {
     public ResponseEntity<Object> createAndDeleteLike(LikeDto likeDto, String email) {
         Optional<Post> post = postRepository.findById(likeDto.getPostId());
         Member member = memberRepository.findByEmail(email).get();
-        if (!(likeDto.getMemberId().equals(member.getMemberId()))) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청입니다.");
-        }
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
@@ -63,6 +65,10 @@ public class LikeServiceImp implements LikeService {
                 return deleteLike(post.get(),member);
             } else {
                 log.info("좋아요 생성");
+                String message = member.getName() + "님이 회원님의 게시물을 좋아합니다.";
+                String key = "notifications:" + post.get().getMember().getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
+                notificationRedisTemplate.opsForValue().set(key, message, Duration.ofDays(3));
+                notificationRedisPublisher.publish("member:" + post.get().getMember().getMemberId(), message);
                 return createLike(post.get(), member);
             }
 

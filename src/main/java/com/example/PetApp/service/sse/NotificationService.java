@@ -29,12 +29,9 @@ public class NotificationService {
 
 
 
-    public ResponseEntity<?> getNotifications(Long memberId, String email) {
+    public ResponseEntity<?> getNotifications(String email) {
         Member member = memberRepository.findByEmail(email).get();
-        if (!memberId.equals(member.getMemberId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-        }
-        Set<String> keys = notificationRedisTemplate.keys("notifications:" + memberId + ":*");
+        Set<String> keys = notificationRedisTemplate.keys("notifications:" + member.getMemberId() + ":*");
         List<NotificationListDto> list = keys.stream()
                 .map(key -> notificationRedisTemplate.opsForValue().get(key))
                 .map(message -> {
