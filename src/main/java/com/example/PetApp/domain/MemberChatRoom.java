@@ -19,7 +19,7 @@ public class MemberChatRoom {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userChatRoomId;
+    private Long memberChatRoomId;
 
     @OneToMany
     private List<Member> members;

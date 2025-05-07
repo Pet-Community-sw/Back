@@ -16,9 +16,8 @@ public class ChattingController {
 
     @MessageMapping("/chat/message")
     private void message(@Payload ChatMessage chatMessage, Principal principal) {
-        Long profileId = Long.valueOf(principal.getName());
-        chattingService.sendToMessage(chatMessage, profileId);
-
+        Long id = Long.valueOf(principal.getName());
+        chattingService.sendToMessage(chatMessage, id);
     }
 }
 
