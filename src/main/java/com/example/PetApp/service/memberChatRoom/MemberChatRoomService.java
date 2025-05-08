@@ -9,7 +9,7 @@ public interface MemberChatRoomService {
 
     ResponseEntity<?> createUserChatRoom(Long memberId, String email);
 
-    ResponseEntity<?> updateUserChatRoom(String userChatRoomName, String email);
+//    ResponseEntity<?> updateUserChatRoom(String userChatRoomName, String email);
 
     ResponseEntity<?> deleteUserChatRoom(Long userChatRoomId, String email);
 }

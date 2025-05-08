@@ -8,11 +8,14 @@ import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.commment.UpdateCommentDto;
+import com.example.PetApp.dto.notification.NotificationListDto;
 import com.example.PetApp.repository.jpa.CommentRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.util.TimeAgoUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,10 +39,11 @@ public class CommentServiceImp implements CommentService {
     private final NotificationRedisPublisher notificationRedisPublisher;
     private final RedisTemplate<String, Object> notificationRedisTemplate;
     private final MemberRepository memberRepository;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     @Override
-    public ResponseEntity<Object> createComment(CommentDto commentDto, String email) {
+    public ResponseEntity<Object> createComment(CommentDto commentDto, String email) throws JsonProcessingException {
         log.info("댓글 작성 요청.");
         Optional<Post> post = postRepository.findById(commentDto.getPostId());
         Member member = memberRepository.findByEmail(email).get();
@@ -54,8 +59,12 @@ public class CommentServiceImp implements CommentService {
                 .member(member)
                 .build();
         Comment newComment = commentRepository.save(comment);
-        String message = member.getName() + "님이 회원님의 게시물에 댓글을 달았습니다.";
+        String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
         String key = "notifications:" + post.get().getMember().getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
+        NotificationListDto notificationListDto = new NotificationListDto(message, LocalDateTime.now());
+        String json =objectMapper.writeValueAsString(notificationListDto);
+        notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
+
         notificationRedisTemplate.opsForValue().set(key, message, Duration.ofDays(3));
         notificationRedisPublisher.publish("member:" + post.get().getMember().getMemberId(), message);
         return ResponseEntity.status(HttpStatus.CREATED).body(newComment.getCommentId());
