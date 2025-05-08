@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 
 @Repository
 public interface MemberChatRoomRepository extends JpaRepository<MemberChatRoom, Long> {
@@ -15,4 +17,5 @@ public interface MemberChatRoomRepository extends JpaRepository<MemberChatRoom, 
             "from MemberChatRoom mc where :member1 member of mc.members and : member2 member of mc.members")
     boolean existsByMembers(@Param("member1") Member member1, @Param("member2") Member member2);
 
+    List<MemberChatRoom> findAllByMembersContains(Member member);
 }

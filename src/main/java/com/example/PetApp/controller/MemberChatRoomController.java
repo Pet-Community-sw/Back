@@ -24,15 +24,15 @@ public class MemberChatRoomController {
         return memberChatRoomService.createUserChatRoom(memberId, email);
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateUserChatRoom(@RequestBody String userChatRoomName, Authentication authentication) {
-        String email = authentication.getPrincipal().toString();
-        return memberChatRoomService.updateUserChatRoom(userChatRoomName, email);
-    }
+//    @PutMapping
+//    public ResponseEntity<?> updateUserChatRoom(@RequestBody String memberChatRoomName, Authentication authentication) {
+//        String email = authentication.getPrincipal().toString();
+//        return memberChatRoomService.updateUserChatRoom(memberChatRoomName, email);
+//    }
 
-    @DeleteMapping("/{userChatRoomId}")
-    public ResponseEntity<?> deleteUserChatRoom(@PathVariable Long userChatRoomId, Authentication authentication) {
+    @DeleteMapping("/{memberChatRoomId}")
+    public ResponseEntity<?> deleteUserChatRoom(@PathVariable Long memberChatRoomId, Authentication authentication) {
         String email = authentication.getPrincipal().toString();
-        return memberChatRoomService.deleteUserChatRoom(userChatRoomId, email);
+        return memberChatRoomService.deleteUserChatRoom(memberChatRoomId, email);
     }
 }

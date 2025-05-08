@@ -1,4 +1,4 @@
-package com.example.PetApp.dto.chat;
+package com.example.PetApp.dto.groupchat;
 
 import lombok.*;
 

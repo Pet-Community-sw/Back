@@ -1,9 +1,9 @@
 package com.example.PetApp.service.chat;
 
 import com.example.PetApp.domain.*;
-import com.example.PetApp.dto.chat.ChatMessageDto;
-import com.example.PetApp.dto.chat.ChatRoomResponseDto;
-import com.example.PetApp.dto.chat.UpdateChatRoomDto;
+import com.example.PetApp.dto.groupchat.ChatMessageDto;
+import com.example.PetApp.dto.groupchat.ChatRoomsResponseDto;
+import com.example.PetApp.dto.groupchat.UpdateChatRoomDto;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
@@ -35,13 +35,13 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> getChatRoomList(Long profileId) {
+    public ResponseEntity<?> getChatRooms(Long profileId) {
         Optional<Profile> profile = profileRepository.findById(profileId);
         if (profile.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
         }
         Set<ChatRoom> chatRoomList = chatRoomRepository.findAllByProfilesContains(profile.get());
-        List<ChatRoomResponseDto> chatRoomResponseDtos = chatRoomList.stream().map(chatRoom -> {
+        List<ChatRoomsResponseDto> chatRoomsResponseDtos = chatRoomList.stream().map(chatRoom -> {
             String lastMessage = redisTemplate.opsForValue().get("chat:lastMessage" + chatRoom.getChatRoomId());
             String lastMessageTime = redisTemplate.opsForValue().get("chat:lastMessageTime" + chatRoom.getChatRoomId());
             String count = redisTemplate.opsForValue().get("unRead:" + chatRoom.getChatRoomId() + ":" + profileId);
@@ -50,9 +50,9 @@ public class ChatRoomServiceImp implements ChatRoomService {
             if (lastMessageTime != null) {
                 lastMessageLocalDateTime = LocalDateTime.parse(lastMessageTime);
             }
-            return ChatRoomResponseDto.from(chatRoom, lastMessage, unReadCount, lastMessageLocalDateTime);
+            return ChatRoomsResponseDto.from(chatRoom, lastMessage, unReadCount, lastMessageLocalDateTime);
         }).collect(Collectors.toList());
-        return ResponseEntity.ok(chatRoomResponseDtos);
+        return ResponseEntity.ok(chatRoomsResponseDtos);
     }
 
     @Transactional

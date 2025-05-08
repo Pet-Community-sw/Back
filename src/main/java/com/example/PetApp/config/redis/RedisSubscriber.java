@@ -1,14 +1,13 @@
 package com.example.PetApp.config.redis;
 
 import com.example.PetApp.domain.*;
-import com.example.PetApp.dto.chat.UpdateChatRoomList;
+import com.example.PetApp.dto.groupchat.UpdateChatRoomList;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.expression.spel.ast.PropertyOrFieldReference;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

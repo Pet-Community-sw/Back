@@ -1,6 +1,6 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.dto.chat.UpdateChatRoomDto;
+import com.example.PetApp.dto.groupchat.UpdateChatRoomDto;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.chat.ChatRoomService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class ChatRoomController {
     @GetMapping()
     private ResponseEntity<?> chatRoomList(Authentication authentication) {
         Long profileId = getProfileId( authentication);
-        return chatRoomService.getChatRoomList(profileId);
+        return chatRoomService.getChatRooms(profileId);
     }
 
     @GetMapping("/{chatRoomId}")
