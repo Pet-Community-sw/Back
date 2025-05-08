@@ -43,10 +43,13 @@ public class MatchPostServiceImp implements MatchPostService {
         List<MatchPost> matchPosts = matchPostRepository.findByMatchPostsByPlace(longitude, latitude);
         List<GetMatchPostListResponseDto> getMatchPostListResponseDtoList = matchPosts.stream()
                 .map(matchPost -> new GetMatchPostListResponseDto(
+                        matchPost.getMatchPostId(),
                         matchPost.getLocationName(),
                         matchPost.getLimitCount(),
                         timeAgoUtil.getTimeAgo(matchPost.getMatchPostTime()),
-                        matchPost.getProfiles().size()
+                        matchPost.getProfiles().size(),
+                        matchPost.getLongitude(),
+                        matchPost.getLatitude()
                 )).collect(Collectors.toList());
         return ResponseEntity.ok(getMatchPostListResponseDtoList);
     }
@@ -61,11 +64,15 @@ public class MatchPostServiceImp implements MatchPostService {
         List<MatchPost> matchPosts = matchPostRepository.findByMatchPostByLocation(minLongitude-0.001, minLatitude-0.001, maxLongitude+0.001, maxLatitude+0.001);
         List<GetMatchPostListResponseDto> getMatchPostListResponseDtoList = matchPosts.stream()
                 .map(matchPost -> new GetMatchPostListResponseDto(
+                        matchPost.getMatchPostId(),
                         matchPost.getLocationName(),
                         matchPost.getLimitCount(),
                         timeAgoUtil.getTimeAgo(matchPost.getMatchPostTime()),
-                        matchPost.getProfiles().size()
+                        matchPost.getProfiles().size(),
+                        matchPost.getLongitude(),
+                        matchPost.getLatitude()
                 )).collect(Collectors.toList());
+
         return ResponseEntity.ok(getMatchPostListResponseDtoList);
     }
 
@@ -106,9 +113,6 @@ public class MatchPostServiceImp implements MatchPostService {
     @Override
     public ResponseEntity<?> createMatchPost(CreateMatchPostDto createMatchPostDto, Long profileId) {
         log.info("매칭글 생성 요청");
-        if (!createMatchPostDto.getProfileId().equals(profileId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청");
-        }
         Profile profile = profileRepository.findById(profileId).get();
         MatchPost matchPost = MatchPost.builder()
                 .profile(profile)
@@ -130,7 +134,7 @@ public class MatchPostServiceImp implements MatchPostService {
     public ResponseEntity<?> startMatch(Long matchPostId, Long profileId) {
         log.info("스타트 매칭");
         if (profileId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요.");
         }
         Optional<MatchPost> matchPost = matchPostRepository.findById(matchPostId);
         if (matchPost.isEmpty()) {
@@ -166,15 +170,12 @@ public class MatchPostServiceImp implements MatchPostService {
 
     @Transactional// 장소를 수정하는게 맞으려나?
     @Override
-    public ResponseEntity<?> updateMatchPost(UpdateMatchPostDto updateMatchPostDto, Long profileId) {
-        Optional<MatchPost> matchPost = matchPostRepository.findById(updateMatchPostDto.getMatchPostId());
-        if (profileId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청");
-        }
+    public ResponseEntity<?> updateMatchPost(Long matchPostId, UpdateMatchPostDto updateMatchPostDto, Long profileId) {
+        Optional<MatchPost> matchPost = matchPostRepository.findById(matchPostId);
         if (matchPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 매칭게시물은 없습니다");
         } else if (!matchPost.get().getProfile().getProfileId().equals(profileId)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("잘못된 요청");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청");
         }
         matchPost.get().setContent(updateMatchPostDto.getContent());
         matchPost.get().setLimitCount(updateMatchPostDto.getLimitCount());

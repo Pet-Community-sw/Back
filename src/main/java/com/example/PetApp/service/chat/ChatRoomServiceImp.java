@@ -2,6 +2,7 @@ package com.example.PetApp.service.chat;
 
 import com.example.PetApp.domain.*;
 import com.example.PetApp.dto.groupchat.ChatMessageDto;
+import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
 import com.example.PetApp.dto.groupchat.ChatRoomsResponseDto;
 import com.example.PetApp.dto.groupchat.UpdateChatRoomDto;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -69,7 +71,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
             chatRoom.addProfiles(matchPost.getProfile());//글 작성자.
             chatRoom.addProfiles(profile);//신청하는사람.
             ChatRoom chatRoom1 = chatRoomRepository.save(chatRoom);
-            return ResponseEntity.status(HttpStatus.CREATED).body(chatRoom1.getChatRoomId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("chatRoomId",chatRoom1.getChatRoomId()));
         } else {
             if (matchPost.getLimitCount() <= chatRoom2.get().getProfiles().size()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("인원초과");//채팅방 limitCount설정.
@@ -80,8 +82,9 @@ public class ChatRoomServiceImp implements ChatRoomService {
         }
     }
 
+    @Override
     @Transactional
-    public void deleteChatRoom(Long chatRoomId, Long profileId) {
+    public ResponseEntity<?> deleteChatRoom(Long chatRoomId, Long profileId) {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
         Optional<Profile> profile = profileRepository.findById(profileId);
         ChatRoom chatRoom1 = chatRoom.get();
@@ -94,6 +97,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
             chatMessageRepository.deleteByChatRoomId(chatRoomId);//채팅방 삭제.
             chatRoomRepository.deleteByChatRoom(chatRoomId);//이게 왜안되는교?
         }
+        return ResponseEntity.ok().body("삭제 되었습니다.");
     }
 
     @Override
@@ -109,19 +113,19 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     @Transactional
     @Override//방장만 수정할 수 있도록 설정.
-    public ResponseEntity<?> updateChatRoom(UpdateChatRoomDto updateChatRoomDto, Long profileId) {
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(updateChatRoomDto.getChatRoomId());
+    public ResponseEntity<?> updateChatRoom(Long chatRoomId, UpdateChatRoomDto updateChatRoomDto, Long profileId) {
+        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
         Optional<Profile> profile = profileRepository.findById(profileId);
         if (chatRoom.isEmpty()) {
-            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 채팅방이 없습니다.");
         }
         if (profile.isEmpty()||!(chatRoom.get().getMatchPost().getProfile().getProfileId().equals(profile.get().getProfileId()))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
         }
         ChatRoom chatRoom1 = chatRoom.get();
-        chatRoom1.setName(updateChatRoomDto.getChatRoomTitle());
+        chatRoom1.setName(updateChatRoomDto.getChatRoomName());
         chatRoom1.setLimitCount(updateChatRoomDto.getLimitCount());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body("수정 되었습니다.");
     }
 
     @Transactional
@@ -129,16 +133,26 @@ public class ChatRoomServiceImp implements ChatRoomService {
     public ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, int page) {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
         Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isEmpty()) {
+        if (chatRoom.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 채팅방이 없습니다.");
+        } else if (profile.isEmpty()||!(chatRoom.get().getProfiles().contains(profile.get()))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-        } else if (chatRoom.isEmpty()||!(chatRoom.get().getProfiles().contains(profile.get()))) {
-            return ResponseEntity.badRequest().body("잘못된 요청입니다.");
         }
         Pageable pageRequest = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "messageTime"));
         Page<ChatMessage> messages = chatMessageRepository.findByChatRoomId(chatRoomId, pageRequest);
         String key = "unRead:" + chatRoomId + ":" + profileId;
         redisTemplate.delete(key);
-        ChatMessageDto messagesList = new ChatMessageDto(chatRoomId, messages.getContent());
+        List<ChatMessage> content = messages.getContent();
+        List<ChatMessageDto> chatMessageDtos = content.stream()
+                .map(chatMessage -> new ChatMessageDto(
+                        chatMessage.getSenderId(),
+                        chatMessage.getSenderName(),
+                        chatMessage.getSenderImageUrl(),
+                        chatMessage.getMessage(),
+                        chatMessage.getMessageTime()
+                ))
+                .collect(Collectors.toList());
+        ChatMessageResponseDto messagesList = new ChatMessageResponseDto(chatRoomId, chatMessageDtos);
         return ResponseEntity.ok(messagesList);
     }
 

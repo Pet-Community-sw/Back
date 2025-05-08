@@ -36,6 +36,7 @@ public class ChatMessage {
     private Long chatRoomId;
     private Long senderId;
     private String senderName;
+    private String senderImageUrl;
     private String message;
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -46,8 +47,11 @@ public class ChatMessage {
         return "ChatMessage{" +
                 "id='" + id + '\'' +
                 ", messageType=" + messageType +
+                ", chatRoomType=" + chatRoomType +
                 ", chatRoomId=" + chatRoomId +
                 ", senderId=" + senderId +
+                ", senderName='" + senderName + '\'' +
+                ", senderImageUrl='" + senderImageUrl + '\'' +
                 ", message='" + message + '\'' +
                 ", messageTime=" + messageTime +
                 '}';

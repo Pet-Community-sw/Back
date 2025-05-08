@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class GetMatchPostListResponseDto {
+    private Long matchPostId;
 
     private String locationName;
 
@@ -16,4 +17,8 @@ public class GetMatchPostListResponseDto {
     private String createdAt;
 
     private int currentCount;
+
+    private Double longitude;
+
+    private Double latitude;
 }

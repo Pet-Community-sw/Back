@@ -7,8 +7,6 @@ import lombok.Setter;
 @Setter
 public class UpdateMatchPostDto {
 
-    private Long matchPostId;
-
     private String content;
 
     private int limitCount;

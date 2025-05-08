@@ -16,7 +16,7 @@ public interface MatchPostService {
 
     ResponseEntity<?> getMatchPost(Long matchPostId, Long profileId);
 
-    ResponseEntity<?> updateMatchPost(UpdateMatchPostDto updateMatchPostDto, Long profileId);
+    ResponseEntity<?> updateMatchPost(Long matchPostId, UpdateMatchPostDto updateMatchPostDto, Long profileId);
 
     ResponseEntity<?> getMatchPostsByLocation(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, Long profileId);
 

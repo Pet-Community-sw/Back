@@ -1,19 +1,25 @@
 package com.example.PetApp.dto.groupchat;
 
-import com.example.PetApp.domain.ChatMessage;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
-
 public class ChatMessageDto {
 
-    private Long chatRoomId;
+    private Long senderId;
 
-    private List<ChatMessage> messageList;
+    private String senderName;
+
+    private String senderImageUrl;
+
+    private String message;
+
+    private LocalDateTime messageTime;
 }

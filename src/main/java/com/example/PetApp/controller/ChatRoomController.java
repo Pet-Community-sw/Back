@@ -31,13 +31,20 @@ public class ChatRoomController {
         return chatRoomService.getMessages(chatRoomId, profileId, page);
     }
 
-    @PutMapping()
-    private ResponseEntity<?> updateChatRoom(@RequestBody UpdateChatRoomDto updateChatRoomDto, Authentication authentication) {
+    @PutMapping("/{chatRoomId}")
+    private ResponseEntity<?> updateChatRoom(@PathVariable Long chatRoomId, @RequestBody UpdateChatRoomDto updateChatRoomDto, Authentication authentication) {
         Long profileId = getProfileId( authentication);
-        return chatRoomService.updateChatRoom(updateChatRoomDto, profileId);
+        return chatRoomService.updateChatRoom(chatRoomId, updateChatRoomDto, profileId);
+    }
+
+    @DeleteMapping("/{chatRoomId}")
+    private ResponseEntity<?> deleteChatRoom(@PathVariable Long chatRoomId, Authentication authentication) {
+        Long profileId = getProfileId(authentication);
+        return chatRoomService.deleteChatRoom(chatRoomId, profileId);
     }
 
     private static Long getProfileId(Authentication authentication) {
+
         JwtAuthenticationToken authentication1 = (JwtAuthenticationToken) authentication;
         return Long.valueOf(authentication1.getProfileId().toString());
     }

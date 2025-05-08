@@ -5,6 +5,7 @@ import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.UpdateCommentDto;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.comment.CommentService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,7 +19,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping()
-    public ResponseEntity<?> createComment(@RequestBody CommentDto commentDto, Authentication authentication) {
+    public ResponseEntity<?> createComment(@RequestBody CommentDto commentDto, Authentication authentication) throws JsonProcessingException {
         return commentService.createComment(commentDto, getEmail(authentication));
     }
 

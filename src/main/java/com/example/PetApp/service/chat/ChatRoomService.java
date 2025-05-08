@@ -15,12 +15,12 @@ public interface ChatRoomService {
 
     ResponseEntity<?> createChatRoom(MatchPost matchPost, Profile profile);
 
-    ResponseEntity<?> updateChatRoom(UpdateChatRoomDto updateChatRoomDto, Long profileId);
+    ResponseEntity<?> updateChatRoom(Long chatRoomId, UpdateChatRoomDto updateChatRoomDto, Long profileId);
 
 
     ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, int page);
 
-    void deleteChatRoom(Long chatRoomId, Long profileId);
+    ResponseEntity<?> deleteChatRoom(Long chatRoomId, Long profileId);
 
     List<Long> getProfiles(Long chatRoomId);
 }

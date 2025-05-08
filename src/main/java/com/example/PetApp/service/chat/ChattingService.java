@@ -5,6 +5,7 @@ import com.example.PetApp.config.redis.RedisPublisher;
 import com.example.PetApp.domain.ChatMessage;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.MemberChatRoom;
+import com.example.PetApp.domain.Profile;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,10 @@ public class ChattingService {
             throw new IllegalArgumentException("사용자가 동일하지 않습니다.");
         }
         log.info("messageType : {}", chatMessage);
-
+        Profile profile = profileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("프로필을 찾을 수 없습니다."));
         chatMessage.setMessageTime(LocalDateTime.now());
+        chatMessage.setSenderImageUrl(profile.getPetImageUrl());
 
         if (chatMessage.getMessageType() == ChatMessage.MessageType.ENTER) {
             chatMessage.setMessage(chatMessage.getSenderName() + "님이 입장하셨습니다.");

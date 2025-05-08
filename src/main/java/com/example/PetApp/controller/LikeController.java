@@ -4,6 +4,7 @@ package com.example.PetApp.controller;
 import com.example.PetApp.dto.like.LikeDto;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.like.LikeService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,7 +24,7 @@ public class LikeController {
     //이상함
 
     @PostMapping()
-    public ResponseEntity<Object> createAndDeleteLike(@RequestBody LikeDto likeDto, Authentication authentication) {
+    public ResponseEntity<Object> createAndDeleteLike(@RequestBody LikeDto likeDto, Authentication authentication) throws JsonProcessingException {
         String email = authentication.getPrincipal().toString();
         return likeService.createAndDeleteLike(likeDto, email);
     }

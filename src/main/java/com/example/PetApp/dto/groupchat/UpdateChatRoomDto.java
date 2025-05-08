@@ -9,9 +9,7 @@ import lombok.*;
 @Builder
 public class UpdateChatRoomDto {
 
-    private Long chatRoomId;
-
-    private String chatRoomTitle;
+    private String chatRoomName;
 
     private int limitCount;
 }

@@ -6,7 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateMatchPostDto {
-    private Long profileId;
 
     private Double longitude;
 

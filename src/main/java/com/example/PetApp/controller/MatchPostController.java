@@ -53,14 +53,14 @@ public class MatchPostController {
         return matchPostService.startMatch(matchPostId, profileId);
     }
 
-    @PutMapping
-    private ResponseEntity<?> updateMatchPost(@RequestBody UpdateMatchPostDto updateMatchPostDto, Authentication authentication) {
+    @PutMapping("/{matchPostId}")
+    private ResponseEntity<?> updateMatchPost(@PathVariable Long matchPostId, @RequestBody UpdateMatchPostDto updateMatchPostDto, Authentication authentication) {
         Long profileId = getProfileId(authentication);
-        return matchPostService.updateMatchPost(updateMatchPostDto, profileId);
+        return matchPostService.updateMatchPost(matchPostId, updateMatchPostDto, profileId);
     }
 
-    @DeleteMapping
-    private ResponseEntity<?> deleteMatchPost(@RequestBody Long matchPostId, Authentication authentication) {
+    @DeleteMapping("/{matchPostId}")
+    private ResponseEntity<?> deleteMatchPost(@PathVariable Long matchPostId, Authentication authentication) {
         Long profileId = getProfileId(authentication);
         return matchPostService.deleteMatchPost(matchPostId, profileId);
     }
