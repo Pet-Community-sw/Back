@@ -1,10 +1,7 @@
 package com.example.PetApp.service.chat;
 
 import com.example.PetApp.domain.*;
-import com.example.PetApp.dto.groupchat.ChatMessageDto;
-import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
-import com.example.PetApp.dto.groupchat.ChatRoomsResponseDto;
-import com.example.PetApp.dto.groupchat.UpdateChatRoomDto;
+import com.example.PetApp.dto.groupchat.*;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
@@ -16,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +32,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
     private final ProfileRepository profileRepository;
     private final StringRedisTemplate redisTemplate;
     private final ChatMessageRepository chatMessageRepository;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Transactional
     @Override
@@ -142,18 +141,45 @@ public class ChatRoomServiceImp implements ChatRoomService {
         Page<ChatMessage> messages = chatMessageRepository.findByChatRoomId(chatRoomId, pageRequest);
         String key = "unReadChatCount:" + chatRoomId + ":" + profileId;
         redisTemplate.delete(key);
+
         List<ChatMessage> content = messages.getContent();
+
+        for (ChatMessage chatMessage : content) {
+            updateChatMessageProfile(chatMessage, profileId);
+        }
         List<ChatMessageDto> chatMessageDtos = content.stream()
                 .map(chatMessage -> new ChatMessageDto(
                         chatMessage.getSenderId(),
                         chatMessage.getSenderName(),
                         chatMessage.getSenderImageUrl(),
                         chatMessage.getMessage(),
+                        chatMessage.getChatUnReadCount(),
                         chatMessage.getMessageTime()
                 ))
                 .collect(Collectors.toList());
         ChatMessageResponseDto messagesList = new ChatMessageResponseDto(chatRoomId, chatMessageDtos);
         return ResponseEntity.ok(messagesList);
     }
-        //안읽은 메시지 만큼만 만약 상세요청하면 그 메시지들만 -1하면 좋을 듯
+        public void updateChatMessageProfile(ChatMessage chatMessage, Long currentProfileId) {
+            List<Long> offlineProfiles = chatMessage.getProfiles();
+
+            // 자신을 제외한 리스트로 새로 만듦
+            List<Long> updatedOfflineProfiles = offlineProfiles.stream()
+                    .filter(id -> !id.equals(currentProfileId))
+                    .collect(Collectors.toList());
+
+            // 업데이트된 리스트 세팅
+            chatMessage.setProfiles(updatedOfflineProfiles);
+
+            chatMessage.setChatUnReadCount(chatMessage.getProfiles().size());
+            UpdateChatUnReadCountDto updateChatUnReadDto=UpdateChatUnReadCountDto.builder()
+                    .chatRoomId(chatMessage.getChatRoomId())
+                    .id(chatMessage.getId())
+                    .chatUnReadCount(chatMessage.getChatUnReadCount())
+                    .build();
+            simpMessagingTemplate.convertAndSend("/sub/chat/update/unread", updateChatUnReadDto);
+
+        }
+
+
 }

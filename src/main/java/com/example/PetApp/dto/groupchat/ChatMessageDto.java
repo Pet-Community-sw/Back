@@ -21,6 +21,8 @@ public class ChatMessageDto {
 
     private String message;
 
+    private int unReadCount;
+
     private LocalDateTime messageTime;
 
 }
