@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -40,6 +41,15 @@ public class ChattingService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatMessage.getChatRoomId()).orElseThrow(() -> new RuntimeException("채팅방 없음"));
         chatMessage.setMessageTime(LocalDateTime.now());
         chatMessage.setSenderImageUrl(profile.getPetImageUrl());
+        List<Profile> profiles = chatRoom.getProfiles();
+        List<Long> profilesIds = profiles.stream()//안읽은 수 처리.
+                .filter(profile1->!profile1.equals(profile))
+                .map(Profile::getProfileId)
+                .collect(Collectors.toList());
+        Set<String> onlineProfiles = stringRedisTemplate.opsForSet().members("chatRoomId:" + chatRoom.getChatRoomId() + ":onlineMembers");
+
+        chatMessage.setProfiles(profilesIds);
+        chatMessage.setChatUnReadCount(profilesIds.size());
 
         if (chatMessage.getMessageType() == ChatMessage.MessageType.ENTER) {
             chatMessage.setMessage(chatMessage.getSenderName() + "님이 입장하셨습니다.");

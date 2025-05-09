@@ -140,7 +140,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
         }
         Pageable pageRequest = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "messageTime"));
         Page<ChatMessage> messages = chatMessageRepository.findByChatRoomId(chatRoomId, pageRequest);
-        String key = "unRead:" + chatRoomId + ":" + profileId;
+        String key = "unReadChatCount:" + chatRoomId + ":" + profileId;
         redisTemplate.delete(key);
         List<ChatMessage> content = messages.getContent();
         List<ChatMessageDto> chatMessageDtos = content.stream()

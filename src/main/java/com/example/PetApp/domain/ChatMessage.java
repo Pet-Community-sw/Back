@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Document(collection = "chat")
 @Getter
@@ -38,6 +39,8 @@ public class ChatMessage {
     private String senderName;
     private String senderImageUrl;
     private String message;
+    private List<Long> profiles;
+    private int chatUnReadCount;
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime messageTime;//포맷 필요함.

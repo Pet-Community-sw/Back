@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -35,13 +36,21 @@ public class RedisSubscriber {
 
             redisTemplate.opsForValue().set("chat:lastMessage" + chatMessage.getChatRoomId(), chatMessage.getMessage());
             redisTemplate.opsForValue().set("chat:lastMessageTime" + chatMessage.getChatRoomId(), String.valueOf(chatMessage.getMessageTime()));
+            Set<String> onlineProfiles = redisTemplate.opsForSet().members("chatRoomId:" + chatRoom.getChatRoomId() + ":onlineMembers");
+
             for (Profile profile : chatRoom.getProfiles()) {
                 if (!(profile.getProfileId().equals(chatMessage.getSenderId()))) {
-                    String key = "unReadChat:" + chatMessage.getChatRoomId() + ":" + profile.getProfileId();
-                    Long count = redisTemplate.opsForValue().increment(key);
-                    unReadMap.put(profile.getMember().getMemberId(), count);
+                    // onlineProfiles가 null이 아닌지 체크하고 포함 여부 확인
+                    boolean isOnline = onlineProfiles != null && onlineProfiles.contains(profile.getProfileId().toString());
+
+                    if (!isOnline) {  // 오프라인인 경우만 count 증가
+                        String key = "unReadChatCount:" + chatMessage.getChatRoomId() + ":" + profile.getProfileId();
+                        Long count = redisTemplate.opsForValue().increment(key);
+                        unReadMap.put(profile.getMember().getMemberId(), count);
+                    }
                 }
             }
+
             UpdateChatRoomList updateChatRoomList = UpdateChatRoomList.builder()
                     .chatRoomId(chatRoom.getChatRoomId())
                     .lastMessage(chatMessage.getMessage())
