@@ -2,19 +2,20 @@ package com.example.PetApp.service.chat;
 
 import com.example.PetApp.config.redis.NotificationRedisPublisher;
 import com.example.PetApp.config.redis.RedisPublisher;
-import com.example.PetApp.domain.ChatMessage;
-import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.MemberChatRoom;
-import com.example.PetApp.domain.Profile;
+import com.example.PetApp.domain.*;
+import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -27,6 +28,7 @@ public class ChattingService {
     private final ChatRoomService chatRoomService;
     private final NotificationRedisPublisher notificationRedisPublisher;
     private final MemberChatRoomRepository memberChatRoomRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     public void sendToMessage(ChatMessage chatMessage, Long id) {
         if (!(chatMessage.getSenderId().equals(id))) {
@@ -35,6 +37,7 @@ public class ChattingService {
         log.info("messageType : {}", chatMessage);
         Profile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("프로필을 찾을 수 없습니다."));
+        ChatRoom chatRoom = chatRoomRepository.findById(chatMessage.getChatRoomId()).orElseThrow(() -> new RuntimeException("채팅방 없음"));
         chatMessage.setMessageTime(LocalDateTime.now());
         chatMessage.setSenderImageUrl(profile.getPetImageUrl());
 
@@ -58,16 +61,21 @@ public class ChattingService {
         }
     }
 
+
     private void sendChatNotification(ChatMessage chatMessage) {//다중 or 1:1
         Long chatRoomId = chatMessage.getChatRoomId();
         Long senderId = chatMessage.getSenderId();
         if (chatMessage.getChatRoomType() == ChatMessage.ChatRoomType.MANY) {
             List<Long> profiles = chatRoomService.getProfiles(chatRoomId);
-
+            Set<String> onlineProfiles = stringRedisTemplate.opsForSet().members("chatRoomId:" + chatRoomId + ":onlineMembers");
             for (Long profileId : profiles) {
                 if (!profileId.equals(senderId)) {
+                    if (onlineProfiles!=null&onlineProfiles.contains(profileId.toString())) {//현재 채팅방 접속 유저
+                        continue;
+                    }
                     String message = chatMessage.getSenderName() + "님이 메시지를 보냈습니다.";
-                    notificationRedisPublisher.publish("member:" + profileId, message);
+                    Profile profile = profileRepository.findById(profileId).get();
+                    notificationRedisPublisher.publish("member:" + profile.getMember().getMemberId(), message);
                 }
             }
         } else {

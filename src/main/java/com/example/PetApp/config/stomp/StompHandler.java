@@ -14,6 +14,8 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -36,11 +38,13 @@ public class StompHandler implements ChannelInterceptor {
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
     private final MemberChatRoomRepository memberChatRoomRepository;
+    private final StringRedisTemplate stringRedisTemplate;
 
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);//매번 새로운 accessor을 생성 x
+        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);//매번 새로운 accessor을 생성
+        //현재처리중인 stomp메시지 헤더를 가지고오는거임.
         log.info("🔥 interceptor 진입 - accessor: {}", accessor);
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {//connect로 들어온 요청은 jwt토큰 인증을 해야됨. setuser을 해도 sub까지 유지가 안됨.
             //토큰 값이 유효 한지만 확인.
@@ -81,6 +85,9 @@ public class StompHandler implements ChannelInterceptor {
                     log.error("chatRoomId:{} 에 권한이 없는 profile이 접근하려고함.", chatRoomId);
                     throw new IllegalArgumentException("잘못된 접근입니다.");
                 }
+                stringRedisTemplate.opsForSet().add("chatRoomId:" + chatRoomId + ":onlineMembers", profileId);//채팅방 접속자 유무
+                String sessionId = accessor.getSessionId();
+                stringRedisTemplate.opsForValue().set("session:"+sessionId, chatRoomId.toString());//chatRoomId를 가지고오기 위한 redis 저장
             } else if (destination.startsWith("/sub/member/chat/")) {
                     // 1:1 채팅방 처리
                     Long memberChatRoomId = Long.valueOf(destination.substring("/sub/member/chat/".length()));

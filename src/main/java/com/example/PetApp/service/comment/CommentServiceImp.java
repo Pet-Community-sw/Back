@@ -64,8 +64,6 @@ public class CommentServiceImp implements CommentService {
         NotificationListDto notificationListDto = new NotificationListDto(message, LocalDateTime.now());
         String json =objectMapper.writeValueAsString(notificationListDto);
         notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
-
-        notificationRedisTemplate.opsForValue().set(key, message, Duration.ofDays(3));
         notificationRedisPublisher.publish("member:" + post.get().getMember().getMemberId(), message);
         return ResponseEntity.status(HttpStatus.CREATED).body(newComment.getCommentId());
     }

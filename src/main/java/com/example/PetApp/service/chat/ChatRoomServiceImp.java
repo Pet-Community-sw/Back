@@ -155,5 +155,5 @@ public class ChatRoomServiceImp implements ChatRoomService {
         ChatMessageResponseDto messagesList = new ChatMessageResponseDto(chatRoomId, chatMessageDtos);
         return ResponseEntity.ok(messagesList);
     }
-
+        //안읽은 메시지 만큼만 만약 상세요청하면 그 메시지들만 -1하면 좋을 듯
 }
