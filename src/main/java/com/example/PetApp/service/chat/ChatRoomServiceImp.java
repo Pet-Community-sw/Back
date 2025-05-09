@@ -172,12 +172,15 @@ public class ChatRoomServiceImp implements ChatRoomService {
             chatMessage.setProfiles(updatedOfflineProfiles);
 
             chatMessage.setChatUnReadCount(chatMessage.getProfiles().size());
+
+            chatMessageRepository.save(chatMessage);//카톡처럼 많은 트래픽이 발생안할것같아 이렇게함.
+
             UpdateChatUnReadCountDto updateChatUnReadDto=UpdateChatUnReadCountDto.builder()
                     .chatRoomId(chatMessage.getChatRoomId())
                     .id(chatMessage.getId())
                     .chatUnReadCount(chatMessage.getChatUnReadCount())
                     .build();
-            simpMessagingTemplate.convertAndSend("/sub/chat/update/unread", updateChatUnReadDto);
+            simpMessagingTemplate.convertAndSend("/sub/chat/update/unReadCount", updateChatUnReadDto);
 
         }
 

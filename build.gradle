@@ -45,6 +45,11 @@ dependencies {
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 	implementation 'com.google.code.gson:gson'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+// Firebase Admin SDK
+	implementation 'com.google.firebase:firebase-admin:9.2.0' // 최신 버전 확인 필요
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
+
+
 }
 
 tasks.named('test') {
