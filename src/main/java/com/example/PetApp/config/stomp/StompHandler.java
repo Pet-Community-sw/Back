@@ -45,7 +45,7 @@ public class StompHandler implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);//매번 새로운 accessor을 생성
         //현재처리중인 stomp메시지 헤더를 가지고오는거임.
-        log.info("🔥 interceptor 진입 - accessor: {}", accessor);
+        log.info(" interceptor 진입 - accessor: {}", accessor);
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {//connect로 들어온 요청은 jwt토큰 인증을 해야됨. setuser을 해도 sub까지 유지가 안됨.
             //토큰 값이 유효 한지만 확인.
             String token = accessor.getFirstNativeHeader("Authorization");

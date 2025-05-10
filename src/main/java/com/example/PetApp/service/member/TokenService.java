@@ -1,4 +1,4 @@
-package com.example.PetApp.service.user;
+package com.example.PetApp.service.member;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RefreshToken;

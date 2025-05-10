@@ -1,4 +1,4 @@
-package com.example.PetApp.service.user;
+package com.example.PetApp.service.member;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Role;
@@ -9,7 +9,6 @@ import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;

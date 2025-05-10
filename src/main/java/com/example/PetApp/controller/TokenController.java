@@ -1,6 +1,6 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.service.user.TokenService;
+import com.example.PetApp.service.member.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -4,22 +4,19 @@ import com.example.PetApp.config.redis.NotificationRedisPublisher;
 import com.example.PetApp.domain.Comment;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
-import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.commment.CommentDto;
-import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.commment.UpdateCommentDto;
 import com.example.PetApp.dto.notification.NotificationListDto;
 import com.example.PetApp.firebase.FcmService;
 import com.example.PetApp.repository.jpa.CommentRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
-import com.example.PetApp.repository.jpa.ProfileRepository;
-import com.example.PetApp.util.TimeAgoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -42,6 +39,7 @@ public class CommentServiceImp implements CommentService {
     private final MemberRepository memberRepository;
     private final ObjectMapper objectMapper;
     private final FcmService fcmService;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Transactional
     @Override
@@ -61,14 +59,21 @@ public class CommentServiceImp implements CommentService {
                 .member(member)
                 .build();
         Comment newComment = commentRepository.save(comment);
+        sendCommentNotifications(post, member);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newComment.getCommentId());
+    }
+
+    private void sendCommentNotifications(Optional<Post> post, Member member) throws JsonProcessingException {
         String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
         String key = "notifications:" + post.get().getMember().getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
         NotificationListDto notificationListDto = new NotificationListDto(message, LocalDateTime.now());
         String json =objectMapper.writeValueAsString(notificationListDto);
         notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
-        notificationRedisPublisher.publish("member:" + post.get().getMember().getMemberId(), message);
-        fcmService.sendNotification(post.get().getMember().getFcmToken().getFcmToken(), "명냥로드", message);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newComment.getCommentId());
+        if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember("foreGroundMembers:", member.getMemberId()))) {
+            notificationRedisPublisher.publish("member:" + post.get().getMember().getMemberId(), message);
+        }else {
+            fcmService.sendNotification(post.get().getMember().getFcmToken().getFcmToken(), "명냥로드", message);
+        }
     }
 
 //    @Transactional
