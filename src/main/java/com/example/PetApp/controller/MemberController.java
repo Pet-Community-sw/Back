@@ -2,7 +2,7 @@ package com.example.PetApp.controller;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.dto.member.*;
-import com.example.PetApp.service.fcm.FcmService;
+import com.example.PetApp.service.fcm.FcmTokenService;
 import com.example.PetApp.service.user.EmailService;
 import com.example.PetApp.service.user.MemberService;
 import com.example.PetApp.service.user.TokenService;
@@ -32,7 +32,7 @@ public class MemberController {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final EmailService emailService;
-    private final FcmService fcmService;
+    private final FcmTokenService fcmTokenService;
 
 
     @PostMapping("/signup")
@@ -110,6 +110,6 @@ public class MemberController {
 
     @PostMapping("/fcm-token")
     public ResponseEntity<?> createFcmToken(@RequestBody FcmTokenDto fcmTokenDto) {
-        return fcmService.createFcmToken(fcmTokenDto);
+        return fcmTokenService.createFcmToken(fcmTokenDto);
     }
 }

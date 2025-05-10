@@ -8,6 +8,7 @@ import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.like.LikeDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
 import com.example.PetApp.dto.notification.NotificationListDto;
+import com.example.PetApp.firebase.FcmService;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
@@ -39,6 +40,7 @@ public class LikeServiceImp implements LikeService {
     private final NotificationRedisPublisher notificationRedisPublisher;
     private final RedisTemplate<String, Object> notificationRedisTemplate;
     private final ObjectMapper objectMapper;
+    private final FcmService fcmService;
 
     @Transactional
     @Override//member의 이름 과 사진으로
@@ -77,6 +79,8 @@ public class LikeServiceImp implements LikeService {
                 String json = objectMapper.writeValueAsString(notificationListDto);
                 notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
                 notificationRedisPublisher.publish("member:" + post.get().getMember().getMemberId(), message);
+                fcmService.sendNotification(post.get().getMember().getFcmToken().getFcmToken(), "명냥로드", message);
+
                 return createLike(post.get(), member);
             }
 

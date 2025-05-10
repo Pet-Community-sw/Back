@@ -5,6 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface FcmService {
+public interface FcmTokenService {
     ResponseEntity<?> createFcmToken(FcmTokenDto fcmTokenDto);
 }

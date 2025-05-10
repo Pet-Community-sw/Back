@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class FcmServiceImp implements FcmService {
+public class FcmTokenServiceImp implements FcmTokenService {
 
     private final FcmTokenRepository fcmTokenRepository;
     private final MemberRepository memberRepository;

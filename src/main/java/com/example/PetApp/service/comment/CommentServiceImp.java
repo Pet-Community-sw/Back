@@ -9,6 +9,7 @@ import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.commment.UpdateCommentDto;
 import com.example.PetApp.dto.notification.NotificationListDto;
+import com.example.PetApp.firebase.FcmService;
 import com.example.PetApp.repository.jpa.CommentRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
@@ -40,6 +41,7 @@ public class CommentServiceImp implements CommentService {
     private final RedisTemplate<String, Object> notificationRedisTemplate;
     private final MemberRepository memberRepository;
     private final ObjectMapper objectMapper;
+    private final FcmService fcmService;
 
     @Transactional
     @Override
@@ -65,6 +67,7 @@ public class CommentServiceImp implements CommentService {
         String json =objectMapper.writeValueAsString(notificationListDto);
         notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
         notificationRedisPublisher.publish("member:" + post.get().getMember().getMemberId(), message);
+        fcmService.sendNotification(post.get().getMember().getFcmToken().getFcmToken(), "명냥로드", message);
         return ResponseEntity.status(HttpStatus.CREATED).body(newComment.getCommentId());
     }
 
