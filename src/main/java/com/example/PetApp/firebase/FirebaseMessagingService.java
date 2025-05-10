@@ -10,30 +10,22 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class FirebaseMessagingService {
-//    private final FcmTokenRepository fcmTokenRepository;
-
-    /**
-     * Firebase를 통해 푸시 알림을 전송합니다.
-     *
-     * @param token   대상 디바이스의 FCM 토큰
-     * @param title   알림 제목
-     * @param body    알림 내용
-     * @return        전송된 메시지의 ID
-     * @throws FirebaseMessagingException FCM 전송 중 오류 발생 시
-     */
     public String sendNotification(String token, String title, String body) {
+
         Notification notification = Notification.builder()
                 .setTitle(title)
                 .setBody(body)
                 .build();
-
+        log.info("Fcm Notification 생성");
         Message message = Message.builder()
                 .setToken(token)
                 .setNotification(notification)
                 .build();
-
+        log.info("Fcm Message 생성");
         try {
+            log.info("fcm에 보냄 요청");
             return FirebaseMessaging.getInstance().send(message);
+
         } catch (FirebaseMessagingException e) {
             if (e.getMessagingErrorCode().equals(MessagingErrorCode.INVALID_ARGUMENT)) {
                 // 토큰이 유효하지 않은 경우, 오류 코드를 반환

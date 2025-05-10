@@ -40,6 +40,9 @@ public class Member {//수정 필요
     @CreationTimestamp
     private LocalDateTime memberTime;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private FcmToken fcmToken;
+
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 
