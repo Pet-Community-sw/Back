@@ -4,6 +4,7 @@ import com.example.PetApp.config.redis.NotificationRedisPublisher;
 import com.example.PetApp.domain.LikeT;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
+import com.example.PetApp.dto.commment.LikeListDto;
 import com.example.PetApp.dto.like.LikeDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
 import com.example.PetApp.dto.notification.NotificationListDto;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -51,9 +53,16 @@ public class LikeServiceImp implements LikeService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없는 게시물입니다.");
         }else {
             List<LikeT> likeList = likeRepository.findAllByPost(post.get());
-            LikeResponseDto likeResponseDto = new LikeResponseDto();
-            likeList.forEach(likeT -> likeResponseDto.getMembers().add(likeT.getMember()));//수정해야됨.
-            likeResponseDto.setLikeCount((long) likeResponseDto.getMembers().size());
+            List<LikeListDto> likeListDtos=likeList.stream()
+                    .map(likeT ->LikeListDto.builder()
+                            .memberName(likeT.getMember().getName())
+                            .memberImageUrl(likeT.getMember().getMemberImageUrl())
+                            .build()
+                    ).collect(Collectors.toList());
+            LikeResponseDto likeResponseDto = LikeResponseDto.builder()
+                    .likeListDtos(likeListDtos)
+                    .likeCount((long) likeList.size())
+                    .build();
             return ResponseEntity.ok(likeResponseDto);
         }
     }

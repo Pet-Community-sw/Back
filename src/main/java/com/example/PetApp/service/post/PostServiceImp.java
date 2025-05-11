@@ -59,6 +59,7 @@ public class PostServiceImp implements PostService {
                 post.getPostImageUrl(),
                 post.getMember().getMemberId(),
                 post.getMember().getName(),
+                post.getMember().getMemberImageUrl(),
                 timeAgoUtil.getTimeAgo(post.getPostTime()),
                 post.getViewCount(),
                 likeRepository.countByPost(post),
@@ -174,6 +175,7 @@ public class PostServiceImp implements PostService {
                         comment.getLikeCount(),
                         comment.getMember().getMemberId(),
                         comment.getMember().getName(),
+                        comment.getMember().getMemberImageUrl(),
                         timeAgoUti.getTimeAgo(comment.getCommentTime()),
                         checkOwner(comment,comment.getMember())
                 )
@@ -188,6 +190,7 @@ public class PostServiceImp implements PostService {
                 .likeCount(likeRepository.countByPost(post))
                 .memberId(post.getMember().getMemberId())
                 .memberName(post.getMember().getName())
+                .memberImageUrl(post.getMember().getMemberImageUrl())
                 .comments(comments)
                 .createdAt(timeAgoUti.getTimeAgo(post.getPostTime()))
                 .like(likeRepository.existsByPostAndMember(post, member))

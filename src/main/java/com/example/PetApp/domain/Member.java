@@ -37,6 +37,9 @@ public class Member {//수정 필요
     @NotEmpty
     private String password;
 
+    @NotEmpty
+    private String memberImageUrl;
+
     @CreationTimestamp
     private LocalDateTime memberTime;
 

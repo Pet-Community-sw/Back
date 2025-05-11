@@ -1,7 +1,9 @@
 package com.example.PetApp.dto.like;
 
 import com.example.PetApp.domain.Member;
+import com.example.PetApp.dto.commment.LikeListDto;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +13,11 @@ import java.util.Set;
 
 @Getter
 @Setter
+@Builder
 public class LikeResponseDto {
-    private List<Member> members=new ArrayList<>();
+    private List<LikeListDto> likeListDtos;
+
     private Long likeCount;
+
 
 }

@@ -40,6 +40,9 @@ spring:
     post:
       image:
         upload: /Users/choiseonjae/Desktop/PetApp/posts
+    member:
+      image:
+        upload: /Users/choiseonjae/Desktop/PetApp/members
   data:
     redis:
       repositories:

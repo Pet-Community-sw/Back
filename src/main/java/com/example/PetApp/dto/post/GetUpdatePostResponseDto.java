@@ -29,6 +29,8 @@ public class GetUpdatePostResponseDto {
 
     private String memberName;
 
+    private String memberImageUrl;
+
     private String createdAt;
 
     private boolean isOwner;

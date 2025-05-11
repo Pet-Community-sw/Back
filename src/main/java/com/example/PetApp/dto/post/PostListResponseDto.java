@@ -17,6 +17,8 @@ public class PostListResponseDto {
 
     private String memberName;
 
+    private String memberImageUrl;
+
     private String timeAgo;
 
     private Long viewCount;

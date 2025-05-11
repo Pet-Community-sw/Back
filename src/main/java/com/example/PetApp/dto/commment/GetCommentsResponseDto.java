@@ -19,6 +19,8 @@ public class GetCommentsResponseDto {
 
     private String memberName;
 
+    private String memberImageUrl;
+
     private String createdAt;
 
     private boolean isOwner;

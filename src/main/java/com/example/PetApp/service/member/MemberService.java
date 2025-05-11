@@ -2,6 +2,7 @@ package com.example.PetApp.service.member;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Role;
+import com.example.PetApp.dto.member.GetMemberResponseDto;
 import com.example.PetApp.dto.member.MemberSignDto;
 import com.example.PetApp.dto.member.MemberSignResponseDto;
 import com.example.PetApp.dto.member.ResetPasswordDto;
@@ -9,12 +10,18 @@ import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Service
@@ -26,7 +33,8 @@ public class MemberService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-
+    @Value("${spring.dog.member.image.upload")
+    private String memberUploadDir;
     @Transactional
     public MemberSignResponseDto save(MemberSignDto memberSignDto) {
         log.info("signup requset email:{}", memberSignDto.getEmail());
@@ -34,11 +42,22 @@ public class MemberService {
         log.info("signup requset Name:{}", memberSignDto.getName());
         log.info("signup requset Password:{}", memberSignDto.getPassword());
         Role role = roleRepository.findByName("ROLE_USER").get();
+        MultipartFile file = memberSignDto.getMemberImageUrl();
+        UUID uuid = UUID.randomUUID();
+        String imageFileName = uuid + "_" + file.getOriginalFilename();
+        try{
+            Path path = Paths.get(memberUploadDir, imageFileName);
+            Files.copy(file.getInputStream(), path);
+        } catch (IOException e) {
+            log.error("member 사진 저장중 에러");
+            throw new RuntimeException(e);
+        }
         Member member = Member.builder()
                 .name(memberSignDto.getName())
                 .email(memberSignDto.getEmail())
                 .password(passwordEncoder.encode(memberSignDto.getPassword()))
                 .phoneNumber(memberSignDto.getPhoneNumber())
+                .memberImageUrl("/member/" + imageFileName)
                 .build();
         if (member.getRoles() == null) {
             member.setRoles(new HashSet<>());
@@ -91,6 +110,11 @@ public class MemberService {
         if (member.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 유저는 없습니다.");
         }
+        GetMemberResponseDto getMemberResponseDto = GetMemberResponseDto.builder()
+                .memberName(member.get().getName())
+                .memberImageUrl(member.get().getMemberImageUrl())
+                .build();
+        return ResponseEntity.ok(getMemberResponseDto);
     }
 
     public ResponseEntity<?> deleteMember(Long memberId, String email) {
