@@ -25,4 +25,6 @@ public class PostListResponseDto {
 
     private String title;
 
+    private boolean like;
+
 }

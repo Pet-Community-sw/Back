@@ -33,6 +33,8 @@ public class GetUpdatePostResponseDto {
 
     private boolean isOwner;
 
+    private boolean like;
+
     List<GetCommentsResponseDto> comments;
 
 }

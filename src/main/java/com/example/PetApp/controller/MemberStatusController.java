@@ -16,5 +16,4 @@ public class MemberStatusController {
     private ResponseEntity<?> MemberStatus(@RequestBody MemberStatusDto statusDto) {
         return memberStatusService.updateMemberStatus(statusDto);
     }
-
 }

@@ -19,8 +19,9 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping()
-    public ResponseEntity<List<PostListResponseDto>> getPosts(@RequestParam(defaultValue = "0") int page) {
-        List<PostListResponseDto> postList = postService.getPosts(page);
+    public ResponseEntity<List<PostListResponseDto>> getPosts(@RequestParam(defaultValue = "0") int page, Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        List<PostListResponseDto> postList = postService.getPosts(page, email);
         return ResponseEntity.ok().body(postList);
     }
 

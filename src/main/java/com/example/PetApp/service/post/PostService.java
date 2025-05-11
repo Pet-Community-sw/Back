@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 public interface PostService {
 
-    List<PostListResponseDto> getPosts(int page);
+    List<PostListResponseDto> getPosts(int page, String email);
 
     ResponseEntity<?> createPost(PostDto createPostDto, String email);
 

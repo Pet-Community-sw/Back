@@ -10,7 +10,6 @@ import com.example.PetApp.dto.post.PostListResponseDto;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
-import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.util.TimeAgoUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +47,9 @@ public class PostServiceImp implements PostService {
 
     @Transactional
     @Override
-    public List<PostListResponseDto> getPosts(int page) {
+    public List<PostListResponseDto> getPosts(int page, String email) {
+        Member member = memberRepository.findByEmail(email).get();
+
         log.info("게시물 리스트 요청");
         Pageable pageable = PageRequest.of(page, 10);
         List<Post> posts = postRepository.findByOrderByPostTimeDesc(pageable).getContent();
@@ -61,7 +62,8 @@ public class PostServiceImp implements PostService {
                 timeAgoUtil.getTimeAgo(post.getPostTime()),
                 post.getViewCount(),
                 likeRepository.countByPost(post),
-                post.getTitle()
+                post.getTitle(),
+                likeRepository.existsByPostAndMember(post, member)
                 )).collect(Collectors.toList());
     }
 
@@ -188,6 +190,7 @@ public class PostServiceImp implements PostService {
                 .memberName(post.getMember().getName())
                 .comments(comments)
                 .createdAt(timeAgoUti.getTimeAgo(post.getPostTime()))
+                .like(likeRepository.existsByPostAndMember(post, member))
                 .build();
 
         if (post.getMember().equals(member)) {
