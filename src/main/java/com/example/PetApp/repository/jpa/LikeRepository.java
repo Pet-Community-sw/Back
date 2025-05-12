@@ -14,11 +14,11 @@ public interface LikeRepository extends JpaRepository<LikeT, Long> {
     Long countByRecommendRoutePost(RecommendRoutePost recommendRoutePost);
     List<LikeT> findAllByPost(Post post);
 
-    List<LikeT> findAllByRecommendRoutePost(RecommendRoutePost recommendRoutePost);
-
     Boolean existsByPostAndMember(Post post, Member member);
 
     Boolean existsByRecommendRoutePostAndMember(RecommendRoutePost recommendRoutePost, Member member);
+
+    void deleteByRecommendRoutePostAndMember(RecommendRoutePost recommendRoutePost, Member member);
 
     void deleteByPostAndMember(Post post, Member member);
 }

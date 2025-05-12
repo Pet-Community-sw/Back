@@ -4,6 +4,8 @@ import com.example.PetApp.config.redis.NotificationRedisPublisher;
 import com.example.PetApp.domain.LikeT;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
+import com.example.PetApp.domain.RecommendRoutePost;
+import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.LikeListDto;
 import com.example.PetApp.dto.like.LikeDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
@@ -12,6 +14,7 @@ import com.example.PetApp.firebase.FcmService;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
+import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +40,7 @@ public class LikeServiceImp implements LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final RecommendRoutePostRepository recommendRoutePostRepository;
     private final NotificationRedisPublisher notificationRedisPublisher;
     private final RedisTemplate<String, Object> notificationRedisTemplate;
     private final ObjectMapper objectMapper;
@@ -70,42 +74,59 @@ public class LikeServiceImp implements LikeService {
     @Transactional
     @Override
     public ResponseEntity<Object> createAndDeleteLike(LikeDto likeDto, String email) throws JsonProcessingException {
-        Optional<Post> post = postRepository.findById(likeDto.getPostId());
         Member member = memberRepository.findByEmail(email).get();
-        if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
-        }
-        boolean isCheck = likeRepository.existsByPostAndMember(post.get(), member);
+        if (likeDto.getPostType()== CommentDto.PostType.COMMUNITY) {
+            Optional<Post> post = postRepository.findById(likeDto.getPostId());
+            if (post.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
+            }
+            boolean isCheck = likeRepository.existsByPostAndMember(post.get(), member);
+
             if (isCheck) {
                 log.info("좋아요 삭제");
-                return deleteLike(post.get(),member);
+                return deleteLike(post.get(), member);
             } else {
                 log.info("좋아요 생성");
-                sendLikeNotification(post, member);
+                sendLikeNotification(post.get().getMember(), member);
 
                 return createLike(post.get(), member);
             }
+        } else if (likeDto.getPostType() == CommentDto.PostType.RECOMMEND) {
+            Optional<RecommendRoutePost> post = recommendRoutePostRepository.findById(likeDto.getPostId());
+            if (post.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
+            }
+            boolean isCheck = likeRepository.existsByRecommendRoutePostAndMember(post.get(), member);
 
-    }
+            if (isCheck) {
+                log.info("좋아요 삭제");
+                return deleteLike(post.get(), member);
+            } else {
+                log.info("좋아요 생성");
+                sendLikeNotification(post.get().getMember(), member);
 
-    private void sendLikeNotification(Optional<Post> post, Member member) throws JsonProcessingException {
-        String message = member.getName() + "님이 회원님의 게시물을 좋아합니다.";
-        String key = "notifications:" + post.get().getMember().getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
-        NotificationListDto notificationListDto = new NotificationListDto(message, LocalDateTime.now());
-        String json = objectMapper.writeValueAsString(notificationListDto);
-        notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
-        notificationRedisPublisher.publish("member:" + post.get().getMember().getMemberId(), message);
-        if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember("foreGroundMembers:", member.getMemberId()))) {
-            notificationRedisPublisher.publish("member:" + post.get().getMember().getMemberId(), message);
+                return createLike(post.get(), member);
+            }
         }else {
-            fcmService.sendNotification(post.get().getMember().getFcmToken().getFcmToken(), "명냥로드", message);
+            return ResponseEntity.badRequest().body("지원하지 않는 게시물 유형입니다.");
         }
+
     }
 
     @Transactional//일단 좋아요 갯수만 보여줄거여서 혹시 모르니까 likeid를 함께 반환
     public ResponseEntity<Object> createLike(Post post, Member member) {
         LikeT likeT = LikeT.builder()
                 .post(post)
+                .member(member)
+                .build();
+        likeRepository.save(likeT);
+        return ResponseEntity.status(HttpStatus.CREATED).body("좋아요 생성했습니다.");
+    }
+
+    @Transactional//일단 좋아요 갯수만 보여줄거여서 혹시 모르니까 likeid를 함께 반환
+    public ResponseEntity<Object> createLike(RecommendRoutePost recommendRoutePost, Member member) {
+        LikeT likeT = LikeT.builder()
+                .recommendRoutePost(recommendRoutePost)
                 .member(member)
                 .build();
         likeRepository.save(likeT);
@@ -119,4 +140,24 @@ public class LikeServiceImp implements LikeService {
         return ResponseEntity.ok().body("좋아요 삭제했습니다.");
     }
 
+    @Transactional
+    public ResponseEntity<Object> deleteLike(RecommendRoutePost recommendRoutePost, Member member) {
+
+        likeRepository.deleteByRecommendRoutePostAndMember(recommendRoutePost, member);
+        return ResponseEntity.ok().body("좋아요 삭제했습니다.");
+    }
+
+    private void sendLikeNotification(Member postMember, Member member) throws JsonProcessingException {
+        String message = member.getName() + "님이 회원님의 게시물을 좋아합니다.";
+        String key = "notifications:" +postMember.getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
+        NotificationListDto notificationListDto = new NotificationListDto(message, LocalDateTime.now());
+        String json = objectMapper.writeValueAsString(notificationListDto);
+        notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
+        notificationRedisPublisher.publish("member:" + postMember.getMemberId(), message);
+        if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember("foreGroundMembers:", member.getMemberId()))) {
+            notificationRedisPublisher.publish("member:" + postMember.getMemberId(), message);
+        }else {
+            fcmService.sendNotification(postMember.getFcmToken().getFcmToken(), "명냥로드", message);
+        }
+    }
 }
