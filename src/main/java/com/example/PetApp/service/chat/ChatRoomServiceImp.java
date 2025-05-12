@@ -58,21 +58,21 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     @Transactional
     @Override//채팅방 생성은 두 가지 일듯 매칭글에서 채팅하기 or 그냥 메시지 보내기
-    public ResponseEntity<?> createChatRoom(MatchPost matchPost, Profile profile) {
-        Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByMatchPost(matchPost);
+    public ResponseEntity<?> createChatRoom(WalkingTogetherPost walkingTogetherPost, Profile profile) {
+        Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByMatchPost(walkingTogetherPost);
         if (chatRoom2.isEmpty()) {//채팅방이 없으면 새로운생성 있으면 profiles에 신청자 Profile 추가
             ChatRoom chatRoom = ChatRoom.builder()
-                    .name(matchPost.getProfile().getPetName()+"님의 방")
-                    .limitCount(matchPost.getLimitCount())//나중에 게시물에서 인원 수를 고정.
-                    .matchPost(matchPost)
+                    .name(walkingTogetherPost.getProfile().getPetName()+"님의 방")
+                    .limitCount(walkingTogetherPost.getLimitCount())//나중에 게시물에서 인원 수를 고정.
+                    .walkingTogetherPost(walkingTogetherPost)
                     //이게 수정에서 가능하려나?
                     .build();
-            chatRoom.addProfiles(matchPost.getProfile());//글 작성자.
+            chatRoom.addProfiles(walkingTogetherPost.getProfile());//글 작성자.
             chatRoom.addProfiles(profile);//신청하는사람.
             ChatRoom chatRoom1 = chatRoomRepository.save(chatRoom);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("chatRoomId",chatRoom1.getChatRoomId()));
         } else {
-            if (matchPost.getLimitCount() <= chatRoom2.get().getProfiles().size()) {
+            if (walkingTogetherPost.getLimitCount() <= chatRoom2.get().getProfiles().size()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("인원초과");//채팅방 limitCount설정.
             }
             ChatRoom chatRoom = chatRoom2.get();
@@ -118,7 +118,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
         if (chatRoom.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 채팅방이 없습니다.");
         }
-        if (profile.isEmpty()||!(chatRoom.get().getMatchPost().getProfile().getProfileId().equals(profile.get().getProfileId()))) {
+        if (profile.isEmpty()||!(chatRoom.get().getWalkingTogetherPost().getProfile().getProfileId().equals(profile.get().getProfileId()))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
         }
         ChatRoom chatRoom1 = chatRoom.get();

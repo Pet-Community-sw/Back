@@ -51,7 +51,7 @@ public class Profile {
     private Member member;
 
     @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MatchPost> matchPost;
+    private List<WalkingTogetherPost> walkingTogetherPost;
 
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

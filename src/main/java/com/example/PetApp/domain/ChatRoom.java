@@ -2,7 +2,6 @@ package com.example.PetApp.domain;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -31,7 +30,7 @@ public class ChatRoom {
 
     @OneToOne
     @JoinColumn(name = "match_post_id")
-    private MatchPost matchPost;
+    private WalkingTogetherPost walkingTogetherPost;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(joinColumns = @JoinColumn(name = "chat_room_id"),

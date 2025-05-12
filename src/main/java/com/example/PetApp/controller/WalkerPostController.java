@@ -1,10 +1,7 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.dto.matchpost.CreateMatchPostDto;
-import com.example.PetApp.dto.matchpost.UpdateMatchPostDto;
 import com.example.PetApp.dto.walkerpost.CreateWalkerPostDto;
 import com.example.PetApp.dto.walkerpost.UpdateWalkerPostDto;
-import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.walkerpost.WalkerPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

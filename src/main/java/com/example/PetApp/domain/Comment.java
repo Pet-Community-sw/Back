@@ -26,8 +26,12 @@ public class Comment {
     private Long likeCount;
 
     @ManyToOne
-    @JoinColumn(name = "post_id",nullable = false)
-    private Post post;//객체 지향적이 아님. 수정해야될듯.
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    @ManyToOne
+    @JoinColumn(name = "recommend_route_post_id")
+    private RecommendRoutePost recommendRoutePost;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)

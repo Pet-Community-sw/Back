@@ -16,37 +16,35 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class MatchPost {
+public class WalkingTogetherPost {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long matchPostId;
+    private Long walkingTogetherPostId;
 
-    private String content;
-
-    private Double latitude;
-
-    private Double longitude;
-
-    private String locationName;
+    private String content;//나중에 시간순으로하기위해 시간으로 받아야할듯?
 
     private int limitCount;
+
+    @OneToOne
+    @JoinColumn(name = "recommend_route_post_id")
+    private RecommendRoutePost recommendRoutePost;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
     @CreationTimestamp
-    private LocalDateTime matchPostTime;
+    private LocalDateTime walkingTogetherPostTime;
 
     @ElementCollection
-    @CollectionTable(name = "match_post_profiles")
+    @CollectionTable(name = "walking_together_post_profiles")
     @Cascade(org.hibernate.annotations.CascadeType.DELETE)
     @Builder.Default
     private Set<Long> profiles=new HashSet<>();
 
     @ElementCollection
-    @CollectionTable(name = "match_post_avoid_Breeds")
+    @CollectionTable(name = "walking_together_post_avoid_Breeds")
     @Cascade(org.hibernate.annotations.CascadeType.DELETE)
     @Builder.Default
     private Set<Long> avoidBreeds=new HashSet<>();

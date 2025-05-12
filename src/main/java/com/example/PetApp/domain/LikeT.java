@@ -18,8 +18,12 @@ public class LikeT {
     private Long likeId;
 
     @ManyToOne
-    @JoinColumn(name = "post_id",nullable = false)
+    @JoinColumn(name = "post_id")
     private Post post;
+
+    @ManyToOne
+    @JoinColumn(name = "recommend_route_post_id")
+    private RecommendRoutePost recommendRoutePost;
 
     @ManyToOne(fetch = FetchType.LAZY)//@OneToOne관계 아님?
     @JoinColumn(name = "member_id", nullable = false)

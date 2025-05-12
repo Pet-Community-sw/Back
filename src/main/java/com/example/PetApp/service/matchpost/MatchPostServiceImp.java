@@ -1,7 +1,7 @@
 package com.example.PetApp.service.matchpost;
 
 
-import com.example.PetApp.domain.MatchPost;
+import com.example.PetApp.domain.WalkingTogetherPost;
 import com.example.PetApp.domain.PetBreed;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.matchpost.CreateMatchPostDto;
@@ -33,48 +33,48 @@ public class MatchPostServiceImp implements MatchPostService {
     private final ProfileRepository profileRepository;
     private final PetBreedRepository petBreedRepository;
     private final TimeAgoUtil timeAgoUtil;
-    @Transactional//반경 1km로 같이 불러옴 테스트해봐야됨.
-    @Override//paging처리 해야할듯.
-    public ResponseEntity<?> getMatchPostsByPlace(Double longitude, Double latitude, Long profileId) {
-        log.info("getMatchPostsByPlace 요청");
-        if (profileId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요");
-        }
-        List<MatchPost> matchPosts = matchPostRepository.findByMatchPostsByPlace(longitude, latitude);
-        List<GetMatchPostListResponseDto> getMatchPostListResponseDtoList = matchPosts.stream()
-                .map(matchPost -> new GetMatchPostListResponseDto(
-                        matchPost.getMatchPostId(),
-                        matchPost.getLocationName(),
-                        matchPost.getLimitCount(),
-                        timeAgoUtil.getTimeAgo(matchPost.getMatchPostTime()),
-                        matchPost.getProfiles().size(),
-                        matchPost.getLongitude(),
-                        matchPost.getLatitude()
-                )).collect(Collectors.toList());
-        return ResponseEntity.ok(getMatchPostListResponseDtoList);
-    }
-
-    @Transactional//화면의 A좌표 B좌표를 받아서 그 안에 있는 게시물들을 반환.
-    @Override//근데 아이콘의 크기때문에 어느정도의 공간을 둘 필요가 있음.
-    public ResponseEntity<?> getMatchPostsByLocation(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, Long profileId) {
-        log.info("getMatchPostsByLocation 요청");
-        if (profileId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요");
-        }
-        List<MatchPost> matchPosts = matchPostRepository.findByMatchPostByLocation(minLongitude-0.001, minLatitude-0.001, maxLongitude+0.001, maxLatitude+0.001);
-        List<GetMatchPostListResponseDto> getMatchPostListResponseDtoList = matchPosts.stream()
-                .map(matchPost -> new GetMatchPostListResponseDto(
-                        matchPost.getMatchPostId(),
-                        matchPost.getLocationName(),
-                        matchPost.getLimitCount(),
-                        timeAgoUtil.getTimeAgo(matchPost.getMatchPostTime()),
-                        matchPost.getProfiles().size(),
-                        matchPost.getLongitude(),
-                        matchPost.getLatitude()
-                )).collect(Collectors.toList());
-
-        return ResponseEntity.ok(getMatchPostListResponseDtoList);
-    }
+//    @Transactional//반경 1km로 같이 불러옴 테스트해봐야됨.
+//    @Override//paging처리 해야할듯.
+//    public ResponseEntity<?> getMatchPostsByPlace(Double longitude, Double latitude, Long profileId) {
+//        log.info("getMatchPostsByPlace 요청");
+//        if (profileId == null) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요");
+//        }
+//        List<WalkingTogetherPost> walkingTogetherPosts = matchPostRepository.findByMatchPostsByPlace(longitude, latitude);
+//        List<GetMatchPostListResponseDto> getMatchPostListResponseDtoList = walkingTogetherPosts.stream()
+//                .map(matchPost -> new GetMatchPostListResponseDto(
+//                        matchPost.getMatchPostId(),
+//                        matchPost.getLocationName(),
+//                        matchPost.getLimitCount(),
+//                        timeAgoUtil.getTimeAgo(matchPost.getMatchPostTime()),
+//                        matchPost.getProfiles().size(),
+//                        matchPost.getLongitude(),
+//                        matchPost.getLatitude()
+//                )).collect(Collectors.toList());
+//        return ResponseEntity.ok(getMatchPostListResponseDtoList);
+//    }
+//
+//    @Transactional//화면의 A좌표 B좌표를 받아서 그 안에 있는 게시물들을 반환.
+//    @Override//근데 아이콘의 크기때문에 어느정도의 공간을 둘 필요가 있음.
+//    public ResponseEntity<?> getMatchPostsByLocation(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, Long profileId) {
+//        log.info("getMatchPostsByLocation 요청");
+//        if (profileId == null) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요");
+//        }
+//        List<WalkingTogetherPost> walkingTogetherPosts = matchPostRepository.findByMatchPostByLocation(minLongitude-0.001, minLatitude-0.001, maxLongitude+0.001, maxLatitude+0.001);
+//        List<GetMatchPostListResponseDto> getMatchPostListResponseDtoList = walkingTogetherPosts.stream()
+//                .map(matchPost -> new GetMatchPostListResponseDto(
+//                        matchPost.getMatchPostId(),
+//                        matchPost.getLocationName(),
+//                        matchPost.getLimitCount(),
+//                        timeAgoUtil.getTimeAgo(matchPost.getMatchPostTime()),
+//                        matchPost.getProfiles().size(),
+//                        matchPost.getLongitude(),
+//                        matchPost.getLatitude()
+//                )).collect(Collectors.toList());
+//
+//        return ResponseEntity.ok(getMatchPostListResponseDtoList);
+//    }
 
 
     @Transactional
@@ -84,7 +84,7 @@ public class MatchPostServiceImp implements MatchPostService {
         if (profileId == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요");
         }
-        Optional<MatchPost> matchPost = matchPostRepository.findById(matchPostId);
+        Optional<WalkingTogetherPost> matchPost = matchPostRepository.findById(matchPostId);
         Profile profile = profileRepository.findById(profileId).get();
         Optional<PetBreed> petBreed = petBreedRepository.findByName(profile.getPetBreed());
         if (matchPost.isEmpty()) {
@@ -114,7 +114,7 @@ public class MatchPostServiceImp implements MatchPostService {
     public ResponseEntity<?> createMatchPost(CreateMatchPostDto createMatchPostDto, Long profileId) {
         log.info("매칭글 생성 요청");
         Profile profile = profileRepository.findById(profileId).get();
-        MatchPost matchPost = MatchPost.builder()
+        WalkingTogetherPost walkingTogetherPost = WalkingTogetherPost.builder()
                 .profile(profile)
                 .latitude(createMatchPostDto.getLatitude())
                 .longitude(createMatchPostDto.getLongitude())
@@ -122,10 +122,10 @@ public class MatchPostServiceImp implements MatchPostService {
                 .limitCount(createMatchPostDto.getLimitCount())
                 .locationName(createMatchPostDto.getLocationName())
                 .build();
-        matchPost.addMatchPostProfiles(profileId);
-        matchPost.addAvoidBreeds(profile);
-        MatchPost saveMatchPost = matchPostRepository.save(matchPost);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("matchPostId", saveMatchPost.getMatchPostId()));
+        walkingTogetherPost.addMatchPostProfiles(profileId);
+        walkingTogetherPost.addAvoidBreeds(profile);
+        WalkingTogetherPost saveWalkingTogetherPost = matchPostRepository.save(walkingTogetherPost);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("matchPostId", saveWalkingTogetherPost.getMatchPostId()));
         //굳이 반환값을 id로 줘야하나? 낭비가 심한것같음.
     }
 
@@ -136,7 +136,7 @@ public class MatchPostServiceImp implements MatchPostService {
         if (profileId == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요.");
         }
-        Optional<MatchPost> matchPost = matchPostRepository.findById(matchPostId);
+        Optional<WalkingTogetherPost> matchPost = matchPostRepository.findById(matchPostId);
         if (matchPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 매칭게시물은 없습니다");
         }
@@ -157,7 +157,7 @@ public class MatchPostServiceImp implements MatchPostService {
     @Override
     public ResponseEntity<?> deleteMatchPost(Long matchPostId, Long profileId) {
         log.info("매칭게시물 삭제 요청");
-        Optional<MatchPost> matchPost = matchPostRepository.findById(matchPostId);
+        Optional<WalkingTogetherPost> matchPost = matchPostRepository.findById(matchPostId);
         if (matchPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 매칭게시물은 없습니다");
         } else if (!matchPost.get().getProfile().getProfileId().equals(profileId)) {
@@ -171,7 +171,7 @@ public class MatchPostServiceImp implements MatchPostService {
     @Transactional// 장소를 수정하는게 맞으려나?
     @Override
     public ResponseEntity<?> updateMatchPost(Long matchPostId, UpdateMatchPostDto updateMatchPostDto, Long profileId) {
-        Optional<MatchPost> matchPost = matchPostRepository.findById(matchPostId);
+        Optional<WalkingTogetherPost> matchPost = matchPostRepository.findById(matchPostId);
         if (matchPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 매칭게시물은 없습니다");
         } else if (!matchPost.get().getProfile().getProfileId().equals(profileId)) {

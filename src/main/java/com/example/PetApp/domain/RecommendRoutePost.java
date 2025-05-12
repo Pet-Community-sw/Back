@@ -1,0 +1,47 @@
+package com.example.PetApp.domain;
+
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Getter
+@Setter
+@Entity
+@Table
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class RecommendRoutePost {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long recommendRouteId;
+
+    private String title;
+
+    private String content;
+
+    private Double locationLongitude;
+
+    private Double locationLatitude;
+
+    @CreationTimestamp
+    private LocalDateTime recommendRouteTime;
+
+    @OneToOne(mappedBy = "recommendRoutePost",cascade = CascadeType.ALL, orphanRemoval = true)
+    private WalkingTogetherPost walkingTogetherPost;
+
+    @OneToMany(mappedBy = "recommendRoutePost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LikeT> likeTs;
+
+    @OneToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @OneToMany(mappedBy = "recommendRoutePost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
+}

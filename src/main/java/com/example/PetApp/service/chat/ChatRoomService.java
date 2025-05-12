@@ -1,6 +1,6 @@
 package com.example.PetApp.service.chat;
 
-import com.example.PetApp.domain.MatchPost;
+import com.example.PetApp.domain.WalkingTogetherPost;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.groupchat.UpdateChatRoomDto;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ public interface ChatRoomService {
 
     ResponseEntity<?> getChatRooms(Long profileId);
 
-    ResponseEntity<?> createChatRoom(MatchPost matchPost, Profile profile);
+    ResponseEntity<?> createChatRoom(WalkingTogetherPost walkingTogetherPost, Profile profile);
 
     ResponseEntity<?> updateChatRoom(Long chatRoomId, UpdateChatRoomDto updateChatRoomDto, Long profileId);
 
