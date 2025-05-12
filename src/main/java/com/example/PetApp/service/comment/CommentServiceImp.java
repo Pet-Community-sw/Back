@@ -4,13 +4,17 @@ import com.example.PetApp.config.redis.NotificationRedisPublisher;
 import com.example.PetApp.domain.Comment;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
+import com.example.PetApp.domain.RecommendRoutePost;
 import com.example.PetApp.dto.commment.CommentDto;
+import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.commment.UpdateCommentDto;
 import com.example.PetApp.dto.notification.NotificationListDto;
 import com.example.PetApp.firebase.FcmService;
 import com.example.PetApp.repository.jpa.CommentRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
+import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
+import com.example.PetApp.util.TimeAgoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,71 +40,53 @@ public class CommentServiceImp implements CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final RecommendRoutePostRepository recommendRoutePostRepository;
     private final NotificationRedisPublisher notificationRedisPublisher;
     private final RedisTemplate<String, Object> notificationRedisTemplate;
     private final MemberRepository memberRepository;
     private final ObjectMapper objectMapper;
     private final FcmService fcmService;
     private final StringRedisTemplate stringRedisTemplate;
+    private final TimeAgoUtil timeAgoUtil;
 
     @Transactional
     @Override
     public ResponseEntity<Object> createComment(CommentDto commentDto, String email) throws JsonProcessingException {
-        log.info("댓글 작성 요청.");
-        Optional<Post> post = postRepository.findById(commentDto.getPostId());
         Member member = memberRepository.findByEmail(email).get();
-        if (!(commentDto.getMemberId()).equals(member.getMemberId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청입니다");
+        log.info("createComment 요청 memberId : {}", member.getMemberId());
+        if (commentDto.getPostType() == CommentDto.PostType.COMMUNITY) {
+            Optional<Post> post = postRepository.findById(commentDto.getPostId());
+            if (post.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
+            }
+            Comment comment = Comment.builder()
+                    .content(commentDto.getContent())
+                    .post(post.get())
+                    .member(member)
+                    .build();
+
+            commentRepository.save(comment);
+            sendCommentNotifications(post.get().getMember(), member); // 알림 전송
+            return ResponseEntity.status(HttpStatus.CREATED).body(comment.getCommentId());
+        } else if (commentDto.getPostType() == CommentDto.PostType.RECOMMEND) {
+            Optional<RecommendRoutePost> post = recommendRoutePostRepository.findById(commentDto.getPostId());
+            if (post.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
+            }
+            Comment comment = Comment.builder()
+                    .content(commentDto.getContent())
+                    .recommendRoutePost(post.get())
+                    .member(member)
+                    .build();
+
+            commentRepository.save(comment);
+            sendCommentNotifications(post.get().getMember(), member); // 알림 전송
+            return ResponseEntity.status(HttpStatus.CREATED).body(comment.getCommentId());
+        } else {
+            return ResponseEntity.badRequest().body("지원하지 않는 게시물 유형입니다.");
         }
-        if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
-        }
-        Comment comment = Comment.builder()
-                .content(commentDto.getContent())
-                .post(post.get())
-                .member(member)
-                .build();
-        Comment newComment = commentRepository.save(comment);
-        sendCommentNotifications(post, member);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newComment.getCommentId());
     }
 
-    private void sendCommentNotifications(Optional<Post> post, Member member) throws JsonProcessingException {
-        String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
-        String key = "notifications:" + post.get().getMember().getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
-        NotificationListDto notificationListDto = new NotificationListDto(message, LocalDateTime.now());
-        String json =objectMapper.writeValueAsString(notificationListDto);
-        notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
-        if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember("foreGroundMembers:", member.getMemberId()))) {
-            notificationRedisPublisher.publish("member:" + post.get().getMember().getMemberId(), message);
-        }else {
-            fcmService.sendNotification(post.get().getMember().getFcmToken().getFcmToken(), "명냥로드", message);
-        }
-    }
-
-//    @Transactional
-//    @Override
-//    public ResponseEntity<Object> getComment(Long commentId,String email) {
-//        log.info("댓글 상세 요청");
-//        Optional<Comment> comment = commentRepository.findById(commentId);
-//        Member member = memberRepository.findByEmail(email).get();
-//        if (comment.isEmpty()) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 댓글은 없는 댓글입니다.");
-//        }
-//        TimeAgoUtil timeAgoUtil = new TimeAgoUtil();
-//        GetCommentsResponseDto getCommentsResponseDto = GetCommentsResponseDto.builder()
-//                .commentId(commentId)
-//                .content(comment.get().getContent())
-//                .memberId(comment.get().getMember().getMemberId())
-//                .memberName(comment.get().getMember().getName())
-//                .likeCount(comment.get().getLikeCount())
-//                .createdAt(timeAgoUtil.getTimeAgo(comment.get().getCommentTime()))
-//                .build();
-//        if (comment.get().getMember().equals(member)) {
-//            getCommentsResponseDto.setOwner(true);
-//        }
-//        return ResponseEntity.ok(getCommentsResponseDto);
-//    }
 
     @Transactional
     @Override
@@ -131,6 +119,46 @@ public class CommentServiceImp implements CommentService {
             return ResponseEntity.ok().body("수정 되었습니다.");
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청입니다.");
+        }
+    }
+
+    @Transactional
+    @Override//likeCount수정해야함.
+    public ResponseEntity<?> getComments(Long recommendRoutePostId, String email) {
+        Member member = memberRepository.findByEmail(email).get();
+        log.info("getComments 요청 recommendRoutePostId : {}, memberId : {}", recommendRoutePostId, member.getMemberId());
+
+        Optional<RecommendRoutePost> post = recommendRoutePostRepository.findById(recommendRoutePostId);
+        if (post.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 산책길 추천 게시글은 없습니다.");
+        }
+
+        List<Comment> comments = commentRepository.findAllByRecommendRoutePost(post.get());
+        List<GetCommentsResponseDto> getCommentsResponseDtos=comments.stream()
+                .map(comment -> new GetCommentsResponseDto(
+                        comment.getCommentId(),
+                        comment.getContent(),
+                        comment.getLikeCount(),
+                        comment.getMember().getMemberId(),
+                        comment.getMember().getName(),
+                        comment.getMember().getMemberImageUrl(),
+                        timeAgoUtil.getTimeAgo(comment.getCommentTime()),
+                        comment.getMember().equals(member)
+                )).collect(Collectors.toList());
+
+        return ResponseEntity.ok(getCommentsResponseDtos);
+    }
+
+    private void sendCommentNotifications(Member postMember, Member member) throws JsonProcessingException {
+        String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
+        String key = "notifications:" + postMember.getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
+        NotificationListDto notificationListDto = new NotificationListDto(message, LocalDateTime.now());
+        String json =objectMapper.writeValueAsString(notificationListDto);
+        notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
+        if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember("foreGroundMembers:", member.getMemberId()))) {
+            notificationRedisPublisher.publish("member:" + postMember.getMemberId(), message);
+        }else {
+            fcmService.sendNotification(postMember.getFcmToken().getFcmToken(), "명냥로드", message);
         }
     }
 }

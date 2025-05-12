@@ -12,11 +12,14 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @NotBlank
 public class CommentDto {
+    public enum PostType {
+        COMMUNITY,RECOMMEND
+    }
 
     private Long postId;
 
-    private Long memberId;
-
     private String content;
+
+    private PostType postType;
 
 }

@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder//좋아요 어떻게할까
+//따로 db에 리스틑 저장안할거임 누른 후 인식만하고 어떤 요청이 있을 때 좋아요 올리기 요청을 보냄?
 public class Comment {
 
     @Id
@@ -25,11 +26,11 @@ public class Comment {
     @Column(columnDefinition = "BIGINT DEFAULT 0")
     private Long likeCount;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recommend_route_post_id")
     private RecommendRoutePost recommendRoutePost;
 

@@ -6,6 +6,7 @@ import com.example.PetApp.dto.commment.UpdateCommentDto;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.comment.CommentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,11 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+
+    @GetMapping("/{recommendRoutePostId}")
+    private ResponseEntity<?> getComments(@PathVariable Long recommendRoutePostId, Authentication authentication) {
+        return commentService.getComments(recommendRoutePostId, getEmail(authentication));
+    }
 
     @PostMapping()
     public ResponseEntity<?> createComment(@RequestBody CommentDto commentDto, Authentication authentication) throws JsonProcessingException {

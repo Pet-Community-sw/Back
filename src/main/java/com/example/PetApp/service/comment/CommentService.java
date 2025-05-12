@@ -13,4 +13,6 @@ public interface CommentService {
     ResponseEntity<String> deleteComment(Long commentId, String email);
 
     ResponseEntity<String> updateComment(Long commentId, UpdateCommentDto updateCommentDto, String  email);
+
+    ResponseEntity<?> getComments(Long recommendRoutePostId, String email);
 }
