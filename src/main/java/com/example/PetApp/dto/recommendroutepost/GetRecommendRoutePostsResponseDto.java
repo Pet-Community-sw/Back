@@ -31,5 +31,5 @@ public class GetRecommendRoutePostsResponseDto {
 
     private boolean isOwner;
 
-    private boolean isLiked;
+    private boolean isLike;
 }

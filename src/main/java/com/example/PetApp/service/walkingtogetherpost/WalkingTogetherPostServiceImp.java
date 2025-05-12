@@ -1,4 +1,4 @@
-package com.example.PetApp.service.matchpost;
+package com.example.PetApp.service.walkingtogetherpost;
 
 
 import com.example.PetApp.domain.RecommendRoutePost;
@@ -93,7 +93,7 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
         WalkingTogetherPost walkingTogetherPost = WalkingTogetherPost.builder()
                 .profile(profile)
                 .recommendRoutePost(recommendRoutePost.get())
-                .content(createWalkingTogetherPostDto.getContent())
+                .scheduledTime(createWalkingTogetherPostDto.getScheduledTime())
                 .limitCount(createWalkingTogetherPostDto.getLimitCount())
                 .build();
         walkingTogetherPost.addMatchPostProfiles(profileId);
@@ -127,7 +127,7 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
         } else if (!walkingTogetherPost.get().getProfile().getProfileId().equals(profileId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청");
         }
-        walkingTogetherPost.get().setContent(updateWalkingTogetherPostDto.getContent());
+        walkingTogetherPost.get().setScheduledTime(updateWalkingTogetherPostDto.getScheduledTime());
         walkingTogetherPost.get().setLimitCount(updateWalkingTogetherPostDto.getLimitCount());
 
         return ResponseEntity.ok().body("수정 완료");
@@ -162,7 +162,7 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
                 .walkingTogetherPostId(walkingTogetherPostId)
                 .petName(walkingTogetherPost.getProfile().getPetName())
                 .petImageUrl(walkingTogetherPost.getProfile().getPetImageUrl())
-                .content(walkingTogetherPost.getContent())
+                .scheduledTime(walkingTogetherPost.getScheduledTime())
                 .currentCount(walkingTogetherPost.getProfiles().size())
                 .limitCount(walkingTogetherPost.getLimitCount())
                 .createdAt(timeAgoUtil.getTimeAgo(walkingTogetherPost.getWalkingTogetherPostTime()))

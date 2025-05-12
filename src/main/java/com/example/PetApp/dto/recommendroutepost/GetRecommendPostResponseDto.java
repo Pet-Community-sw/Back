@@ -29,5 +29,5 @@ public class GetRecommendPostResponseDto {
 
     private boolean isOwner;
 
-    private boolean isLiked;
+    private boolean isLike;
 }

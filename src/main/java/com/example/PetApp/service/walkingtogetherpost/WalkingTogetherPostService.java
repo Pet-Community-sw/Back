@@ -1,4 +1,4 @@
-package com.example.PetApp.service.matchpost;
+package com.example.PetApp.service.walkingtogetherpost;
 
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostDto;
 import com.example.PetApp.dto.walkingtogetherpost.UpdateWalkingTogetherPostDto;

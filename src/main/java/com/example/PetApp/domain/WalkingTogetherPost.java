@@ -22,8 +22,6 @@ public class WalkingTogetherPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long walkingTogetherPostId;
 
-    private String content;//나중에 시간순으로하기위해 시간으로 받아야할듯?
-
     private int limitCount;
 
     @OneToOne
@@ -33,6 +31,8 @@ public class WalkingTogetherPost {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     private Profile profile;
+
+    private LocalDateTime scheduledTime;
 
     @CreationTimestamp
     private LocalDateTime walkingTogetherPostTime;

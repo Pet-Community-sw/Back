@@ -87,7 +87,7 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
                 .createdAt(timeAgoUtil.getTimeAgo(post.get().getRecommendRouteTime()))
                 .likeCount(likeRepository.countByRecommendRoutePost(post.get()))
                 .isOwner(post.get().getMember().getMemberId().equals(member.getMemberId()))
-                .isLiked(likeRepository.existsByRecommendRoutePostAndMember(post.get(), member))
+                .isLike(likeRepository.existsByRecommendRoutePostAndMember(post.get(), member))
                 .build();
         return ResponseEntity.ok(getRecommendPostResponseDto);
 

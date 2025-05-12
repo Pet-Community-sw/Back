@@ -2,6 +2,8 @@ package com.example.PetApp.dto.walkingtogetherpost;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -10,7 +12,7 @@ import lombok.*;
 public class GetWalkingTogetherPostResponseDto {
     private Long walkingTogetherPostId;
 
-    private String content;
+    private LocalDateTime scheduledTime;
 
     private Long profileId;
 
