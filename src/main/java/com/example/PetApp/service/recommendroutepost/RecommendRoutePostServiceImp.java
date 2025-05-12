@@ -2,7 +2,6 @@ package com.example.PetApp.service.recommendroutepost;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RecommendRoutePost;
-import com.example.PetApp.dto.matchpost.GetMatchPostListResponseDto;
 import com.example.PetApp.dto.recommendroutepost.CreateRecommendRoutePostDto;
 import com.example.PetApp.dto.recommendroutepost.GetRecommendPostResponseDto;
 import com.example.PetApp.dto.recommendroutepost.GetRecommendRoutePostsResponseDto;

@@ -1,15 +1,13 @@
-package com.example.PetApp.dto.matchpost;
+package com.example.PetApp.dto.walkingtogetherpost;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UpdateMatchPostDto {
+public class UpdateWalkingTogetherPostDto {
 
     private String content;
 
     private int limitCount;
-
-    //장소 추가해야할듯.
 }

@@ -1,4 +1,4 @@
-package com.example.PetApp.dto.matchpost;
+package com.example.PetApp.dto.walkingtogetherpost;
 
 import lombok.*;
 
@@ -7,16 +7,16 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class GetMatchPostResponseDto {
-    private Long matchPostId;
+public class GetWalkingTogetherPostResponseDto {
+    private Long walkingTogetherPostId;
 
     private String content;
+
+    private Long profileId;
 
     private String petName;
 
     private String petImageUrl;
-
-    private String locationName;
 
     private int currentCount;
 
@@ -24,8 +24,8 @@ public class GetMatchPostResponseDto {
 
     private String createdAt;
 
-    private boolean isOwner=false;
+    private boolean isOwner;
 
-    private boolean filtering = false;
+    private boolean filtering;
 
 }
