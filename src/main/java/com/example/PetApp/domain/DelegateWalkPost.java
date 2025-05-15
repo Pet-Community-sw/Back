@@ -17,6 +17,10 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class DelegateWalkPost {
+    public enum DelegateWalkStatus {
+        RECRUITING,   // 모집중
+        COMPLETED     // 모집완료
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,6 +53,11 @@ public class DelegateWalkPost {
     private LocalDateTime scheduledTime;
 
     private LocalDateTime delegateWalkPostTime;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DelegateWalkStatus status = DelegateWalkStatus.RECRUITING;//기본값을 모집중으로 선언.
 
     @ElementCollection
     @CollectionTable(name = "walker_post_applicants")
