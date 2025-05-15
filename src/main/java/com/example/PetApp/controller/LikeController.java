@@ -17,7 +17,7 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    @GetMapping("/post/{postId}")//recommendRoutePost따로 보내야할듯
+    @GetMapping("/post/{postId}")
     public ResponseEntity<?> getLike(@PathVariable Long postId) {
         return likeService.getLike(postId);
     }

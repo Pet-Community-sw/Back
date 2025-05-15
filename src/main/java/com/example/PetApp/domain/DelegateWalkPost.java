@@ -5,6 +5,7 @@ import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,17 +16,13 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class WalkerPost {
+public class DelegateWalkPost {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long walkerPostId;
+    private Long delegateWalkPostId;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
-
-    @OneToOne
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
@@ -39,30 +36,25 @@ public class WalkerPost {
     private Long price;
 
     @NotEmpty
-    private Double minLongitude;
-
-    @NotEmpty
-    private Double minLatitude;
-
-    @NotEmpty
-    private Double maxLongitude;
-
-    @NotEmpty
-    private Double maxLatitude;
-
-    @NotEmpty
     private Double locationLongitude;
 
     @NotEmpty
     private Double locationLatitude;
 
-    private int level;
+    @NotEmpty
+    private Integer allowedRadiusMeters;
+
+    private boolean requireProfile;//profile여부 true or false
+
+    private LocalDateTime scheduledTime;
+
+    private LocalDateTime delegateWalkPostTime;
 
     @ElementCollection
-    @CollectionTable(name = "walker_post_members")
+    @CollectionTable(name = "walker_post_applicants")
     @Cascade(org.hibernate.annotations.CascadeType.DELETE)
     @Builder.Default
-    private Set<Long> members=new HashSet<>();
+    private Set<Long> applicants=new HashSet<>();
 
 
 }
