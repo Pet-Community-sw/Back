@@ -13,5 +13,5 @@ public interface LikeService {
 
     ResponseEntity<?> getLike(Long postId);
 
-    ResponseEntity<?> getLikeByRecommendRoutePostId(Long recommendRoutePostId);
+    ResponseEntity<?> getLikeByRecommendRoutePost(Long recommendRoutePostId);
 }

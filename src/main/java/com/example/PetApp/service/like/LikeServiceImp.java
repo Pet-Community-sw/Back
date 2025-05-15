@@ -64,7 +64,7 @@ public class LikeServiceImp implements LikeService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> getLikeByRecommendRoutePostId(Long recommendRoutePostId) {
+    public ResponseEntity<?> getLikeByRecommendRoutePost(Long recommendRoutePostId) {
         log.info("getLikeByRecommendRoutePostId 요청 recommendRoutePostId : {}", recommendRoutePostId);
         Optional<RecommendRoutePost> recommendRoutePost = recommendRoutePostRepository.findById(recommendRoutePostId);
         if (recommendRoutePost.isEmpty()) {

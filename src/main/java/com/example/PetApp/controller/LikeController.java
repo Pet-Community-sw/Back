@@ -24,8 +24,8 @@ public class LikeController {
 
     //이상함
     @GetMapping("/recommend-route-post/{recommendRoutePostId}")
-    private ResponseEntity<?> getLikeByRecommendRoutePostId(@PathVariable Long recommendRoutePostId) {
-        return likeService.getLikeByRecommendRoutePostId(recommendRoutePostId);
+    private ResponseEntity<?> getLikeByRecommendRoutePost(@PathVariable Long recommendRoutePostId) {
+        return likeService.getLikeByRecommendRoutePost(recommendRoutePostId);
     }
 
     @PostMapping()
