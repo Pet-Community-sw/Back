@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
     private final TimeAgoUtil timeAgoUtil;
     private final LikeRepository likeRepository;
 
+    @Transactional
     @Override
     public ResponseEntity<?> createRecommendRoutePost(CreateRecommendRoutePostDto createRecommendRoutePostDto, String email) {
         Member member = memberRepository.findByEmail(email).get();
@@ -47,6 +49,7 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("recommendRoutePostId", saveRecommendRoutePost.getRecommendRouteId()));
     }
 
+    @Transactional
     @Override
     public ResponseEntity<?> getRecommendRoutePosts(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, String email) {
         Member member = memberRepository.findByEmail(email).get();
@@ -58,6 +61,7 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
 
     }
 
+    @Transactional
     @Override
     public ResponseEntity<?> getRecommendRoutePosts(Double longitude, Double latitude, String email) {
         Member member = memberRepository.findByEmail(email).get();
@@ -69,6 +73,7 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
 
     }
 
+    @Transactional
     @Override
     public ResponseEntity<?> getRecommendRoutePost(Long recommendRoutePostId, String email) {
         Member member = memberRepository.findByEmail(email).get();
@@ -93,6 +98,7 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
 
     }
 
+    @Transactional
     @Override
     public ResponseEntity<?> updateRecommendRoutePost(Long recommendRoutePostId, UpdateRecommendRoutePostDto updateRecommendRoutePostDto, String email) {
         Member member = memberRepository.findByEmail(email).get();
@@ -109,6 +115,7 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
         return ResponseEntity.ok().body("수정 완료.");
     }
 
+    @Transactional
     @Override
     public ResponseEntity<?> deleteRecommendRoutePost(Long recommendRoutePostId, String email) {
         Member member = memberRepository.findByEmail(email).get();

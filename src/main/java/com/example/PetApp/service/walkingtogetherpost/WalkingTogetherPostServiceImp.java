@@ -42,13 +42,13 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
     public ResponseEntity<?> getWalkingTogetherPost(Long walkingTogetherPostId, Long profileId) {
         log.info("getWalingTogetherPost 요청 walkingTogetherPostId : {}, profileId : {}", walkingTogetherPostId,profileId);
         if (profileId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요.");
         }
         Optional<WalkingTogetherPost> walkingTogetherPost = walkingTogetherPostRepository.findById(walkingTogetherPostId);
         Profile profile = profileRepository.findById(profileId).get();
         Optional<PetBreed> petBreed = petBreedRepository.findByName(profile.getPetBreed());
         if (walkingTogetherPost.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("해당 매칭글은 없습니다.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("해당 함께 산책해요 게시글은 없습니다.");
         }
         GetWalkingTogetherPostResponseDto getWalkingTogetherPostResponseDto = getGetWalkingTogetherPostResponseDto(walkingTogetherPostId, walkingTogetherPost.get(), profile, petBreed.get());
 
@@ -59,7 +59,7 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
     public ResponseEntity<?> getWalkingTogetherPostsList(Long recommendRoutePostId, Long profileId) {
         log.info("getWalkingTogetherPostsList 요청 recommendRoutePostId : {}, profileId : {}", recommendRoutePostId, profileId);
         if (profileId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요.");
         }
         Optional<RecommendRoutePost> recommendRoutePost = recommendRoutePostRepository.findById(recommendRoutePostId);
         if (recommendRoutePost.isEmpty()) {
@@ -87,7 +87,7 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 산책길 추천 게시물은 없습니다.");
         }
         if (profileId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("프로필 설정 해주세요.");
         }
         Profile profile = profileRepository.findById(profileId).get();
         WalkingTogetherPost walkingTogetherPost = WalkingTogetherPost.builder()
@@ -105,32 +105,32 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
 
     @Transactional
     @Override
-    public ResponseEntity<?> deleteWalkingTogetherPost(Long walkingTogetherPostId, Long profileId) {
-        log.info("deleteWalkingTogetherPost 요청 walkingTogetherPostId : {}, profileId : {}", walkingTogetherPostId, profileId);
-        Optional<WalkingTogetherPost> walkingTogetherPost = walkingTogetherPostRepository.findById(walkingTogetherPostId);
-        if (walkingTogetherPost.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 같이 산책해요 게시물은 없습니다");
-        } else if (!walkingTogetherPost.get().getProfile().getProfileId().equals(profileId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청");
-        }
-
-        walkingTogetherPostRepository.deleteById(walkingTogetherPostId);
-        return ResponseEntity.ok().body("삭제 완료");
-    }
-
-    @Transactional
-    @Override
     public ResponseEntity<?> updateWalkingTogetherPost(Long walkingTogetherPostId, UpdateWalkingTogetherPostDto updateWalkingTogetherPostDto, Long profileId) {
         Optional<WalkingTogetherPost> walkingTogetherPost = walkingTogetherPostRepository.findById(walkingTogetherPostId);
         if (walkingTogetherPost.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 같이 산책해요 게시물은 없습니다");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 함께 산책해요 게시글은 없습니다.");
         } else if (!walkingTogetherPost.get().getProfile().getProfileId().equals(profileId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한 없음.");
         }
         walkingTogetherPost.get().setScheduledTime(updateWalkingTogetherPostDto.getScheduledTime());
         walkingTogetherPost.get().setLimitCount(updateWalkingTogetherPostDto.getLimitCount());
 
-        return ResponseEntity.ok().body("수정 완료");
+        return ResponseEntity.ok().body("수정 완료.");
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<?> deleteWalkingTogetherPost(Long walkingTogetherPostId, Long profileId) {
+        log.info("deleteWalkingTogetherPost 요청 walkingTogetherPostId : {}, profileId : {}", walkingTogetherPostId, profileId);
+        Optional<WalkingTogetherPost> walkingTogetherPost = walkingTogetherPostRepository.findById(walkingTogetherPostId);
+        if (walkingTogetherPost.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 함께 산책해요 게시글은 없습니다.");
+        } else if (!walkingTogetherPost.get().getProfile().getProfileId().equals(profileId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한 없음.");
+        }
+
+        walkingTogetherPostRepository.deleteById(walkingTogetherPostId);
+        return ResponseEntity.ok().body("삭제 완료.");
     }
 
     @Transactional
@@ -142,7 +142,7 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
         }
         Optional<WalkingTogetherPost> walkingTogetherPost = walkingTogetherPostRepository.findById(walkingTogetherPostId);
         if (walkingTogetherPost.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 매칭게시물은 없습니다");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 함께 산책해요 게시글은 없습니다.");
         }
         if (walkingTogetherPost.get().getProfiles().contains(profileId)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 채팅방에 들어가있습니다.");

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor//테스트 해야됨.
 public class LikeServiceImp implements LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
@@ -50,25 +51,42 @@ public class LikeServiceImp implements LikeService {
     @Transactional
     @Override//member의 이름 과 사진으로
     //좋아요는 redis가 아니라 누르는순간 요청을 보내는게 맞고 새로고침할 때 마다 좋아요 리셋하는게 맞을듯.
-    public ResponseEntity<Object> getLike(Long postId) {
+    public ResponseEntity<?> getLike(Long postId) {
         log.info("좋아요 상세 요청");
         Optional<Post> post = postRepository.findById(postId);
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없는 게시물입니다.");
-        }else {
-            List<LikeT> likeList = likeRepository.findAllByPost(post.get());
-            List<LikeListDto> likeListDtos=likeList.stream()
-                    .map(likeT ->LikeListDto.builder()
-                            .memberName(likeT.getMember().getName())
-                            .memberImageUrl(likeT.getMember().getMemberImageUrl())
-                            .build()
-                    ).collect(Collectors.toList());
-            LikeResponseDto likeResponseDto = LikeResponseDto.builder()
-                    .likeListDtos(likeListDtos)
-                    .likeCount((long) likeList.size())
-                    .build();
-            return ResponseEntity.ok(likeResponseDto);
         }
+            List<LikeT> likeList = likeRepository.findAllByPost(post.get());
+            return getLikeList(likeList);
+
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<?> getLikeByRecommendRoutePostId(Long recommendRoutePostId) {
+        log.info("getLikeByRecommendRoutePostId 요청 recommendRoutePostId : {}", recommendRoutePostId);
+        Optional<RecommendRoutePost> recommendRoutePost = recommendRoutePostRepository.findById(recommendRoutePostId);
+        if (recommendRoutePost.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 산책길 추전 게시글은 없습니다.");
+        }
+        List<LikeT> likeList = likeRepository.findAllByRecommendRoutePost(recommendRoutePost.get());
+        return getLikeList(likeList);
+    }
+
+    @NotNull
+    private ResponseEntity<?> getLikeList(List<LikeT> likeList) {
+        List<LikeListDto> likeListDtos = likeList.stream()
+                .map(likeT -> LikeListDto.builder()
+                        .memberName(likeT.getMember().getName())
+                        .memberImageUrl(likeT.getMember().getMemberImageUrl())
+                        .build()
+                ).collect(Collectors.toList());
+        LikeResponseDto likeResponseDto = LikeResponseDto.builder()
+                .likeListDtos(likeListDtos)
+                .likeCount((long) likeList.size())
+                .build();
+        return ResponseEntity.ok(likeResponseDto);
     }
 
     @Transactional

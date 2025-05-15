@@ -17,14 +17,19 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    @GetMapping("/{postId}")//좋아요 갯수만 보내줘도 되나요? 좋아요 누를 때마다 페이지 새로고침하는거면 너무 성능이 낭비일 것 같은디...
-    public ResponseEntity<Object> getLike(@PathVariable Long postId) {
+    @GetMapping("/post/{postId}")//recommendRoutePost따로 보내야할듯
+    public ResponseEntity<?> getLike(@PathVariable Long postId) {
         return likeService.getLike(postId);
     }
+
     //이상함
+    @GetMapping("/recommend-route-post/{recommendRoutePostId}")
+    private ResponseEntity<?> getLikeByRecommendRoutePostId(@PathVariable Long recommendRoutePostId) {
+        return likeService.getLikeByRecommendRoutePostId(recommendRoutePostId);
+    }
 
     @PostMapping()
-    public ResponseEntity<Object> createAndDeleteLike(@RequestBody LikeDto likeDto, Authentication authentication) throws JsonProcessingException {
+    public ResponseEntity<?> createAndDeleteLike(@RequestBody LikeDto likeDto, Authentication authentication) throws JsonProcessingException {
         String email = authentication.getPrincipal().toString();
         return likeService.createAndDeleteLike(likeDto, email);
     }

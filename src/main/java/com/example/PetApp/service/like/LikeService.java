@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 @Service
 public interface LikeService {
 
-    ResponseEntity<Object> createAndDeleteLike(LikeDto likeDto, String email) throws JsonProcessingException;
+    ResponseEntity<?> createAndDeleteLike(LikeDto likeDto, String email) throws JsonProcessingException;
 
-    ResponseEntity<Object> getLike(Long postId);
+    ResponseEntity<?> getLike(Long postId);
+
+    ResponseEntity<?> getLikeByRecommendRoutePostId(Long recommendRoutePostId);
 }

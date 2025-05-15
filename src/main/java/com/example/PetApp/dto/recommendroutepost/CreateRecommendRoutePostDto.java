@@ -19,6 +19,9 @@ public class CreateRecommendRoutePostDto {
     private String content;
 
     @NotEmpty
+    private String locationName;
+
+    @NotEmpty
     private Double locationLongitude;
 
     @NotEmpty
