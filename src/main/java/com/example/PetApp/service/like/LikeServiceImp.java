@@ -1,6 +1,5 @@
 package com.example.PetApp.service.like;
 
-import com.example.PetApp.config.redis.NotificationRedisPublisher;
 import com.example.PetApp.domain.LikeT;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
@@ -9,29 +8,22 @@ import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.LikeListDto;
 import com.example.PetApp.dto.like.LikeDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
-import com.example.PetApp.dto.notification.NotificationListDto;
-import com.example.PetApp.firebase.FcmService;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
+import com.example.PetApp.util.SendNotificationUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,11 +34,7 @@ public class LikeServiceImp implements LikeService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final RecommendRoutePostRepository recommendRoutePostRepository;
-    private final NotificationRedisPublisher notificationRedisPublisher;
-    private final RedisTemplate<String, Object> notificationRedisTemplate;
-    private final ObjectMapper objectMapper;
-    private final FcmService fcmService;
-    private final StringRedisTemplate stringRedisTemplate;
+    private final SendNotificationUtil sendNotificationUtil;
 
     @Transactional
     @Override//member의 이름 과 사진으로
@@ -90,7 +78,7 @@ public class LikeServiceImp implements LikeService {
     }
 
     @Transactional
-    @Override
+    @Override//리펙토링 필수.
     public ResponseEntity<Object> createAndDeleteLike(LikeDto likeDto, String email) throws JsonProcessingException {
         Member member = memberRepository.findByEmail(email).get();
         if (likeDto.getPostType()== CommentDto.PostType.COMMUNITY) {
@@ -105,7 +93,8 @@ public class LikeServiceImp implements LikeService {
                 return deleteLike(post.get(), member);
             } else {
                 log.info("좋아요 생성");
-                sendLikeNotification(post.get().getMember(), member);
+                String message = member.getName() + "님이 회원님의 게시물을 좋아합니다.";
+                sendNotificationUtil.sendNotification(post.get().getMember(), member, message);
 
                 return createLike(post.get(), member);
             }
@@ -121,7 +110,8 @@ public class LikeServiceImp implements LikeService {
                 return deleteLike(post.get(), member);
             } else {
                 log.info("좋아요 생성");
-                sendLikeNotification(post.get().getMember(), member);
+                String message = member.getName() + "님이 회원님의 게시물을 좋아합니다.";
+                sendNotificationUtil.sendNotification(post.get().getMember(), member, message);
 
                 return createLike(post.get(), member);
             }
@@ -165,17 +155,4 @@ public class LikeServiceImp implements LikeService {
         return ResponseEntity.ok().body("좋아요 삭제했습니다.");
     }
 
-    private void sendLikeNotification(Member postMember, Member member) throws JsonProcessingException {
-        String message = member.getName() + "님이 회원님의 게시물을 좋아합니다.";
-        String key = "notifications:" +postMember.getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
-        NotificationListDto notificationListDto = new NotificationListDto(message, LocalDateTime.now());
-        String json = objectMapper.writeValueAsString(notificationListDto);
-        notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
-        notificationRedisPublisher.publish("member:" + postMember.getMemberId(), message);
-        if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember("foreGroundMembers:", member.getMemberId()))) {
-            notificationRedisPublisher.publish("member:" + postMember.getMemberId(), message);
-        }else {
-            fcmService.sendNotification(postMember.getFcmToken().getFcmToken(), "명냥로드", message);
-        }
-    }
 }

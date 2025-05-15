@@ -4,6 +4,7 @@ import com.example.PetApp.dto.delegateWalkpost.CreateDelegateWalkPostDto;
 import com.example.PetApp.dto.delegateWalkpost.UpdateDelegateWalkPostDto;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.walkerpost.DelegateWalkPostService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -28,9 +29,10 @@ public class DelegateWalkPostController {
     }
 
     @PostMapping("/{delegateWalkPostId}")
-    public ResponseEntity<?> applyToWalkerPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
-        String email = getEmail(authentication);
-        return delegateWalkPostService.applyToDelegateWalkPost(delegateWalkPostId, email);
+    public ResponseEntity<?> applyToWalkerPost(@PathVariable Long delegateWalkPostId,
+                                               @RequestBody String content,
+                                               Authentication authentication) throws JsonProcessingException {
+        return delegateWalkPostService.applyToDelegateWalkPost(delegateWalkPostId, content, getEmail(authentication));
     }
 
     @GetMapping("/by-location")
@@ -59,8 +61,7 @@ public class DelegateWalkPostController {
 
     @GetMapping("/{delegateWalkPostId}/applicants")
     public ResponseEntity<?> getApplicants(@PathVariable Long delegateWalkPostId, Authentication authentication) {
-        String email = getEmail(authentication);
-        return delegateWalkPostService.getApplicants(delegateWalkPostId, email);
+        return delegateWalkPostService.getApplicants(delegateWalkPostId, getProfileId(authentication));
     }
 
 

@@ -1,6 +1,5 @@
 package com.example.PetApp.service.comment;
 
-import com.example.PetApp.config.redis.NotificationRedisPublisher;
 import com.example.PetApp.domain.Comment;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
@@ -8,29 +7,22 @@ import com.example.PetApp.domain.RecommendRoutePost;
 import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.commment.UpdateCommentDto;
-import com.example.PetApp.dto.notification.NotificationListDto;
-import com.example.PetApp.firebase.FcmService;
 import com.example.PetApp.repository.jpa.CommentRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
+import com.example.PetApp.util.SendNotificationUtil;
 import com.example.PetApp.util.TimeAgoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,16 +33,12 @@ public class CommentServiceImp implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final RecommendRoutePostRepository recommendRoutePostRepository;
-    private final NotificationRedisPublisher notificationRedisPublisher;
-    private final RedisTemplate<String, Object> notificationRedisTemplate;
     private final MemberRepository memberRepository;
-    private final ObjectMapper objectMapper;
-    private final FcmService fcmService;
-    private final StringRedisTemplate stringRedisTemplate;
     private final TimeAgoUtil timeAgoUtil;
+    private final SendNotificationUtil sendNotificationUtil;
 
     @Transactional
-    @Override
+    @Override//리펙토링 필수.
     public ResponseEntity<Object> createComment(CommentDto commentDto, String email) throws JsonProcessingException {
         Member member = memberRepository.findByEmail(email).get();
         log.info("createComment 요청 memberId : {}", member.getMemberId());
@@ -66,7 +54,8 @@ public class CommentServiceImp implements CommentService {
                     .build();
 
             commentRepository.save(comment);
-            sendCommentNotifications(post.get().getMember(), member); // 알림 전송
+            String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
+            sendNotificationUtil.sendNotification(post.get().getMember(), member, message); // 알림 전송
             return ResponseEntity.status(HttpStatus.CREATED).body(comment.getCommentId());
         } else if (commentDto.getPostType() == CommentDto.PostType.RECOMMEND) {
             Optional<RecommendRoutePost> post = recommendRoutePostRepository.findById(commentDto.getPostId());
@@ -80,7 +69,8 @@ public class CommentServiceImp implements CommentService {
                     .build();
 
             commentRepository.save(comment);
-            sendCommentNotifications(post.get().getMember(), member); // 알림 전송
+            String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
+            sendNotificationUtil.sendNotification(post.get().getMember(), member, message); // 알림 전송
             return ResponseEntity.status(HttpStatus.CREATED).body(comment.getCommentId());
         } else {
             return ResponseEntity.badRequest().body("지원하지 않는 게시물 유형입니다.");
@@ -149,16 +139,4 @@ public class CommentServiceImp implements CommentService {
         return ResponseEntity.ok(getCommentsResponseDtos);
     }
 
-    private void sendCommentNotifications(Member postMember, Member member) throws JsonProcessingException {
-        String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
-        String key = "notifications:" + postMember.getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
-        NotificationListDto notificationListDto = new NotificationListDto(message, LocalDateTime.now());
-        String json =objectMapper.writeValueAsString(notificationListDto);
-        notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
-        if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember("foreGroundMembers:", member.getMemberId()))) {
-            notificationRedisPublisher.publish("member:" + postMember.getMemberId(), message);
-        }else {
-            fcmService.sendNotification(postMember.getFcmToken().getFcmToken(), "명냥로드", message);
-        }
-    }
 }

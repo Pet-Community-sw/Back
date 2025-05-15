@@ -29,7 +29,7 @@ public class ChatRoom {
     private LocalDateTime chatRoomTime;
 
     @OneToOne
-    @JoinColumn(name = "match_post_id")
+    @JoinColumn(name = "walking_together_post_id")
     private WalkingTogetherPost walkingTogetherPost;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

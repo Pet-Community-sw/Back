@@ -54,7 +54,8 @@ public class DelegateWalkPost {
     @CollectionTable(name = "walker_post_applicants")
     @Cascade(org.hibernate.annotations.CascadeType.DELETE)
     @Builder.Default
-    private Set<Long> applicants=new HashSet<>();
+    private Set<Applicant> applicants = new HashSet<>();
+
 
 
 }
