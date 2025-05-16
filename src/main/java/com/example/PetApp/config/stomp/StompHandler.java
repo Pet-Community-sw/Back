@@ -36,8 +36,8 @@ public class StompHandler implements ChannelInterceptor {
     private final JwtTokenizer jwtTokenizer;
     private final ChatRoomRepository chatRoomRepository;
     private final ProfileRepository profileRepository;
-    private final MemberRepository memberRepository;
     private final MemberChatRoomRepository memberChatRoomRepository;
+    private final MemberRepository memberRepository;
     private final StringRedisTemplate stringRedisTemplate;
 
 
@@ -61,19 +61,24 @@ public class StompHandler implements ChannelInterceptor {
             }
             Claims claims = jwtTokenizer.parseAccessToken(accessToken);
             Object profileId = claims.get("profileId");
+            Authentication authentication;
             if (profileId == null) {
                 String email = claims.getSubject();
-                Member member = memberRepository.findByEmail(email).get();
-                Authentication authentication = new UsernamePasswordAuthenticationToken(member.getMemberId(), null);
-                accessor.setUser(authentication);//memberId를 추가
+                Member member = memberRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("해당 이메일의 사용자를 찾을 수 없습니다."));
+                authentication = new UsernamePasswordAuthenticationToken(member.getMemberId(), null);
+                log.info("websocket 인증: profileId 없음 → memberId({}) 사용", member.getMemberId());
+            } else {
+                authentication = new UsernamePasswordAuthenticationToken(profileId, null);
+                log.info("websocket 인증: profileId({}) 사용", profileId);
             }
-            Authentication authentication = new UsernamePasswordAuthenticationToken(profileId, null);//profileId를 넣고있음.
             accessor.setUser(authentication);
         } else if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {//목적지 주소와 같은지 확인을 해야됨. 구독을 검증하는 단계
             String destination = accessor.getDestination();
+            accessor.getSessionId()
             if (destination != null && destination.startsWith("/sub/chat/")) {//null이면 안되고 /sub/chat/으로 시작을 해야됨.
                 Long chatRoomId = Long.valueOf(destination.substring("/sub/chat/".length()));//이거는 chatRoomId가 나옴. chatRoom에 있는 profileId와 검사를 해야됨.
-                ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 앖습니다."));
+                chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 앖습니다."));
                 Principal auth = accessor.getUser();
                 if (auth == null) {
                     throw new NullPointerException("auth가 null입니다.");
@@ -85,26 +90,29 @@ public class StompHandler implements ChannelInterceptor {
                     log.error("chatRoomId:{} 에 권한이 없는 profile이 접근하려고함.", chatRoomId);
                     throw new IllegalArgumentException("잘못된 접근입니다.");
                 }
-                stringRedisTemplate.opsForSet().add("chatRoomId:" + chatRoomId + ":onlineMembers", profileId);//채팅방 접속자 유무
+                stringRedisTemplate.opsForSet().add("chatRoomId:" + chatRoomId + ":onlineProfiles", profileId);//채팅방 접속자 유무
                 String sessionId = accessor.getSessionId();
                 stringRedisTemplate.opsForValue().set("session:"+sessionId, chatRoomId.toString());//chatRoomId를 가지고오기 위한 redis 저장
             } else if (destination.startsWith("/sub/member/chat/")) {
                     // 1:1 채팅방 처리
-                    Long memberChatRoomId = Long.valueOf(destination.substring("/sub/member/chat/".length()));
-                    MemberChatRoom memberChatRoom = memberChatRoomRepository.findById(memberChatRoomId)
+                Long memberChatRoomId = Long.valueOf(destination.substring("/sub/member/chat/".length()));
+                MemberChatRoom memberChatRoom = memberChatRoomRepository.findById(memberChatRoomId)
                             .orElseThrow(() -> new IllegalArgumentException("1:1 채팅방이 존재하지 않습니다."));
                 String memberId = accessor.getUser().getName();
 
                 boolean hasAccess = memberChatRoom.getMembers().stream()
                         .anyMatch(m -> m.getMemberId().equals(Long.valueOf(memberId)));
-                    if (!hasAccess) {
-                        log.error("memberChatRoomId:{} 에 권한이 없는 member가 접근하려고 함.", memberChatRoomId);
-                        throw new IllegalArgumentException("잘못된 접근입니다.");
-                    }
-                } else {
-                    log.error("알 수 없는 구독 경로: {}", destination);
-                    throw new IllegalArgumentException("알 수 없는 구독 경로입니다.");
+                if (!hasAccess) {
+                    log.error("memberChatRoomId:{} 에 권한이 없는 member가 접근하려고 함.", memberChatRoomId);
+                    throw new IllegalArgumentException("잘못된 접근입니다.");
                 }
+                stringRedisTemplate.opsForSet().add("memberChatRoomId:" + memberChatRoomId + ":onlineMembers", memberId);
+                String sessionId = accessor.getSessionId();
+                stringRedisTemplate.opsForValue().set("session:" + sessionId, memberChatRoomId.toString());
+            } else {
+                log.error("알 수 없는 구독 경로: {}", destination);
+                throw new IllegalArgumentException("알 수 없는 구독 경로입니다.");
+            }
         }
         return message;
     }

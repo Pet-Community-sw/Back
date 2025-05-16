@@ -100,7 +100,6 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
         walkingTogetherPost.addAvoidBreeds(profile);
         WalkingTogetherPost saveWalkingTogetherPost = walkingTogetherPostRepository.save(walkingTogetherPost);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("matchPostId", saveWalkingTogetherPost.getWalkingTogetherPostId()));
-        //굳이 반환값을 id로 줘야하나? 낭비가 심한것같음.
     }
 
     @Transactional

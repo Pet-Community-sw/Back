@@ -29,7 +29,6 @@ public class ChatMessage {
         ONE, MANY
     }
 
-
     @Id
     private String id;
     private MessageType messageType;

@@ -94,7 +94,7 @@ public class LikeServiceImp implements LikeService {
             } else {
                 log.info("좋아요 생성");
                 String message = member.getName() + "님이 회원님의 게시물을 좋아합니다.";
-                sendNotificationUtil.sendNotification(post.get().getMember(), member, message);
+                sendNotificationUtil.sendNotification(post.get().getMember(), message);
 
                 return createLike(post.get(), member);
             }
@@ -111,7 +111,7 @@ public class LikeServiceImp implements LikeService {
             } else {
                 log.info("좋아요 생성");
                 String message = member.getName() + "님이 회원님의 게시물을 좋아합니다.";
-                sendNotificationUtil.sendNotification(post.get().getMember(), member, message);
+                sendNotificationUtil.sendNotification(post.get().getMember(), message);
 
                 return createLike(post.get(), member);
             }

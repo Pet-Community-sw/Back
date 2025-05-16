@@ -24,17 +24,22 @@ public class StompDisconnectEventListener {
         String sessionId = accessor.getSessionId();
         String profileId = accessor.getUser() != null ? accessor.getUser().getName() : null;
 
-        log.info(" disconnect 요청  sessionId: {}, profileId: {}", sessionId, profileId);
-        if (profileId != null) {
-            String chatRoomId = stringRedisTemplate.opsForValue().get("session:" + sessionId);
-            if (chatRoomId != null) {
-                stringRedisTemplate.opsForSet().remove("chatRoomId:" + chatRoomId + ":onlineMembers", profileId);
-                stringRedisTemplate.delete("session:" + sessionId);
+        log.info("DISCONNECT 요청 - sessionId: {}, profileId: {}", sessionId, profileId);
 
-                log.info("Removed profileId {} from chatRoom {} online members", profileId, chatRoomId);
-
-            }
+        if (profileId == null) {
+            log.warn("DISCONNECT: 사용자 정보가 없는 세션입니다. sessionId: {}", sessionId);
+            return;
         }
 
+        String chatRoomId = stringRedisTemplate.opsForValue().get("session:" + sessionId);
+        if (chatRoomId == null) {
+            log.warn("DISCONNECT: sessionId {} 에 해당하는 chatRoomId 없음", sessionId);
+            return;
+        }
+
+        stringRedisTemplate.opsForSet().remove("chatRoomId:" + chatRoomId + ":onlineMembers", profileId);
+        stringRedisTemplate.delete("session:" + sessionId);
+
+        log.info("DISCONNECT 처리 완료 - profileId {} removed from chatRoomId {}", profileId, chatRoomId);
     }
 }

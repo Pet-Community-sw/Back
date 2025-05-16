@@ -55,7 +55,7 @@ public class CommentServiceImp implements CommentService {
 
             commentRepository.save(comment);
             String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
-            sendNotificationUtil.sendNotification(post.get().getMember(), member, message); // 알림 전송
+            sendNotificationUtil.sendNotification(post.get().getMember(), message); // 알림 전송
             return ResponseEntity.status(HttpStatus.CREATED).body(comment.getCommentId());
         } else if (commentDto.getPostType() == CommentDto.PostType.RECOMMEND) {
             Optional<RecommendRoutePost> post = recommendRoutePostRepository.findById(commentDto.getPostId());
@@ -70,7 +70,7 @@ public class CommentServiceImp implements CommentService {
 
             commentRepository.save(comment);
             String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
-            sendNotificationUtil.sendNotification(post.get().getMember(), member, message); // 알림 전송
+            sendNotificationUtil.sendNotification(post.get().getMember(), message); // 알림 전송
             return ResponseEntity.status(HttpStatus.CREATED).body(comment.getCommentId());
         } else {
             return ResponseEntity.badRequest().body("지원하지 않는 게시물 유형입니다.");

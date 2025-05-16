@@ -17,7 +17,6 @@ public interface ChatRoomService {
 
     ResponseEntity<?> updateChatRoom(Long chatRoomId, UpdateChatRoomDto updateChatRoomDto, Long profileId);
 
-
     ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, int page);
 
     ResponseEntity<?> deleteChatRoom(Long chatRoomId, Long profileId);

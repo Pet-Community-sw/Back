@@ -57,9 +57,9 @@ public class ChatRoomServiceImp implements ChatRoomService {
     }
 
     @Transactional
-    @Override//채팅방 생성은 두 가지 일듯 매칭글에서 채팅하기 or 그냥 메시지 보내기
+    @Override
     public ResponseEntity<?> createChatRoom(WalkingTogetherPost walkingTogetherPost, Profile profile) {
-        Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByMatchPost(walkingTogetherPost);
+        Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByWalkingTogetherPost(walkingTogetherPost);
         if (chatRoom2.isEmpty()) {//채팅방이 없으면 새로운생성 있으면 profiles에 신청자 Profile 추가
             ChatRoom chatRoom = ChatRoom.builder()
                     .name(walkingTogetherPost.getProfile().getPetName()+"님의 방")
@@ -128,7 +128,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
     }
 
     @Transactional
-    @Override//이렇게 하면 채팅방에 적속해 있을 때 unread 증가하는데 이러면 안됨.
+    @Override
     public ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, int page) {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
         Optional<Profile> profile = profileRepository.findById(profileId);
@@ -160,29 +160,28 @@ public class ChatRoomServiceImp implements ChatRoomService {
         ChatMessageResponseDto messagesList = new ChatMessageResponseDto(chatRoomId, chatMessageDtos);
         return ResponseEntity.ok(messagesList);
     }
-        public void updateChatMessageProfile(ChatMessage chatMessage, Long currentProfileId) {
-            List<Long> offlineProfiles = chatMessage.getProfiles();
 
-            // 자신을 제외한 리스트로 새로 만듦
-            List<Long> updatedOfflineProfiles = offlineProfiles.stream()
+    public void updateChatMessageProfile(ChatMessage chatMessage, Long currentProfileId) {
+        List<Long> offlineProfiles = chatMessage.getProfiles();
+
+        // 자신을 제외한 리스트로 새로 만듦
+        List<Long> updatedOfflineProfiles = offlineProfiles.stream()
                     .filter(id -> !id.equals(currentProfileId))
                     .collect(Collectors.toList());
 
-            // 업데이트된 리스트 세팅
-            chatMessage.setProfiles(updatedOfflineProfiles);
+        // 업데이트된 리스트 세팅
+        chatMessage.setProfiles(updatedOfflineProfiles);
 
-            chatMessage.setChatUnReadCount(chatMessage.getProfiles().size());
+        chatMessage.setChatUnReadCount(chatMessage.getProfiles().size());
 
-            chatMessageRepository.save(chatMessage);//카톡처럼 많은 트래픽이 발생안할것같아 이렇게함.
+        chatMessageRepository.save(chatMessage);//카톡처럼 많은 트래픽이 발생안할것같아 이렇게함.
 
-            UpdateChatUnReadCountDto updateChatUnReadDto=UpdateChatUnReadCountDto.builder()
+        UpdateChatUnReadCountDto updateChatUnReadDto=UpdateChatUnReadCountDto.builder()
                     .chatRoomId(chatMessage.getChatRoomId())
                     .id(chatMessage.getId())
                     .chatUnReadCount(chatMessage.getChatUnReadCount())
                     .build();
-            simpMessagingTemplate.convertAndSend("/sub/chat/update/unReadCount", updateChatUnReadDto);
-
-        }
-
-
+        simpMessagingTemplate.convertAndSend("/sub/chat/update/unReadCount", updateChatUnReadDto);
+        //이거 api명세서 작성해야됨. 안읽은 수 처리.
+    }
 }

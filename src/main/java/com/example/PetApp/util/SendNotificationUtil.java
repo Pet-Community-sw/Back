@@ -25,15 +25,15 @@ public class SendNotificationUtil {
     private final NotificationRedisPublisher notificationRedisPublisher;
     private final FcmService fcmService;
 
-    public void sendNotification(Member postMember, Member member, String message) throws JsonProcessingException {
-        String key = "notifications:" +postMember.getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
+    public void sendNotification(Member member, String message) throws JsonProcessingException {
+        String key = "notifications:" + member.getMemberId() + ":" + UUID.randomUUID();//알림 설정 최대 3일.
         NotificationListDto notificationListDto = new NotificationListDto(message, LocalDateTime.now());
         String json = objectMapper.writeValueAsString(notificationListDto);
         notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
         if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember("foreGroundMembers:", member.getMemberId()))) {
-            notificationRedisPublisher.publish("member:" + postMember.getMemberId(), message);
+            notificationRedisPublisher.publish("member:" + member.getMemberId(), message);
         }else {
-            fcmService.sendNotification(postMember.getFcmToken().getFcmToken(), "명냥로드", message);
+            fcmService.sendNotification(member.getFcmToken().getFcmToken(), "명냥로드", message);
         }
     }
 }

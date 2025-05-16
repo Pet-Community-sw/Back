@@ -5,6 +5,7 @@ import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.repository.jpa.DelegateWalkPostRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
+import com.example.PetApp.service.memberChatRoom.MemberChatRoomService;
 import com.example.PetApp.util.SendNotificationUtil;
 import com.example.PetApp.util.TimeAgoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,6 +31,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
     private final DelegateWalkPostRepository delegateWalkPostRepository;
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
+    private final MemberChatRoomService memberChatRoomService;
     private final TimeAgoUtil timeAgoUtil;
     private final SendNotificationUtil sendNotificationUtil;
 
@@ -58,9 +60,8 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
         }
         delegateWalkPost.get().setStatus(DelegateWalkPost.DelegateWalkStatus.COMPLETED);
         //켈린더에 넣는 로직필요.
-        //채팅방열리는 로직필요.
-        return ResponseEntity.ok().build();
-
+        //알림 로직 필요.
+        return memberChatRoomService.createMemberChatRoom(member, memberRepository.findById(memberId).get());
     }
 
     @Transactional
@@ -214,7 +215,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
                 .content(content)
                 .build());
         String message = member.getName() + "님이 회원님의 대리산책자 게시글에 지원했습니다.";
-        sendNotificationUtil.sendNotification(delegateWalkPost.get().getProfile().getMember(), member, message);
+        sendNotificationUtil.sendNotification(delegateWalkPost.get().getProfile().getMember(), message);
         return ResponseEntity.ok().body("신청 완료.");
     }
 

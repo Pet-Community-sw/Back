@@ -8,24 +8,23 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-수정해야해
 
 @Repository
 public interface RecommendRoutePostRepository extends JpaRepository<RecommendRoutePost, Long> {
-    @Query(value = "select * from match_post m " +
-            "where ST_Distance_Sphere(POINT(m.longitude, m.latitude), " +
+    @Query(value = "select * from RecommendRoutePost r" +
+            "where ST_Distance_Sphere(POINT(r.locationLongitude, r.locationLatitude), " +
             "POINT(:longitude, :latitude)) <= 1000 " +
-            "order by m.matchPostTiem desc"
+            "order by r.recommendRouteTime desc"
             , nativeQuery = true)
     List<RecommendRoutePost> findByRecommendRoutePostByPlace(
             @Param("longitude") Double longitude,
             @Param("latitude") Double latitude
     );
 
-    @Query(value = "select * from match_post m " +
-            "where m.longitude between :minLongitude and :maxLongitude " +
-            "and m.latitude between :minLatitude and :maxLatitude " +
-            "order by m.matchPostTime desc ",
+    @Query(value = "select * from RecommendRoutePost r " +
+            "where r.locationLongitude between :minLongitude and :maxLongitude " +
+            "and r.locationLatitude between :minLatitude and :maxLatitude " +
+            "order by r.recommendRouteTime desc ",
             nativeQuery = true)
     List<RecommendRoutePost> findByRecommendRoutePostByLocation(
             @Param("minLongitude") Double minLongitude,

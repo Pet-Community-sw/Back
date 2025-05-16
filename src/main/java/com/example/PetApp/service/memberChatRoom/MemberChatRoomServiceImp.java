@@ -6,6 +6,7 @@ import com.example.PetApp.dto.memberchat.MemberChatRoomsResponseDto;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor//리펙토링 필수
+@Slf4j
 public class MemberChatRoomServiceImp implements MemberChatRoomService {
 
     private final MemberChatRoomRepository memberChatRoomRepository;
@@ -29,7 +31,7 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> getUserChatRooms(String email) {
+    public ResponseEntity<?> getMemberChatRooms(String email) {
         Member member = memberRepository.findByEmail(email).get();
         List<MemberChatRoom> memberChatRooms = memberChatRoomRepository.findAllByMembersContains(member);
 
@@ -46,7 +48,7 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
                             }
                             return MemberChatRoomsResponseDto.builder()
                                     .chatName(roomName)
-                            .lastMessage(lastMessage)
+                                    .lastMessage(lastMessage)
                                     .unReadCount(unReadCount)
                                     .lastMessageTime(lastMessageLocalDateTime)
                                     .build();
@@ -55,19 +57,22 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
 
     }
 
-    private static Member filterMember(List<Member> members, Member member) {
-        Member returnMember = null;
-        for (Member member1 : members) {
-            if (!(member1.equals(member))) {
-                returnMember= member1;
-            }
-        }
-        return returnMember;
+    @Transactional
+    @Override
+    public ResponseEntity<?> createMemberChatRoom(Member fromMember, Member member) {//방 제목을 어떻게 할까
+        List<Member> members = new ArrayList<>();
+        members.add(fromMember);
+        members.add(member);
+        MemberChatRoom memberChatRoom = MemberChatRoom.builder()
+                .members(members)
+                .build();
+        MemberChatRoom newMemberChatRoom = memberChatRoomRepository.save(memberChatRoom);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("memberChatRoomId", newMemberChatRoom.getMemberChatRoomId()));
     }
 
     @Transactional
     @Override
-    public ResponseEntity<?> createUserChatRoom(Long memberId, String email) {
+    public ResponseEntity<?> createMemberChatRoom(Long memberId, String email) {
         Optional<Member> fromMember = memberRepository.findById(memberId);
         if (fromMember.isEmpty()) {
             return ResponseEntity.status(HttpStatus.FOUND).body("해당 유저를 찾을 수 없습니다.");
@@ -87,14 +92,16 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("memberChatRoomId", newMemberChatRoom.getMemberChatRoomId()));
     }
 
+    @Transactional
     @Override
-    public ResponseEntity<?> updateUserChatRoom(Long memberChatRoomId, String userChatRoomName, String email) {
+    public ResponseEntity<?> updateMemberChatRoom(Long memberChatRoomId, String userChatRoomName, String email) {
 
         return null;
     }
 
+    @Transactional
     @Override
-    public ResponseEntity<?> deleteUserChatRoom(Long memberChatRoomId, String email) {
+    public ResponseEntity<?> deleteMemberChatRoom(Long memberChatRoomId, String email) {
         Member member = memberRepository.findByEmail(email).get();
         Optional<MemberChatRoom> memberChatRoom = memberChatRoomRepository.findById(memberChatRoomId);
         if (memberChatRoom.isEmpty()) {
@@ -105,5 +112,15 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
         }
         memberChatRoomRepository.deleteById(memberChatRoomId);
         return ResponseEntity.ok().body("삭제 완료.");
+    }
+
+    private static Member filterMember(List<Member> members, Member member) {
+        Member returnMember = null;
+        for (Member member1 : members) {
+            if (!(member1.equals(member))) {
+                returnMember= member1;
+            }
+        }
+        return returnMember;
     }
 }

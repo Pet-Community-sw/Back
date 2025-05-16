@@ -13,23 +13,23 @@ public class MemberChatRoomController {
     private final MemberChatRoomService memberChatRoomService;
 
     @GetMapping
-    public ResponseEntity<?> getUserChatRooms(Authentication authentication) {
-        return memberChatRoomService.getUserChatRooms(getEmail(authentication));
+    public ResponseEntity<?> getMemberChatRooms(Authentication authentication) {
+        return memberChatRoomService.getMemberChatRooms(getEmail(authentication));
     }
 
     @PostMapping
-    public ResponseEntity<?> createUserChatRoom(@RequestBody Long memberId, Authentication authentication) {
-        return memberChatRoomService.createUserChatRoom(memberId, getEmail(authentication));
+    public ResponseEntity<?> createMemberChatRoom(@RequestBody Long memberId, Authentication authentication) {
+        return memberChatRoomService.createMemberChatRoom(memberId, getEmail(authentication));
     }
 
     @PutMapping("/{memberChatRoomId}")
-    public ResponseEntity<?> updateUserChatRoom(@PathVariable Long memberChatRoomId, @RequestBody String memberChatRoomName, Authentication authentication) {
-        return memberChatRoomService.updateUserChatRoom(memberChatRoomId, memberChatRoomName, getEmail(authentication));
+    public ResponseEntity<?> updateMemberChatRoom(@PathVariable Long memberChatRoomId, @RequestBody String memberChatRoomName, Authentication authentication) {
+        return memberChatRoomService.updateMemberChatRoom(memberChatRoomId, memberChatRoomName, getEmail(authentication));
     }
 
     @DeleteMapping("/{memberChatRoomId}")
-    public ResponseEntity<?> deleteUserChatRoom(@PathVariable Long memberChatRoomId, Authentication authentication) {
-        return memberChatRoomService.deleteUserChatRoom(memberChatRoomId, getEmail(authentication));
+    public ResponseEntity<?> deleteMemberChatRoom(@PathVariable Long memberChatRoomId, Authentication authentication) {
+        return memberChatRoomService.deleteMemberChatRoom(memberChatRoomId, getEmail(authentication));
     }
 
     private static String getEmail(Authentication authentication) {

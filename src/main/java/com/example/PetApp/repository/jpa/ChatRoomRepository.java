@@ -17,7 +17,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     Set<ChatRoom> findAllByProfilesContains(Profile profile);// 이거 검사해봐야할듯.
 
-    Optional<ChatRoom> findByMatchPost(WalkingTogetherPost walkingTogetherPost);
+    Optional<ChatRoom> findByWalkingTogetherPost(WalkingTogetherPost walkingTogetherPost);
 
     boolean existsByChatRoomIdAndProfilesContains(Long chatRoomId, Profile profile);
 
