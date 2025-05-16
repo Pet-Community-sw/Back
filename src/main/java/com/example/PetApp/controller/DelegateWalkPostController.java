@@ -77,6 +77,11 @@ public class DelegateWalkPostController {
         return delegateWalkPostService.deleteDelegateWalkPost(delegateWalkPostId, email);
     }
 
+    @PostMapping("/select-applicant/{delegateWalkPostId}")
+    public ResponseEntity<?> selectApplicant(@PathVariable Long delegateWalkPostId, @RequestBody Long memberId, Authentication authentication) {
+        return delegateWalkPostService.selectApplicant(delegateWalkPostId, memberId, getEmail(authentication));
+    }
+
 
     private static String getEmail(Authentication authentication) {
         return authentication.getPrincipal().toString();

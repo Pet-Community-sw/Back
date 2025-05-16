@@ -25,4 +25,6 @@ public interface DelegateWalkPostService {
     ResponseEntity<?> getApplicants(Long delegateWalkPostId, Long profileId);
 
     ResponseEntity<?> checkProfile(Long profileId);
+
+    ResponseEntity<?> selectApplicant(Long delegateWalkPostId, Long memberId, String email);
 }

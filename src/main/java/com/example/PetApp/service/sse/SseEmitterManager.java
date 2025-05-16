@@ -2,6 +2,8 @@ package com.example.PetApp.service.sse;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.repository.jpa.MemberRepository;
+import com.example.PetApp.security.jwt.util.JwtTokenizer;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,11 +20,16 @@ public class SseEmitterManager {
 
     private final MemberRepository memberRepository;
 
+    private final JwtTokenizer jwtTokenizer;
+
     private final static Long DEFAULT_TIMEOUT = 60 * 60 * 1000L;
 
     private final Map<Long, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();//스레드 중복 방지
 
-    public SseEmitter subscribe(String email) {
+
+
+    public SseEmitter subscribe(String token) {
+        String email = jwtTokenizer.parseAccessToken(token).getSubject();
         Member member = memberRepository.findByEmail(email).get();
 
         SseEmitter sseEmitter = new SseEmitter(DEFAULT_TIMEOUT);

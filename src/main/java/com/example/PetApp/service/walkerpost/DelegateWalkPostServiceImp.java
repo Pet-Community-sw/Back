@@ -45,6 +45,26 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
 
     @Transactional
     @Override
+    public ResponseEntity<?> selectApplicant(Long delegateWalkPostId, Long memberId, String email) {
+        Member member = memberRepository.findByEmail(email).get();
+        log.info("selectApplicant 요청 delegateWalkPostId : {}, memberId : {}", delegateWalkPostId, member.getMemberId());
+        Optional<DelegateWalkPost> delegateWalkPost = delegateWalkPostRepository.findById(delegateWalkPostId);
+        if (delegateWalkPost.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 대리산책자 게시글은 없습니다.");
+        } else if (!(delegateWalkPost.get().getProfile().getMember().equals(member))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한 없음.");
+        } else if (delegateWalkPost.get().getApplicants().stream().noneMatch(applicant -> applicant.getMemberId().equals(memberId))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("해당 지원자는 없습니다.");
+        }
+        delegateWalkPost.get().setStatus(DelegateWalkPost.DelegateWalkStatus.COMPLETED);
+        //켈린더에 넣는 로직필요.
+        //채팅방열리는 로직필요.
+        return ResponseEntity.ok().build();
+
+    }
+
+    @Transactional
+    @Override
     public ResponseEntity<?> createDelegateWalkPost(CreateDelegateWalkPostDto createDelegateWalkPostDto, Long profileId) {
         log.info("createDelegateWalkPost 요청 profileId : {}", profileId);
         if (profileId == null) {

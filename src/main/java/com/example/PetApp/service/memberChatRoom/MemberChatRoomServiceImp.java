@@ -88,6 +88,12 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
     }
 
     @Override
+    public ResponseEntity<?> updateUserChatRoom(Long memberChatRoomId, String userChatRoomName, String email) {
+
+        return null;
+    }
+
+    @Override
     public ResponseEntity<?> deleteUserChatRoom(Long memberChatRoomId, String email) {
         Member member = memberRepository.findByEmail(email).get();
         Optional<MemberChatRoom> memberChatRoom = memberChatRoomRepository.findById(memberChatRoomId);
