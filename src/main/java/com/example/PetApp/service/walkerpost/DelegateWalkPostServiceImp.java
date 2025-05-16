@@ -47,7 +47,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> selectApplicant(Long delegateWalkPostId, Long memberId, String email) {
+    public ResponseEntity<?> selectApplicant(Long delegateWalkPostId, Long memberId, String email) throws JsonProcessingException {
         Member member = memberRepository.findByEmail(email).get();
         log.info("selectApplicant 요청 delegateWalkPostId : {}, memberId : {}", delegateWalkPostId, member.getMemberId());
         Optional<DelegateWalkPost> delegateWalkPost = delegateWalkPostRepository.findById(delegateWalkPostId);
@@ -60,7 +60,8 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
         }
         delegateWalkPost.get().setStatus(DelegateWalkPost.DelegateWalkStatus.COMPLETED);
         //켈린더에 넣는 로직필요.
-        //알림 로직 필요.
+        //선정하면 나머지는 신청못하게끔
+        sendNotificationUtil.sendNotification(memberRepository.findById(memberId).get(),"대리산책자 지원에 선정되었습니다!" );
         return memberChatRoomService.createMemberChatRoom(member, memberRepository.findById(memberId).get());
     }
 
@@ -209,6 +210,8 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
         }else if ( delegateWalkPost.get().getApplicants().stream().
                 anyMatch(applicant -> applicant.getMemberId().equals(member.getMemberId()))){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 신청한 회원입니다.");
+        } else if (delegateWalkPost.get().getStatus() == DelegateWalkPost.DelegateWalkStatus.COMPLETED) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("모집 완료 게시글입니다.");
         }
         delegateWalkPost.get().getApplicants().add(Applicant.builder()
                 .memberId(member.getMemberId())

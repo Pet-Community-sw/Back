@@ -26,5 +26,5 @@ public interface DelegateWalkPostService {
 
     ResponseEntity<?> checkProfile(Long profileId);
 
-    ResponseEntity<?> selectApplicant(Long delegateWalkPostId, Long memberId, String email);
+    ResponseEntity<?> selectApplicant(Long delegateWalkPostId, Long memberId, String email) throws JsonProcessingException;
 }
