@@ -7,6 +7,8 @@ import com.example.PetApp.dto.walkrecord.GetWalkRecordLocationResponseDto;
 import com.example.PetApp.dto.walkrecord.GetWalkRecordResponseDto;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.WalkRecordRepository;
+import com.example.PetApp.util.SendNotificationUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -29,6 +31,7 @@ public class WalkRecordServiceImp implements WalkRecordService{
     private final WalkRecordRepository walkRecordRepository;
     private final MemberRepository memberRepository;
     private final StringRedisTemplate stringRedisTemplate;
+    private final SendNotificationUtil sendNotificationUtil;
 
     @Transactional
     @Override
@@ -44,6 +47,11 @@ public class WalkRecordServiceImp implements WalkRecordService{
                 .member(member.get())
                 .build();
         WalkRecord savedWalkRecord = walkRecordRepository.save(walkRecord);
+        try {
+            sendNotificationUtil.sendNotification(member.get(), "산책 권한이 부여 되었습니다.");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("알림 보내는 도중 예외 발생",e);
+        }
         return ResponseEntity.ok().body(Map.of("walkRecordId", savedWalkRecord.getWalkRecordId()));
     }
 
@@ -100,6 +108,12 @@ public class WalkRecordServiceImp implements WalkRecordService{
         }
         walkRecord.get().setWalkStatus(WalkRecord.WalkStatus.START);
         walkRecord.get().setStartTime(LocalDateTime.now());//이때 /sub/walk-record/location/{walkRecordId}가 필요.
+        try {
+            sendNotificationUtil.sendNotification(walkRecord.get().getDelegateWalkPost().getProfile().getMember(),
+                    walkRecord.get().getMember().getName()+"님이 산책을 시작하였습니다.");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("알림 보내는 도중 예외 발생",e);
+        }
         return ResponseEntity.ok().body("start");
     }
 
@@ -121,6 +135,13 @@ public class WalkRecordServiceImp implements WalkRecordService{
         Double totalDistance = calculateTotalDistance(paths);
         walkRecord.get().setWalkDistance(totalDistance);
         walkRecord.get().setPathPoints(paths);//finish를 하고 후기를 작성할 수 있어야됨.
+        stringRedisTemplate.delete("walk:path:" + walkRecordId);
+        try {
+            sendNotificationUtil.sendNotification(walkRecord.get().getDelegateWalkPost().getProfile().getMember(),
+                    walkRecord.get().getMember().getName()+"님이 산책을 마쳤습니다. 후기를 작성해주세요.");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("알림 보내는 도중 예외 발생",e);
+        }
         return ResponseEntity.ok().body("finish");
     }
 

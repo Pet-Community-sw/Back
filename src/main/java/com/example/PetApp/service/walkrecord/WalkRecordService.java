@@ -1,6 +1,7 @@
 package com.example.PetApp.service.walkrecord;
 
 import com.example.PetApp.domain.DelegateWalkPost;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
