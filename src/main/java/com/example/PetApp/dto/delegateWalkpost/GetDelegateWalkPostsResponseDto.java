@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
+@Builder//작성자까지 나오게 해야할듯?
 public class GetDelegateWalkPostsResponseDto {
 
     private Long delegateWalkPostId;

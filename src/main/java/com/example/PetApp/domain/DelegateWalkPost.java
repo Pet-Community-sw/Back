@@ -54,6 +54,10 @@ public class DelegateWalkPost {
 
     private LocalDateTime delegateWalkPostTime;
 
+    private Long selectedApplicantMemberId;
+
+    private boolean startAuthorized;// start권한 부여
+
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -64,7 +68,5 @@ public class DelegateWalkPost {
     @Cascade(org.hibernate.annotations.CascadeType.DELETE)
     @Builder.Default
     private Set<Applicant> applicants = new HashSet<>();
-
-
 
 }

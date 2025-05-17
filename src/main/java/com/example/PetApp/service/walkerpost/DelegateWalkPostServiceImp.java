@@ -6,6 +6,7 @@ import com.example.PetApp.repository.jpa.DelegateWalkPostRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.service.memberChatRoom.MemberChatRoomService;
+import com.example.PetApp.service.walkrecord.WalkRecordService;
 import com.example.PetApp.util.SendNotificationUtil;
 import com.example.PetApp.util.TimeAgoUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,6 +33,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
     private final MemberChatRoomService memberChatRoomService;
+    private final WalkRecordService walkRecordService;
     private final TimeAgoUtil timeAgoUtil;
     private final SendNotificationUtil sendNotificationUtil;
 
@@ -59,10 +61,23 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("해당 지원자는 없습니다.");
         }
         delegateWalkPost.get().setStatus(DelegateWalkPost.DelegateWalkStatus.COMPLETED);
+        delegateWalkPost.get().setSelectedApplicantMemberId(memberId);//
         //켈린더에 넣는 로직필요.
-        //선정하면 나머지는 신청못하게끔
         sendNotificationUtil.sendNotification(memberRepository.findById(memberId).get(),"대리산책자 지원에 선정되었습니다!" );
         return memberChatRoomService.createMemberChatRoom(member, memberRepository.findById(memberId).get());
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<?> updateDelegateWalkPost(Long delegateWalkPostId, Long profileId) {
+        Optional<DelegateWalkPost> delegateWalkPost = delegateWalkPostRepository.findById(delegateWalkPostId);
+        if (delegateWalkPost.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 대리산책자 게시글은 없습니다.");
+        } else if (!(delegateWalkPost.get().getProfile().getProfileId().equals(profileId))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한 없음.");
+        }
+        delegateWalkPost.get().setStartAuthorized(true);//산책 start 허가.
+        return walkRecordService.createWalkRecord(delegateWalkPost.get());
     }
 
     @Transactional
@@ -94,7 +109,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
     }
 
     @Transactional
-    @Override
+    @Override//작성자 까지 나오게해야할듯하오 memberName, memberImageUrl
     public ResponseEntity<?> getDelegateWalkPostsByLocation(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, String email) {
         Member member = memberRepository.findByEmail(email).get();
         log.info("getDelegateWalkPostsByLocation 요청 memberId : {}", member.getMemberId());

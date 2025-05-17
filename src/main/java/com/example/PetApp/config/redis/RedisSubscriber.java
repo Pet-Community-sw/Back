@@ -64,7 +64,7 @@ public class RedisSubscriber {
 
             redisTemplate.opsForValue().set("memberChat:lastMessage" + chatMessage.getChatRoomId(), chatMessage.getMessage());
             redisTemplate.opsForValue().set("memberChat:lastMessageTime" + chatMessage.getChatRoomId(), String.valueOf(chatMessage.getMessageTime()));
-            Set<String> onlineMembers = redisTemplate.opsForSet().members("memberChatRoomId:" + memberChatRoom.getMemberChatRoomId() + "onlineMembers");
+            Set<String> onlineMembers = redisTemplate.opsForSet().members("memberChatRoomId:" + memberChatRoom.getMemberChatRoomId() + ":onlineMembers");
             for (Member member : memberChatRoom.getMembers()) {
                 if (!member.getMemberId().equals(chatMessage.getSenderId())) {
                     boolean isOnline = onlineMembers != null && onlineMembers.contains(member.getMemberId().toString());

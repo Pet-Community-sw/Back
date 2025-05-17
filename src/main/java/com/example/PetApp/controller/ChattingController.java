@@ -16,7 +16,7 @@ public class ChattingController {
     private final ChattingService chattingService;
 
     @MessageMapping("/chat/message")
-    private void message(@Payload ChatMessage chatMessage, Principal principal) throws JsonProcessingException {//memberId or profileId
+    public void message(@Payload ChatMessage chatMessage, Principal principal) throws JsonProcessingException {//memberId or profileId
         Long id = Long.valueOf(principal.getName());
         chattingService.sendToMessage(chatMessage, id);
     }

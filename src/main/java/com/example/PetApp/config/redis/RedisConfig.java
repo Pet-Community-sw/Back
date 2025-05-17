@@ -41,6 +41,17 @@ public class RedisConfig {
         notificationRedisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
         return notificationRedisTemplate;
     }
+
+    @Bean//위치 저장을 위한 redisTemplate
+    public RedisTemplate<String, Object> locationRedisTemplate() {
+        RedisTemplate<String, Object> locationRedisTemplate = new RedisTemplate<>();
+        locationRedisTemplate.setConnectionFactory(redisConnectionFactory());
+        locationRedisTemplate.setKeySerializer(new StringRedisSerializer());
+        locationRedisTemplate.setHashKeySerializer(new StringRedisSerializer());//해시 설정
+        locationRedisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        locationRedisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
+        return locationRedisTemplate;
+    }
     @Bean
     public ChannelTopic channelTopic() {
         return new ChannelTopic("chatRoom");//나중에 chatRoomId로 바꿔보자.

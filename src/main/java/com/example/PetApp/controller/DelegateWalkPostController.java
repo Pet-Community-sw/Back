@@ -29,14 +29,14 @@ public class DelegateWalkPostController {
     }
 
     @PostMapping("/{delegateWalkPostId}")
-    public ResponseEntity<?> applyToWalkerPost(@PathVariable Long delegateWalkPostId,
+    public ResponseEntity<?> applyToDelegateWalkPost(@PathVariable Long delegateWalkPostId,
                                                @RequestBody String content,
                                                Authentication authentication) throws JsonProcessingException {
         return delegateWalkPostService.applyToDelegateWalkPost(delegateWalkPostId, content, getEmail(authentication));
     }
 
     @GetMapping("/by-location")
-    public ResponseEntity<?> getWalkerPosts(@RequestParam Double minLongitude,
+    public ResponseEntity<?> getDelegateWalkPostsByLocation(@RequestParam Double minLongitude,
                                             @RequestParam Double minLatitude,
                                             @RequestParam Double maxLongitude,
                                             @RequestParam Double maxLatitude,
@@ -46,7 +46,7 @@ public class DelegateWalkPostController {
     }
 
     @GetMapping("/by-place")
-    public ResponseEntity<?> getWalkerPosts(@RequestParam Double longitude,
+    public ResponseEntity<?> getDelegateWalkPostsByPlace(@RequestParam Double longitude,
                                             @RequestParam Double latitude,
                                             Authentication authentication) {
         String email = getEmail(authentication);
@@ -54,7 +54,7 @@ public class DelegateWalkPostController {
     }
 
     @GetMapping("/{delegateWalkPostId}")
-    public ResponseEntity<?> getMatchPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
+    public ResponseEntity<?> getDelegateWalkPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
         String email = getEmail(authentication);
         return delegateWalkPostService.getDelegateWalkPost(delegateWalkPostId, email);
     }
@@ -66,19 +66,24 @@ public class DelegateWalkPostController {
 
 
     @PutMapping("/{delegateWalkPostId}")
-    public ResponseEntity<?> updateMatchPost(@PathVariable Long delegateWalkPostId, @RequestBody UpdateDelegateWalkPostDto updateDelegateWalkPostDto, Authentication authentication) {
+    public ResponseEntity<?> updateDelegateWalkPost(@PathVariable Long delegateWalkPostId, @RequestBody UpdateDelegateWalkPostDto updateDelegateWalkPostDto, Authentication authentication) {
         String email = getEmail(authentication);
         return delegateWalkPostService.updateDelegateWalkPost(delegateWalkPostId, updateDelegateWalkPostDto, email);
     }
 
+    @PutMapping("/start-authorized/{delegateWalkPostId}")
+    public ResponseEntity<?> updateDelegateWalkPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
+        return delegateWalkPostService.updateDelegateWalkPost(delegateWalkPostId, getProfileId(authentication));
+    }
+
     @DeleteMapping("/{delegateWalkPostId}")
-    public ResponseEntity<?> deleteMatchPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
+    public ResponseEntity<?> deleteDelegateWalkPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
         String email = getEmail(authentication);
         return delegateWalkPostService.deleteDelegateWalkPost(delegateWalkPostId, email);
     }
 
     @PostMapping("/select-applicant/{delegateWalkPostId}")
-    public ResponseEntity<?> selectApplicant(@PathVariable Long delegateWalkPostId, @RequestBody Long memberId, Authentication authentication) {
+    public ResponseEntity<?> selectApplicant(@PathVariable Long delegateWalkPostId, @RequestBody Long memberId, Authentication authentication) throws JsonProcessingException {
         return delegateWalkPostService.selectApplicant(delegateWalkPostId, memberId, getEmail(authentication));
     }
 
