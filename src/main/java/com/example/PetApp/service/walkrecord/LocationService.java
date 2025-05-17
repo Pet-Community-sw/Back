@@ -6,6 +6,7 @@ import com.example.PetApp.repository.jpa.WalkRecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ import javax.naming.AuthenticationException;
 public class LocationService {//예외 처리해야됨.
 
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final RedisTemplate<String, Object> locationRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
     private final WalkRecordRepository walkRecordRepository;
 
     public void sendLocation(LocationMessage locationMessage, String memberId) {
@@ -29,11 +30,13 @@ public class LocationService {//예외 처리해야됨.
         } else if (walkRecord.getWalkStatus() != WalkRecord.WalkStatus.START) {
             throw new IllegalArgumentException("start 권한 없음.");
         }
-        locationRedisTemplate.opsForHash()
-                .put("walk:location:" + locationMessage.getWalkRecordId(), "longitude", locationMessage.getLongitude());
-        locationRedisTemplate.opsForHash()
-                .put("walk:location:" + locationMessage.getWalkRecordId(), "latitude", locationMessage.getLatitude());
-        simpMessagingTemplate.convertAndSend("/sub/walk-record/location/" + locationMessage.getWalkRecordId(), locationMessage);
+
+        String location = locationMessage.getLongitude() + "," + locationMessage.getLatitude();
+        stringRedisTemplate.opsForList().rightPush("walk:path:" + locationMessage.getWalkRecordId(), location);
+
+        simpMessagingTemplate.convertAndSend(
+                "/sub/walk-record/location/" + locationMessage.getWalkRecordId(),
+                locationMessage);
 
     }
 }

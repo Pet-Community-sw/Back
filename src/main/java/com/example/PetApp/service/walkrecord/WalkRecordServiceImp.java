@@ -7,12 +7,15 @@ import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.WalkRecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,6 +26,7 @@ public class WalkRecordServiceImp implements WalkRecordService{
 
     private final WalkRecordRepository walkRecordRepository;
     private final MemberRepository memberRepository;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Transactional
     @Override
@@ -59,10 +63,64 @@ public class WalkRecordServiceImp implements WalkRecordService{
         }
         walkRecord.get().setWalkStatus(WalkRecord.WalkStatus.START);
         walkRecord.get().setStartTime(LocalDateTime.now());//이때 /sub/walk-record/location/{walkRecordId}가 필요.
+        return ResponseEntity.ok().body("start");
     }
 
+    @Transactional
     @Override
     public ResponseEntity<?> updateFinishWalkRecord(Long walkRecordId, String email) {
-        return null;
+        Member member = memberRepository.findByEmail(email).get();
+        log.info("updateFinishWalkRecord 요청 walkRecordId : {}, memberId : {}",walkRecordId, member.getMemberId());
+        Optional<WalkRecord> walkRecord = walkRecordRepository.findById(walkRecordId);
+        if (walkRecord.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 산책기록은 없습니다.");
+        } else if (!(walkRecord.get().getDelegateWalkPost().getSelectedApplicantMemberId().equals(member.getMemberId()))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한 없음.");
+        }
+        walkRecord.get().setWalkStatus(WalkRecord.WalkStatus.FINISH);
+        walkRecord.get().setFinishTime(LocalDateTime.now());
+
+        List<String> paths = stringRedisTemplate.opsForList().range("walk:path" + walkRecordId, 0, -1);
+        Double totalDistance = calculateTotalDistance(paths);
+        walkRecord.get().setWalkDistance(totalDistance);
+        walkRecord.get().setPathPoints(paths);//finish를 하고 후기를 작성할 수 있어야됨.
+        return ResponseEntity.ok().body("finish");
     }
+
+
+    private Double calculateTotalDistance(List<String> list) {
+        double totalDistance=0.0;
+        for (int i = 1; i < list.size(); i++) {
+            String path1 = list.get(i - 1);
+            String path2 = list.get(i);
+
+            String[] arr1 = path1.split(",");
+            String[] arr2 = path2.split(",");
+
+            double longitude1 = Double.parseDouble(arr1[0]);
+            double latitude1 = Double.parseDouble(arr1[1]);
+            double longitude2 = Double.parseDouble(arr2[0]);
+            double latitude2 = Double.parseDouble(arr2[1]);
+            double distanceInMeters = calculateDistanceInMeters(latitude1, longitude1, latitude2, longitude2);
+            totalDistance += distanceInMeters;
+        }
+        return totalDistance;
+    }
+
+    //거리 계산 공식(Haversine)
+    private double calculateDistanceInMeters(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371000; // Earth radius in meters
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
+    }
+
 }
