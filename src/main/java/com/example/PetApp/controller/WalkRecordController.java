@@ -19,6 +19,11 @@ public class WalkRecordController {
         return walkRecordService.getWalkRecord(walkRecordId, authUtil.getEmail(authentication));
     }
 
+    @GetMapping("/{walkRecordId}/location")
+    public ResponseEntity<?> getWalkRecordLocation(@PathVariable Long walkRecordId, Authentication authentication) {
+        return walkRecordService.getWalkRecordLocation(walkRecordId, authUtil.getEmail(authentication));
+    }
+
     @PutMapping("/{walkRecordId}/start")
     public ResponseEntity<?> updateStartWalkRecord(@PathVariable Long walkRecordId, Authentication authentication) {
         return walkRecordService.updateStartWalkRecord(walkRecordId, authUtil.getEmail(authentication));
