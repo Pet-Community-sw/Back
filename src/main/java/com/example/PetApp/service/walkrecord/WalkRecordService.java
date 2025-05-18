@@ -16,4 +16,5 @@ public interface WalkRecordService {
     ResponseEntity<?> updateFinishWalkRecord(Long walkRecordId, String email);
 
     ResponseEntity<?> getWalkRecordLocation(Long walkRecordId, String email);
+
 }

@@ -7,6 +7,7 @@ import com.example.PetApp.dto.walkrecord.GetWalkRecordLocationResponseDto;
 import com.example.PetApp.dto.walkrecord.GetWalkRecordResponseDto;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.WalkRecordRepository;
+import com.example.PetApp.util.HaversineUtil;
 import com.example.PetApp.util.SendNotificationUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class WalkRecordServiceImp implements WalkRecordService{
     private final MemberRepository memberRepository;
     private final StringRedisTemplate stringRedisTemplate;
     private final SendNotificationUtil sendNotificationUtil;
+    private final HaversineUtil haversineUtil;
 
     @Transactional
     @Override
@@ -135,7 +137,7 @@ public class WalkRecordServiceImp implements WalkRecordService{
         Double totalDistance = calculateTotalDistance(paths);
         walkRecord.get().setWalkDistance(totalDistance);
         walkRecord.get().setPathPoints(paths);//finish를 하고 후기를 작성할 수 있어야됨.
-        stringRedisTemplate.delete("walk:path:" + walkRecordId);
+        stringRedisTemplate.delete("walk:path:" + walkRecordId);//redis 삭제
         try {
             sendNotificationUtil.sendNotification(walkRecord.get().getDelegateWalkPost().getProfile().getMember(),
                     walkRecord.get().getMember().getName()+"님이 산책을 마쳤습니다. 후기를 작성해주세요.");
@@ -159,26 +161,10 @@ public class WalkRecordServiceImp implements WalkRecordService{
             double latitude1 = Double.parseDouble(arr1[1]);
             double longitude2 = Double.parseDouble(arr2[0]);
             double latitude2 = Double.parseDouble(arr2[1]);
-            double distanceInMeters = calculateDistanceInMeters(latitude1, longitude1, latitude2, longitude2);
+            double distanceInMeters = haversineUtil.calculateDistanceInMeters(latitude1, longitude1, latitude2, longitude2);
             totalDistance += distanceInMeters;
         }
         return totalDistance;
-    }
-
-    //거리 계산 공식(Haversine)
-    private double calculateDistanceInMeters(double lat1, double lon1, double lat2, double lon2) {
-        final int R = 6371000; // Earth radius in meters
-
-        double latDistance = Math.toRadians(lat2 - lat1);
-        double lonDistance = Math.toRadians(lon2 - lon1);
-
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        return R * c;
     }
 
     public String getFormattedWalkDuration(LocalDateTime start, LocalDateTime finish) {
