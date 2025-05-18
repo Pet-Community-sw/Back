@@ -61,6 +61,5 @@ public class LocationService {//예외 처리해야됨.
         simpMessagingTemplate.convertAndSend(
                 "/sub/walk-record/location/" + locationMessage.getWalkRecordId(),
                 locationMessage);
-
     }
 }
