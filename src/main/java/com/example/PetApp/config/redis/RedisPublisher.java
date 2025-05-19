@@ -11,14 +11,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RedisPublisher {
 
-    private final ChannelTopic channelTopic;
-
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final ChatMessageRepository chatMessageRepository;
 
     public void publish(ChatMessage chatMessage) {
         chatMessageRepository.save(chatMessage);
-        redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
+        String topic = chatMessage.getChatRoomType() == ChatMessage.ChatRoomType.ONE ? "memberChatRoom" : "chatRoom";
+
+        redisTemplate.convertAndSend(topic, chatMessage);
     }
 }

@@ -53,7 +53,7 @@ public class RedisConfig {
         return locationRedisTemplate;
     }
     @Bean
-    public ChannelTopic channelTopic() {
+    public ChannelTopic chatRoomChannelTopic() {
         return new ChannelTopic("chatRoom");//나중에 chatRoomId로 바꿔보자.
     }
 
@@ -62,9 +62,16 @@ public class RedisConfig {
                                                                        MessageListenerAdapter messageListenerAdapter) {
         RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
         redisMessageListenerContainer.setConnectionFactory(redisConnectionFactory);
-        redisMessageListenerContainer.addMessageListener(messageListenerAdapter, channelTopic());
+        redisMessageListenerContainer.addMessageListener(messageListenerAdapter, chatRoomChannelTopic());
+        redisMessageListenerContainer.addMessageListener(messageListenerAdapter, memberChatRoomChannelTopic());
         return redisMessageListenerContainer;
     }
+
+    @Bean
+    public ChannelTopic memberChatRoomChannelTopic() {
+        return new ChannelTopic("memberChatRoom");
+    }
+
 
     @Bean//topic 설정.
     public RedisMessageListenerContainer notificationRedisMessageListenerContainer(RedisConnectionFactory redisConnectionFactory,
