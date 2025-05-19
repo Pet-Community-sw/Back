@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public interface DelegateWalkPostService {
     ResponseEntity<?> createDelegateWalkPost(CreateDelegateWalkPostDto createDelegateWalkPostDto, Long profileId);
 
-    ResponseEntity<?> applyToDelegateWalkPost(Long delegateWalkPostId, String content, String email) throws JsonProcessingException;
+    ResponseEntity<?> applyToDelegateWalkPost(Long delegateWalkPostId, String content, String email);
 
     ResponseEntity<?> getDelegateWalkPostsByLocation(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, String email);
 
@@ -26,7 +26,7 @@ public interface DelegateWalkPostService {
 
     ResponseEntity<?> checkProfile(Long profileId);
 
-    ResponseEntity<?> selectApplicant(Long delegateWalkPostId, Long memberId, String email) throws JsonProcessingException;
+    ResponseEntity<?> selectApplicant(Long delegateWalkPostId, Long memberId, String email);
 
-    ResponseEntity<?> updateDelegateWalkPost(Long delegateWalkPostId, Long profileId);
+    ResponseEntity<?> updateStartDelegateWalkPost(Long delegateWalkPostId, Long profileId);
 }

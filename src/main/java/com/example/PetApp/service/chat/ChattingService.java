@@ -108,7 +108,7 @@ public class ChattingService {
                 .filter(profileId -> onlineProfiles == null || !onlineProfiles.contains(profileId.toString()))
                 .collect(Collectors.toList());
 
-        chatMessage.setProfiles(offlineProfiles);
+        chatMessage.setUsers(offlineProfiles);
         chatMessage.setChatUnReadCount(offlineProfiles.size());
 
         log.info("오프라인 프로필 목록 설정 (MANY): {}", offlineProfiles);
@@ -123,7 +123,7 @@ public class ChattingService {
                 .filter(memberId -> onlineMembers == null || !onlineMembers.contains(memberId.toString()))
                 .collect(Collectors.toList());
 
-        chatMessage.setProfiles(offlineMembers);
+        chatMessage.setUsers(offlineMembers);
         chatMessage.setChatUnReadCount(offlineMembers.size());
 
         log.info("오프라인 멤버 목록 설정 (ONE): {}", offlineMembers);

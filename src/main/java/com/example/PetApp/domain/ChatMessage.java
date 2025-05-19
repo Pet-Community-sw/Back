@@ -38,7 +38,7 @@ public class ChatMessage {
     private String senderName;
     private String senderImageUrl;
     private String message;
-    private List<Long> profiles;
+    private List<Long> users;
     private int chatUnReadCount;
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)

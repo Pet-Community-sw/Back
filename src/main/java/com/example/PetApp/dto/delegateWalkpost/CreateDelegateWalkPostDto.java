@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class CreateDelegateWalkPostDto {
-    private Long profileId;
 
     private String title;
 

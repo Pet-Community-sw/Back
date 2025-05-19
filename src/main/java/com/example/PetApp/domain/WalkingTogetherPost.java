@@ -12,7 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "match_post")
+@Table(name = "walking_together_post")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

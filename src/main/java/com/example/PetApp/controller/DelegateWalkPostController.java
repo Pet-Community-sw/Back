@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/delegate-walk-post")
+@RequestMapping("/delegate-walk-posts")
 public class DelegateWalkPostController {
 
     private final DelegateWalkPostService delegateWalkPostService;
@@ -31,7 +31,7 @@ public class DelegateWalkPostController {
     @PostMapping("/{delegateWalkPostId}")
     public ResponseEntity<?> applyToDelegateWalkPost(@PathVariable Long delegateWalkPostId,
                                                @RequestBody String content,
-                                               Authentication authentication) throws JsonProcessingException {
+                                               Authentication authentication) {
         return delegateWalkPostService.applyToDelegateWalkPost(delegateWalkPostId, content, getEmail(authentication));
     }
 
@@ -59,7 +59,7 @@ public class DelegateWalkPostController {
         return delegateWalkPostService.getDelegateWalkPost(delegateWalkPostId, email);
     }
 
-    @GetMapping("/{delegateWalkPostId}/applicants")
+    @GetMapping("/applicants/{delegateWalkPostId}")
     public ResponseEntity<?> getApplicants(@PathVariable Long delegateWalkPostId, Authentication authentication) {
         return delegateWalkPostService.getApplicants(delegateWalkPostId, getProfileId(authentication));
     }
@@ -73,7 +73,7 @@ public class DelegateWalkPostController {
 
     @PutMapping("/start-authorized/{delegateWalkPostId}")
     public ResponseEntity<?> updateDelegateWalkPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
-        return delegateWalkPostService.updateDelegateWalkPost(delegateWalkPostId, getProfileId(authentication));
+        return delegateWalkPostService.updateStartDelegateWalkPost(delegateWalkPostId, getProfileId(authentication));
     }
 
     @DeleteMapping("/{delegateWalkPostId}")

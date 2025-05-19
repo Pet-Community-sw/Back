@@ -8,10 +8,16 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder//작성자까지 나오게 해야할듯?
+@Builder
 public class GetDelegateWalkPostsResponseDto {
 
     private Long delegateWalkPostId;
+
+    private Long profileId;
+
+    private String petName;
+
+    private String petImageUrl;
 
     private String title;
 

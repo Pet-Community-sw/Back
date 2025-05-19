@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/walk-record")
+@RequestMapping("/walk-record")//삭제도 있어야하나?
 public class WalkRecordController {
     private final WalkRecordService walkRecordService;
     private final AuthUtil authUtil;

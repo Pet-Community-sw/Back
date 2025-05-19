@@ -42,14 +42,14 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
     public ResponseEntity<?> checkProfile(Long profileId) {
         log.info("checkProfile 요청 profileId : {}", profileId);
         if (profileId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("profile 없음.");
+            return ResponseEntity.ok().body("profile 없음.");
         }
         return ResponseEntity.ok().body("profile 있음.");
     }
 
     @Transactional
     @Override
-    public ResponseEntity<?> selectApplicant(Long delegateWalkPostId, Long memberId, String email) throws JsonProcessingException {
+    public ResponseEntity<?> selectApplicant(Long delegateWalkPostId, Long memberId, String email) {
         Member member = memberRepository.findByEmail(email).get();
         log.info("selectApplicant 요청 delegateWalkPostId : {}, memberId : {}", delegateWalkPostId, member.getMemberId());
         Optional<DelegateWalkPost> delegateWalkPost = delegateWalkPostRepository.findById(delegateWalkPostId);
@@ -61,15 +61,19 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("해당 지원자는 없습니다.");
         }
         delegateWalkPost.get().setStatus(DelegateWalkPost.DelegateWalkStatus.COMPLETED);
-        delegateWalkPost.get().setSelectedApplicantMemberId(memberId);//
+        delegateWalkPost.get().setSelectedApplicantMemberId(memberId);
         //켈린더에 넣는 로직필요.
-        sendNotificationUtil.sendNotification(memberRepository.findById(memberId).get(),"대리산책자 지원에 선정되었습니다!" );
+        try {
+            sendNotificationUtil.sendNotification(memberRepository.findById(memberId).get(),"대리산책자 지원에 선정되었습니다!" );
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("알림 전송 중 에러 발생", e);
+        }
         return memberChatRoomService.createMemberChatRoom(member, memberRepository.findById(memberId).get());
     }
 
     @Transactional
     @Override
-    public ResponseEntity<?> updateDelegateWalkPost(Long delegateWalkPostId, Long profileId) {
+    public ResponseEntity<?> updateStartDelegateWalkPost(Long delegateWalkPostId, Long profileId) {
         Optional<DelegateWalkPost> delegateWalkPost = delegateWalkPostRepository.findById(delegateWalkPostId);
         if (delegateWalkPost.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 대리산책자 게시글은 없습니다.");
@@ -87,11 +91,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
         if (profileId == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("profile 없음.");
         }
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        Optional<Profile> createPostProfile = profileRepository.findById(createDelegateWalkPostDto.getProfileId());
-        if (!(createPostProfile.equals(profile))) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청.");
-        }
+        Optional<Profile> createPostProfile = profileRepository.findById(profileId);
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
                 .title(createDelegateWalkPostDto.getTitle())
                 .content(createDelegateWalkPostDto.getContent())
@@ -109,7 +109,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
     }
 
     @Transactional
-    @Override//작성자 까지 나오게해야할듯하오 memberName, memberImageUrl
+    @Override
     public ResponseEntity<?> getDelegateWalkPostsByLocation(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, String email) {
         Member member = memberRepository.findByEmail(email).get();
         log.info("getDelegateWalkPostsByLocation 요청 memberId : {}", member.getMemberId());
@@ -154,6 +154,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
                 .petBreed(post.getProfile().getPetBreed())
                 .extraInfo(post.getProfile().getExtraInfo())
                 .applicantCount(post.getApplicants().size())
+                .createdAt(timeAgoUtil.getTimeAgo(post.getDelegateWalkPostTime()))
                 .build();
         return ResponseEntity.ok(getPostResponseDto);
     }
@@ -214,7 +215,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> applyToDelegateWalkPost(Long delegateWalkPostId,String content, String email) throws JsonProcessingException {
+    public ResponseEntity<?> applyToDelegateWalkPost(Long delegateWalkPostId, String content, String email) {
         Member member = memberRepository.findByEmail(email).get();
         log.info("applyToDelegateWalkPost 요청 delegateWalkPostId : {}, memberId : {}", delegateWalkPostId, member.getMemberId());
         Optional<DelegateWalkPost> delegateWalkPost = delegateWalkPostRepository.findById(delegateWalkPostId);
@@ -222,8 +223,8 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 대리산책자 게시글은 없습니다.");
         } else if (filter(delegateWalkPost.get(), member)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("profile을 등록해야됨.");
-        }else if ( delegateWalkPost.get().getApplicants().stream().
-                anyMatch(applicant -> applicant.getMemberId().equals(member.getMemberId()))){
+        } else if (delegateWalkPost.get().getApplicants().stream().
+                anyMatch(applicant -> applicant.getMemberId().equals(member.getMemberId()))) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 신청한 회원입니다.");
         } else if (delegateWalkPost.get().getStatus() == DelegateWalkPost.DelegateWalkStatus.COMPLETED) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("모집 완료 게시글입니다.");
@@ -233,7 +234,11 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
                 .content(content)
                 .build());
         String message = member.getName() + "님이 회원님의 대리산책자 게시글에 지원했습니다.";
-        sendNotificationUtil.sendNotification(delegateWalkPost.get().getProfile().getMember(), message);
+        try {
+            sendNotificationUtil.sendNotification(delegateWalkPost.get().getProfile().getMember(), message);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("알림 전송중 에러 발생 ",e);
+        }
         return ResponseEntity.ok().body("신청 완료.");
     }
 
@@ -243,6 +248,9 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
         return delegateWalkPosts.stream()
                 .map(delegateWalkPost -> GetDelegateWalkPostsResponseDto.builder()
                         .delegateWalkPostId(delegateWalkPost.getDelegateWalkPostId())
+                        .profileId(delegateWalkPost.getProfile().getProfileId())
+                        .petName(delegateWalkPost.getProfile().getPetName())
+                        .petImageUrl(delegateWalkPost.getProfile().getPetImageUrl())
                         .title(delegateWalkPost.getTitle())
                         .price(delegateWalkPost.getPrice())
                         .locationLongitude(delegateWalkPost.getLocationLongitude())
