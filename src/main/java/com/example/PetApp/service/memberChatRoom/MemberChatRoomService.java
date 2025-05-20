@@ -15,4 +15,7 @@ public interface MemberChatRoomService {
     ResponseEntity<?> updateMemberChatRoom(Long memberChatRoomId, String userChatRoomName, String email);
 
     ResponseEntity<?> deleteMemberChatRoom(Long userChatRoomId, String email);
+
+    ResponseEntity<?> getMessages(Long memberChatRoomId, String email, int page);
+
 }

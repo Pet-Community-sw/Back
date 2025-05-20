@@ -1,10 +1,12 @@
 package com.example.PetApp.service.memberChatRoom;
 
+import com.example.PetApp.domain.ChatMessage;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.MemberChatRoom;
 import com.example.PetApp.dto.memberchat.MemberChatRoomsResponseDto;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
+import com.example.PetApp.service.chat.ChattingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,6 +30,7 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
     private final MemberChatRoomRepository memberChatRoomRepository;
     private final MemberRepository memberRepository;
     private final StringRedisTemplate redisTemplate;
+    private final ChattingService chattingService;
 
     @Transactional
     @Override
@@ -79,7 +82,7 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
         }
         Member member = memberRepository.findByEmail(email).get();
         if (memberChatRoomRepository.existsByMembers(fromMember.get(), member)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 있는 방입니다");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 있는 방입니다.");
         }
 
         List<Member> members = new ArrayList<>();
@@ -112,6 +115,13 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
         }
         memberChatRoomRepository.deleteById(memberChatRoomId);
         return ResponseEntity.ok().body("삭제 완료.");
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<?> getMessages(Long memberChatRoomId, String email, int page) {
+        Member member = memberRepository.findByEmail(email).get();
+        return chattingService.getMessages(memberChatRoomId, member.getMemberId(), ChatMessage.ChatRoomType.ONE, page);
     }
 
     private static Member filterMember(List<Member> members, Member member) {

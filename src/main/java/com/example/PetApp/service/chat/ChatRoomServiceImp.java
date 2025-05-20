@@ -3,9 +3,12 @@ package com.example.PetApp.service.chat;
 import com.example.PetApp.domain.*;
 import com.example.PetApp.dto.groupchat.*;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
+import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
+import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,15 +27,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.example.PetApp.domain.ChatMessage.*;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatRoomServiceImp implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ProfileRepository profileRepository;
     private final StringRedisTemplate redisTemplate;
     private final ChatMessageRepository chatMessageRepository;
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final ChattingService chattingService;
+
 
     @Transactional
     @Override
@@ -129,59 +136,8 @@ public class ChatRoomServiceImp implements ChatRoomService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> getMessages(Long chatRoomId, Long profileId, int page) {
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (chatRoom.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 채팅방이 없습니다.");
-        } else if (profile.isEmpty()||!(chatRoom.get().getProfiles().contains(profile.get()))) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-        }
-        Pageable pageRequest = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "messageTime"));
-        Page<ChatMessage> messages = chatMessageRepository.findByChatRoomId(chatRoomId, pageRequest);
-        String key = "unReadChatCount:" + chatRoomId + ":" + profileId;
-        redisTemplate.delete(key);
-
-        List<ChatMessage> content = messages.getContent();
-
-        for (ChatMessage chatMessage : content) {
-            updateChatMessageProfile(chatMessage, profileId);
-        }
-        List<ChatMessageDto> chatMessageDtos = content.stream()
-                .map(chatMessage -> new ChatMessageDto(
-                        chatMessage.getSenderId(),
-                        chatMessage.getSenderName(),
-                        chatMessage.getSenderImageUrl(),
-                        chatMessage.getMessage(),
-                        chatMessage.getChatUnReadCount(),
-                        chatMessage.getMessageTime()
-                ))
-                .collect(Collectors.toList());
-        ChatMessageResponseDto messagesList = new ChatMessageResponseDto(chatRoomId, chatMessageDtos);
-        return ResponseEntity.ok(messagesList);
+    public ResponseEntity<?> getMessages(Long chatRoomId, Long userId, int page) {
+        return chattingService.getMessages(chatRoomId, userId, ChatRoomType.MANY, page);
     }
 
-    public void updateChatMessageProfile(ChatMessage chatMessage, Long currentProfileId) {
-        List<Long> offlineProfiles = chatMessage.getProfiles();
-
-        // 자신을 제외한 리스트로 새로 만듦
-        List<Long> updatedOfflineProfiles = offlineProfiles.stream()
-                    .filter(id -> !id.equals(currentProfileId))
-                    .collect(Collectors.toList());
-
-        // 업데이트된 리스트 세팅
-        chatMessage.setProfiles(updatedOfflineProfiles);
-
-        chatMessage.setChatUnReadCount(chatMessage.getProfiles().size());
-
-        chatMessageRepository.save(chatMessage);//카톡처럼 많은 트래픽이 발생안할것같아 이렇게함.
-
-        UpdateChatUnReadCountDto updateChatUnReadDto=UpdateChatUnReadCountDto.builder()
-                    .chatRoomId(chatMessage.getChatRoomId())
-                    .id(chatMessage.getId())
-                    .chatUnReadCount(chatMessage.getChatUnReadCount())
-                    .build();
-        simpMessagingTemplate.convertAndSend("/sub/chat/update/unReadCount", updateChatUnReadDto);
-        //이거 api명세서 작성해야됨. 안읽은 수 처리.
-    }
 }

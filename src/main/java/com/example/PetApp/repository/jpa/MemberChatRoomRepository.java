@@ -18,4 +18,6 @@ public interface MemberChatRoomRepository extends JpaRepository<MemberChatRoom, 
     boolean existsByMembers(@Param("member1") Member member1, @Param("member2") Member member2);
 
     List<MemberChatRoom> findAllByMembersContains(Member member);
+
+
 }

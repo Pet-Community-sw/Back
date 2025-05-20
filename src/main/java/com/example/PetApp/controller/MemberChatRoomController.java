@@ -32,6 +32,13 @@ public class MemberChatRoomController {
         return memberChatRoomService.deleteMemberChatRoom(memberChatRoomId, getEmail(authentication));
     }
 
+    @GetMapping("/{memberChatRoomId}")
+    public ResponseEntity<?> getMessages(@PathVariable Long memberChatRoomId,
+                                         @RequestParam(defaultValue ="0") int page,
+                                         Authentication authentication) {
+        return memberChatRoomService.getMessages(memberChatRoomId, getEmail(authentication), page);
+    }
+
     private static String getEmail(Authentication authentication) {
         return authentication.getPrincipal().toString();
     }

@@ -1,5 +1,6 @@
 package com.example.PetApp.controller;
 
+import com.example.PetApp.domain.ChatMessage;
 import com.example.PetApp.dto.groupchat.UpdateChatRoomDto;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.chat.ChatRoomService;
@@ -7,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import static com.example.PetApp.domain.ChatMessage.*;
 
 
 @RestController
