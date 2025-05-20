@@ -4,12 +4,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
-public class GetReviewListByMemberResponseDto {
+public class GetReviewListByMember {
+
+    private Long reviewId;
 
     private Long userId;
 
@@ -17,9 +19,12 @@ public class GetReviewListByMemberResponseDto {
 
     private String userImageUrl;
 
-    private Double averageRating;
+    private String title;
 
-    private int reviewCount;
+    private Integer rating;
 
-    List<GetReviewListByMember> reviewList;
+    private LocalDateTime reviewTime;
+
+    private boolean isOwner;
+
 }

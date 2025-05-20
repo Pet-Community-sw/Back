@@ -4,10 +4,7 @@ import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.Review;
 import com.example.PetApp.domain.WalkRecord;
-import com.example.PetApp.dto.review.CreateReviewDto;
-import com.example.PetApp.dto.review.GetReviewListByMemberResponseDto;
-import com.example.PetApp.dto.review.GetReviewResponseDto;
-import com.example.PetApp.dto.review.UpdateReviewDto;
+import com.example.PetApp.dto.review.*;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.jpa.ReviewRepository;
@@ -76,8 +73,8 @@ public class ReviewServiceImp implements ReviewService{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 유저가 없습니다.");
         }
         List<Review> reviewList = reviewRepository.findAllByMemberAndReviewType(member.get(), ReviewType.PROFILE_TO_MEMBER);
-        List<GetReviewListByMemberResponseDto> reviewMemberList = reviewList.stream().map(review ->
-                GetReviewListByMemberResponseDto.builder()
+        List<GetReviewListByMember> getReviewListByMembers = reviewList.stream()
+                .map(review -> GetReviewListByMember.builder()
                         .reviewId(review.getReviewId())
                         .userId(review.getProfile().getProfileId())
                         .userName(review.getProfile().getPetName())
@@ -88,6 +85,15 @@ public class ReviewServiceImp implements ReviewService{
                         .isOwner(checkOwner(ownerMember,member.get()))
                         .build()
         ).collect(Collectors.toList());
+        //이렇게 하면 안될것같은데
+        GetReviewListByMemberResponseDto reviewMemberList=GetReviewListByMemberResponseDto.builder()
+                .userId(ownerMember.getMemberId())
+                .userName(ownerMember.getName())
+                .userImageUrl(ownerMember.getMemberImageUrl())
+                .averageRating(reviewList.stream().mapToInt(Review::getRating).average().orElse(0.0))
+                .reviewCount(reviewList.size())
+                .reviewList(getReviewListByMembers)
+                .build();
 
         return ResponseEntity.ok(reviewMemberList);
     }
@@ -101,9 +107,10 @@ public class ReviewServiceImp implements ReviewService{
         if (profile.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 프로필이 없습니다.");
         }
-        List<Review> reviewList = reviewRepository.findAllByProfileAndReviewType(profile.get(), ReviewType.MEMBER_TO_PROFILE);
-        List<GetReviewListByMemberResponseDto> reviewProfileList = reviewList.stream().map(review ->
-                GetReviewListByMemberResponseDto.builder()
+        Profile ownerProfile = profile.get();
+        List<Review> reviewList = reviewRepository.findAllByProfileAndReviewType(ownerProfile, ReviewType.MEMBER_TO_PROFILE);
+        List<GetReviewListByMember> getReviewListByMembers = reviewList.stream().map(review ->
+                GetReviewListByMember.builder()
                         .reviewId(review.getReviewId())
                         .userId(review.getMember().getMemberId())
                         .userName(review.getMember().getName())
@@ -111,11 +118,21 @@ public class ReviewServiceImp implements ReviewService{
                         .title(review.getTitle())
                         .rating(review.getRating())
                         .reviewTime(review.getReviewTime())
-                        .isOwner(checkOwner(member, profile.get().getMember()))
+                        .isOwner(checkOwner(member, ownerProfile.getMember()))
                         .build()
         ).collect(Collectors.toList());
 
-        return ResponseEntity.ok(reviewProfileList);
+        GetReviewListByMemberResponseDto reviewMemberList = GetReviewListByMemberResponseDto.builder()
+                .userId(ownerProfile.getProfileId())
+                .userName(ownerProfile.getPetName())
+                .userImageUrl(ownerProfile.getPetImageUrl())
+                .averageRating(reviewList.stream().mapToInt(Review::getRating).average().orElse(0.0))
+                .reviewCount(reviewList.size())
+                .reviewList(getReviewListByMembers)
+                .build();
+
+
+        return ResponseEntity.ok(reviewMemberList);
 
     }
 

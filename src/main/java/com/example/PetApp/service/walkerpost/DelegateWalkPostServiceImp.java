@@ -197,7 +197,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
     }
 
     @Transactional
-    @Override
+    @Override//여기에 후기를 보여주는 로직이 있어야할듯.
     public ResponseEntity<?> getApplicants(Long delegateWalkPostId, Long profileId) {
         log.info("getApplicants 요청 delegateWalkPostId : {}, profileId : {}", delegateWalkPostId, profileId);
         if (profileId == null) {
