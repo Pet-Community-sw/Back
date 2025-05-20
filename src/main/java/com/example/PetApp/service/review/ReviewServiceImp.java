@@ -191,11 +191,11 @@ public class ReviewServiceImp implements ReviewService{
         Review mainReview = review.get();
         if (mainReview.getReviewType() == ReviewType.MEMBER_TO_PROFILE) {
             if (!(mainReview.getMember().equals(member))) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한 없음.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한 없음.");
             }
         } else if (mainReview.getReviewType() == ReviewType.PROFILE_TO_MEMBER) {
             if (!(mainReview.getProfile().getMember().equals(member))) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한 없음.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한 없음.");
             }
         }
 

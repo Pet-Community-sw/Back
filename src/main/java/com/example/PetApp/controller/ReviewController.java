@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/review")
+@RequestMapping("/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -22,12 +22,12 @@ public class ReviewController {
         return reviewService.createReview(createReviewDto, authUtil.getEmail(authentication));
     }
 
-    @GetMapping("/list/member/{memberId}")
+    @GetMapping("/{memberId}/list/member")
     public ResponseEntity<?> getReviewListByMember(@PathVariable Long memberId, Authentication authentication) {
         return reviewService.getReviewListByMember(memberId, authUtil.getEmail(authentication));
     }
 
-    @GetMapping("/list/profile/{profileId}")
+    @GetMapping("/{profileId}/list/profile")
     public ResponseEntity<?> getReviewListByProfile(@PathVariable Long profileId, Authentication authentication) {
         return reviewService.getReviewListByProfile(profileId, authUtil.getEmail(authentication));
     }
