@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class GetReviewListByMemberResponseDto {
+public class GetReviewListResponseDto {
 
     private Long userId;
 
@@ -21,5 +21,5 @@ public class GetReviewListByMemberResponseDto {
 
     private int reviewCount;
 
-    List<GetReviewListByMember> reviewList;
+    List<GetReviewList> reviewList;
 }

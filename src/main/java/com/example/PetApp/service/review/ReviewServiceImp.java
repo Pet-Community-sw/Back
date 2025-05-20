@@ -73,8 +73,8 @@ public class ReviewServiceImp implements ReviewService{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 유저가 없습니다.");
         }
         List<Review> reviewList = reviewRepository.findAllByMemberAndReviewType(member.get(), ReviewType.PROFILE_TO_MEMBER);
-        List<GetReviewListByMember> getReviewListByMembers = reviewList.stream()
-                .map(review -> GetReviewListByMember.builder()
+        List<GetReviewList> getReviewListByMembers = reviewList.stream()
+                .map(review -> GetReviewList.builder()
                         .reviewId(review.getReviewId())
                         .userId(review.getProfile().getProfileId())
                         .userName(review.getProfile().getPetName())
@@ -86,7 +86,7 @@ public class ReviewServiceImp implements ReviewService{
                         .build()
         ).collect(Collectors.toList());
         //이렇게 하면 안될것같은데
-        GetReviewListByMemberResponseDto reviewMemberList=GetReviewListByMemberResponseDto.builder()
+        GetReviewListResponseDto reviewMemberList= GetReviewListResponseDto.builder()
                 .userId(ownerMember.getMemberId())
                 .userName(ownerMember.getName())
                 .userImageUrl(ownerMember.getMemberImageUrl())
@@ -109,8 +109,8 @@ public class ReviewServiceImp implements ReviewService{
         }
         Profile ownerProfile = profile.get();
         List<Review> reviewList = reviewRepository.findAllByProfileAndReviewType(ownerProfile, ReviewType.MEMBER_TO_PROFILE);
-        List<GetReviewListByMember> getReviewListByMembers = reviewList.stream().map(review ->
-                GetReviewListByMember.builder()
+        List<GetReviewList> getReviewLists = reviewList.stream().map(review ->
+                GetReviewList.builder()
                         .reviewId(review.getReviewId())
                         .userId(review.getMember().getMemberId())
                         .userName(review.getMember().getName())
@@ -122,13 +122,13 @@ public class ReviewServiceImp implements ReviewService{
                         .build()
         ).collect(Collectors.toList());
 
-        GetReviewListByMemberResponseDto reviewMemberList = GetReviewListByMemberResponseDto.builder()
+        GetReviewListResponseDto reviewMemberList = GetReviewListResponseDto.builder()
                 .userId(ownerProfile.getProfileId())
                 .userName(ownerProfile.getPetName())
                 .userImageUrl(ownerProfile.getPetImageUrl())
                 .averageRating(reviewList.stream().mapToInt(Review::getRating).average().orElse(0.0))
                 .reviewCount(reviewList.size())
-                .reviewList(getReviewListByMembers)
+                .reviewList(getReviewLists)
                 .build();
 
 

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class GetReviewListByMember {
+public class GetReviewList {
 
     private Long reviewId;
 
