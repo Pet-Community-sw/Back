@@ -8,6 +8,6 @@ import static com.example.PetApp.domain.ChatMessage.*;
 
 @Service
 public interface ChattingReader  {
-    public ResponseEntity<?> getMessages(Long chatRoomId, Long userId, ChatRoomType chatRoomType, int page);
+    ResponseEntity<?> getMessages(Long chatRoomId, Long userId, ChatRoomType chatRoomType, int page);
 
 }

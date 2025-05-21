@@ -16,8 +16,8 @@ public class RecommendRoutePostController {
     private final RecommendRoutePostService recommendRoutePostService;
 
     @PostMapping
-    private ResponseEntity<?> createRecommendRoutePost(@RequestBody CreateRecommendRoutePostDto createRecommendRoutePostDto
-            , Authentication authentication) {
+    private ResponseEntity<?> createRecommendRoutePost(@RequestBody CreateRecommendRoutePostDto createRecommendRoutePostDto,
+                                                       Authentication authentication) {
         String email = getEmail(authentication);
         return recommendRoutePostService.createRecommendRoutePost(createRecommendRoutePostDto, email);
     }

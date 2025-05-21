@@ -39,6 +39,9 @@ public class StompDisconnectEventListener {
 
         stringRedisTemplate.opsForSet().remove("chatRoomId:" + chatRoomId + ":onlineMembers", profileId);
         stringRedisTemplate.delete("session:" + sessionId);
+        stringRedisTemplate.opsForSet().remove("foreGroundMembers", profileId);
+        //connect할 때는 webSocket이 필요할 때 접속. unConnect는 사용자가 앱 종료 할 때 발생 stomp 프레임이아님.
+
 
         log.info("DISCONNECT 처리 완료 - profileId {} removed from chatRoomId {}", profileId, chatRoomId);
     }

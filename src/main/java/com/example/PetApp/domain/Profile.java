@@ -32,7 +32,7 @@ public class Profile {
     @NotEmpty
     private String petAge;
 
-    @NotEmpty
+    @NotEmpty//이것도 바꿔야할듯.
     private String petBreed;
 
     @NotEmpty
@@ -52,7 +52,6 @@ public class Profile {
 
     @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WalkingTogetherPost> walkingTogetherPost;
-
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ChatRoom> chatRooms;
