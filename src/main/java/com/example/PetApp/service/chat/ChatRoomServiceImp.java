@@ -38,7 +38,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
     private final ProfileRepository profileRepository;
     private final StringRedisTemplate redisTemplate;
     private final ChatMessageRepository chatMessageRepository;
-    private final ChattingService chattingService;
+    private final ChattingReader chattingReader;
 
 
     @Transactional
@@ -137,7 +137,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
     @Transactional
     @Override
     public ResponseEntity<?> getMessages(Long chatRoomId, Long userId, int page) {
-        return chattingService.getMessages(chatRoomId, userId, ChatRoomType.MANY, page);
+        return chattingReader.getMessages(chatRoomId, userId, ChatRoomType.MANY, page);
     }
 
 }

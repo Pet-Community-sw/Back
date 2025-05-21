@@ -6,6 +6,7 @@ import com.example.PetApp.domain.MemberChatRoom;
 import com.example.PetApp.dto.memberchat.MemberChatRoomsResponseDto;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
+import com.example.PetApp.service.chat.ChattingReader;
 import com.example.PetApp.service.chat.ChattingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
     private final MemberChatRoomRepository memberChatRoomRepository;
     private final MemberRepository memberRepository;
     private final StringRedisTemplate redisTemplate;
-    private final ChattingService chattingService;
+    private final ChattingReader chattingReader;
 
     @Transactional
     @Override
@@ -121,7 +122,7 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
     @Override
     public ResponseEntity<?> getMessages(Long memberChatRoomId, String email, int page) {
         Member member = memberRepository.findByEmail(email).get();
-        return chattingService.getMessages(memberChatRoomId, member.getMemberId(), ChatMessage.ChatRoomType.ONE, page);
+        return chattingReader.getMessages(memberChatRoomId, member.getMemberId(), ChatMessage.ChatRoomType.ONE, page);
     }
 
     private static Member filterMember(List<Member> members, Member member) {
