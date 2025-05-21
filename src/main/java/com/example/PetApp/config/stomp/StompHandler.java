@@ -4,8 +4,11 @@ import com.example.PetApp.domain.*;
 import com.example.PetApp.repository.jpa.*;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,6 +35,7 @@ public class StompHandler implements ChannelInterceptor {
     private final MemberChatRoomRepository memberChatRoomRepository;
     private final MemberRepository memberRepository;
     private final WalkRecordRepository walkRecordRepository;
+    private final ObjectMapper objectMapper;
     private final StringRedisTemplate stringRedisTemplate;
     private final JwtTokenizer jwtTokenizer;
 
@@ -71,6 +75,7 @@ public class StompHandler implements ChannelInterceptor {
             accessor.setUser(authentication);
         } else if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {//목적지 주소와 같은지 확인을 해야됨. 구독을 검증하는 단계
             String destination = accessor.getDestination();
+            String subscriptionId = accessor.getSubscriptionId();
             if (destination != null && destination.startsWith("/sub/chat/")) {//null이면 안되고 /sub/chat/으로 시작을 해야됨.
                 Long chatRoomId = Long.valueOf(destination.substring("/sub/chat/".length()));//이거는 chatRoomId가 나옴. chatRoom에 있는 profileId와 검사를 해야됨.
                 chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 앖습니다."));
@@ -88,6 +93,13 @@ public class StompHandler implements ChannelInterceptor {
                 stringRedisTemplate.opsForSet().add("chatRoomId:" + chatRoomId + ":onlineProfiles", profileId);//채팅방 접속자 유무
                 String sessionId = accessor.getSessionId();
                 stringRedisTemplate.opsForValue().set("session:"+sessionId, chatRoomId.toString());//chatRoomId를 가지고오기 위한 redis 저장
+                SubscribeInfo subscribeInfo = new SubscribeInfo(chatRoomId, profileId, ChatMessage.ChatRoomType.MANY);
+                try {
+                    String json = objectMapper.writeValueAsString(subscribeInfo);
+                    stringRedisTemplate.opsForValue().set("subscriptionId:"+subscriptionId, json);//unsubscribe를 위한 정보 저장
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException("subscribeInfo string 변환 과정 중 에러 발생",e);
+                }
             } else if (destination.startsWith("/sub/member/chat/")) {
                     // 1:1 채팅방 처리
                 Long memberChatRoomId = Long.valueOf(destination.substring("/sub/member/chat/".length()));
@@ -104,6 +116,13 @@ public class StompHandler implements ChannelInterceptor {
                 stringRedisTemplate.opsForSet().add("memberChatRoomId:" + memberChatRoomId + ":onlineMembers", memberId);
                 String sessionId = accessor.getSessionId();
                 stringRedisTemplate.opsForValue().set("session:" + sessionId, memberChatRoomId.toString());
+                SubscribeInfo subscribeInfo = new SubscribeInfo(memberChatRoomId, memberId, ChatMessage.ChatRoomType.ONE);
+                try {
+                    String json = objectMapper.writeValueAsString(subscribeInfo);
+                    stringRedisTemplate.opsForValue().set("subscriptionId:"+subscriptionId, json);//unsubscribe를 위한 정보 저장
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException("subscribeInfo string 변환 과정 중 에러 발생", e);
+                }
             } else if (destination.startsWith("/sub/walk-record/location/")) {//unsubscribe 필요 없을듯?
                 Long walkRecordId = Long.valueOf(destination.substring("/sub/walk-record/location/".length()));
                 WalkRecord walkRecord = walkRecordRepository.findById(walkRecordId)
@@ -117,7 +136,38 @@ public class StompHandler implements ChannelInterceptor {
                 log.error("알 수 없는 구독 경로: {}", destination);
                 throw new IllegalArgumentException("알 수 없는 구독 경로입니다.");
             }
+        } else if (StompCommand.UNSUBSCRIBE.equals(accessor.getCommand())) {
+            String subscriptionId = accessor.getSubscriptionId();
+            if (subscriptionId == null) {
+                log.error("UNSUBSCRIBE 요청 오류 - subscriptionId 없음");
+                throw new IllegalArgumentException("subscriptionId 없음.");
+            }
+
+            log.info("UNSUBSCRIBE 요청 - subscriptionId: {}", subscriptionId);
+
+            String json = stringRedisTemplate.opsForValue().get("subscriptionId:" + subscriptionId);
+            try {
+                SubscribeInfo subscribeInfo = objectMapper.readValue(json, SubscribeInfo.class);
+
+                if (subscribeInfo.getChatRoomType() == ChatMessage.ChatRoomType.MANY) {
+                    stringRedisTemplate.opsForSet().remove(
+                            "chatRoomId:" + subscribeInfo.getChatRoomId() + ":onlineMembers",
+                            subscribeInfo.getUserId()
+                    );
+                } else {
+                    stringRedisTemplate.opsForSet().remove(
+                            "memberChatRoomId:" + subscribeInfo.getChatRoomId() + ":onlineMembers",
+                            subscribeInfo.getUserId()
+                    );
+                }
+                stringRedisTemplate.opsForSet().remove("subscriptionId" + subscriptionId);
+
+            } catch (JsonProcessingException e) {
+                log.error("UNSUBSCRIBE 처리 중 JSON 파싱 에러", e);
+                throw new RuntimeException("string을 subscribeInfo.class로 변환 중 에러 발생", e);
+            }
         }
+
         return message;
     }
 }
