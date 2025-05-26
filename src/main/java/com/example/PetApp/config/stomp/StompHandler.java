@@ -2,16 +2,13 @@ package com.example.PetApp.config.stomp;
 
 import com.example.PetApp.domain.*;
 import com.example.PetApp.repository.jpa.*;
-import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -22,11 +19,10 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
-import java.nio.file.attribute.UserPrincipal;
 import java.security.Principal;
 
 @RequiredArgsConstructor
-@Configuration//jwt토큰인증 해야할듯
+@Configuration
 @Slf4j
 public class StompHandler implements ChannelInterceptor {
 

@@ -14,7 +14,7 @@ spring:
         show_sql: true
         format_sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
-#    open-in-view: false
+#    open-in-view: false N+1 문제 방지해야되서 나중에 DTO로 처리한 뒤 false로 설정. projection.
 
 
   mail:

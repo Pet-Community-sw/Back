@@ -39,10 +39,11 @@ public class CommentServiceImp implements CommentService {
 
     @Transactional
     @Override//리펙토링 필수.
-    public ResponseEntity<Object> createComment(CommentDto commentDto, String email) throws JsonProcessingException {
+    public ResponseEntity<?> createComment(CommentDto commentDto, String email) throws JsonProcessingException {
         Member member = memberRepository.findByEmail(email).get();
         log.info("createComment 요청 memberId : {}", member.getMemberId());
         if (commentDto.getPostType() == CommentDto.PostType.COMMUNITY) {
+            log.info("CommunityPost");
             Optional<Post> post = postRepository.findById(commentDto.getPostId());
             if (post.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
@@ -56,8 +57,10 @@ public class CommentServiceImp implements CommentService {
             commentRepository.save(comment);
             String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
             sendNotificationUtil.sendNotification(post.get().getMember(), message); // 알림 전송
+            log.error("왜 안됨.");
             return ResponseEntity.status(HttpStatus.CREATED).body(comment.getCommentId());
         } else if (commentDto.getPostType() == CommentDto.PostType.RECOMMEND) {
+            log.info("RecommendPost");
             Optional<RecommendRoutePost> post = recommendRoutePostRepository.findById(commentDto.getPostId());
             if (post.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");

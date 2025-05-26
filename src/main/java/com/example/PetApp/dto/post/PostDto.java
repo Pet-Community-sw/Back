@@ -17,8 +17,6 @@ public class PostDto {
     @NotBlank
     private String content;
 
-    @NotBlank
-    private Long memberId;
 
     MultipartFile postImageFile;
 }

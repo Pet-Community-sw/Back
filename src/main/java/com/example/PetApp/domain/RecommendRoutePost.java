@@ -37,7 +37,7 @@ public class RecommendRoutePost {
     @OneToMany(mappedBy = "recommendRoutePost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeT> likeTs;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 

@@ -36,7 +36,7 @@ public class MemberController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity signUp(@RequestBody @Valid MemberSignDto memberSignDto, BindingResult bindingResult) {
+    public ResponseEntity signUp(@ModelAttribute @Valid MemberSignDto memberSignDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errorMessages = bindingResult.getFieldErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.toList());
@@ -89,11 +89,13 @@ public class MemberController {
 
 
     @PutMapping("/reset-password")
-    public ResponseEntity resetPassword(@RequestBody @Valid ResetPasswordDto resetPasswordDto, BindingResult bindingResult) {
+    public ResponseEntity resetPassword(@RequestBody @Valid ResetPasswordDto resetPasswordDto,
+                                        BindingResult bindingResult,
+                                        Authentication authentication) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
         }
-        return memberService.resetPassword(resetPasswordDto);
+        return memberService.resetPassword(resetPasswordDto,authentication.getPrincipal().toString());
     }
 
     @GetMapping("/{memberId}")

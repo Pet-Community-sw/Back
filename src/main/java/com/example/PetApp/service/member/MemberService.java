@@ -29,12 +29,13 @@ import java.util.*;
 @Slf4j
 public class MemberService {
 
+    @Value("${spring.dog.member.image.upload}")
+    private String memberUploadDir;
+
     private final MemberRepository memberRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${spring.dog.member.image.upload")
-    private String memberUploadDir;
     @Transactional
     public MemberSignResponseDto save(MemberSignDto memberSignDto) {
         log.info("signup requset email:{}", memberSignDto.getEmail());
@@ -42,7 +43,7 @@ public class MemberService {
         log.info("signup requset Name:{}", memberSignDto.getName());
         log.info("signup requset Password:{}", memberSignDto.getPassword());
         Role role = roleRepository.findByName("ROLE_USER").get();
-        MultipartFile file = memberSignDto.getMemberImageUrl();
+        MultipartFile file = memberSignDto.getMemberImageUrl();//기본 이미지를 넣어야할듯.
         UUID uuid = UUID.randomUUID();
         String imageFileName = uuid + "_" + file.getOriginalFilename();
         try{
@@ -91,8 +92,8 @@ public class MemberService {
 
 
     @Transactional
-    public ResponseEntity resetPassword(ResetPasswordDto resetPasswordDto) {
-        Member member = memberRepository.findByEmail(resetPasswordDto.getEmail()).get();
+    public ResponseEntity resetPassword(ResetPasswordDto resetPasswordDto, String email) {
+        Member member = memberRepository.findByEmail(email).get();
         if (passwordEncoder.matches(resetPasswordDto.getNewPassword(),member.getPassword())) {
             return ResponseEntity.badRequest().body("전 비밀번호와 다르게 설정해야합니다.");
         } else {

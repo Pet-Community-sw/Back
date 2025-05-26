@@ -49,6 +49,9 @@ public class Member {//수정 필요
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecommendRoutePost> recommendRoutePosts;
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "member_role",
             joinColumns = @JoinColumn(name = "member_id"),

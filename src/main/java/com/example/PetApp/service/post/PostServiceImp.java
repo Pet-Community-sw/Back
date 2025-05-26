@@ -75,10 +75,6 @@ public class PostServiceImp implements PostService {
         log.info("email : {}",email);
         MultipartFile file = createPostDto.getPostImageFile();
         Member member = memberRepository.findByEmail(email).get();
-        if (!(createPostDto.getMemberId().equals(member.getMemberId()))) {
-            log.error("잘못된 요청");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("잘못된 요청입니다.");
-        }
         String imageFileName = "";
         imageFileName = fileSetting(createPostDto, file, imageFileName);
 
@@ -136,7 +132,7 @@ public class PostServiceImp implements PostService {
         if (post.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
         }
-        if (updatePostDto.getMemberId().equals(member.getMemberId())||post.get().getMember().equals(member)) {
+        if (post.get().getMember().equals(member)) {
             String imageFileName="";
             imageFileName = fileSetting(updatePostDto, updatePostDto.getPostImageFile(), imageFileName);
 
