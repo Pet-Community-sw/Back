@@ -57,7 +57,6 @@ public class CommentServiceImp implements CommentService {
             commentRepository.save(comment);
             String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
             sendNotificationUtil.sendNotification(post.get().getMember(), message); // 알림 전송
-            log.error("왜 안됨.");
             return ResponseEntity.status(HttpStatus.CREATED).body(comment.getCommentId());
         } else if (commentDto.getPostType() == CommentDto.PostType.RECOMMEND) {
             log.info("RecommendPost");

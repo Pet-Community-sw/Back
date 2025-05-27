@@ -40,6 +40,7 @@ public class PostServiceImp implements PostService {
 
     @Value("${spring.dog.post.image.upload}")
     private String postUploadDir;
+    private final String ImageUrl = "http://192.210.223.217:8080/members";
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;

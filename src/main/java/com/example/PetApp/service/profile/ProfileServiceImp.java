@@ -58,7 +58,7 @@ public class ProfileServiceImp implements ProfileService {
 
             Profile profile = Profile.builder()
                     .member(member)
-                    .petImageUrl("/profile/" + imageFileName)
+                    .petImageUrl("/profiles/" + imageFileName)
                     .petBirthDate(profileDto.getPetBirthDate())
                     .extraInfo(profileDto.getExtraInfo())
                     .petBreed(profileDto.getPetBreed())

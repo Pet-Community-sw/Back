@@ -58,7 +58,7 @@ public class MemberService {
                 .email(memberSignDto.getEmail())
                 .password(passwordEncoder.encode(memberSignDto.getPassword()))
                 .phoneNumber(memberSignDto.getPhoneNumber())
-                .memberImageUrl("/member/" + imageFileName)
+                .memberImageUrl(imageFileName)
                 .build();
         if (member.getRoles() == null) {
             member.setRoles(new HashSet<>());
