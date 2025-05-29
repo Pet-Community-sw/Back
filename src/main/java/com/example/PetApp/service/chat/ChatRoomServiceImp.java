@@ -58,7 +58,7 @@ public class ChatRoomServiceImp implements ChatRoomService {
             if (lastMessageTime != null) {
                 lastMessageLocalDateTime = LocalDateTime.parse(lastMessageTime);
             }
-            return ChatRoomsResponseDto.from(chatRoom, lastMessage, unReadCount, lastMessageLocalDateTime);
+            return ChatRoomsResponseDto.from(chatRoom, profile.get().getProfileId(), lastMessage, unReadCount, lastMessageLocalDateTime);
         }).collect(Collectors.toList());
         return ResponseEntity.ok(chatRoomsResponseDtos);
     }
