@@ -13,8 +13,6 @@ public class GetCommentsResponseDto {
 
     private String content;
 
-    private Long likeCount;
-
     private Long memberId;
 
     private String memberName;

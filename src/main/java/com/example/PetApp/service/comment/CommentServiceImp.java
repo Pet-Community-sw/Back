@@ -130,7 +130,6 @@ public class CommentServiceImp implements CommentService {
                 .map(comment -> new GetCommentsResponseDto(
                         comment.getCommentId(),
                         comment.getContent(),
-                        comment.getLikeCount(),
                         comment.getMember().getMemberId(),
                         comment.getMember().getName(),
                         comment.getMember().getMemberImageUrl(),
