@@ -45,30 +45,4 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("message", ex.getMessage()));
     }
-
-    private static class ForbiddenException extends RuntimeException {
-        public ForbiddenException(String message) {
-            super(message);
-        }
-    }
-
-    private static class NotFoundException extends RuntimeException {
-        public NotFoundException(String message) {
-            super(message);
-        }
-    }
-
-
-    private static class ConflictException extends RuntimeException {
-        public ConflictException(String message) {
-            super(message);
-        }
-    }
-
-    private static class UnAuthorizedException extends RuntimeException {
-        public UnAuthorizedException(String message) {
-            super(message);
-        }
-    }
-
 }

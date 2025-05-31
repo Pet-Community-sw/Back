@@ -29,8 +29,10 @@ public class TokenServiceImp implements TokenService {
     private final RefreshRepository refreshRepository;
     private final JwtTokenizer jwtTokenizer;
     private final RedisUtil redisUtil;
+
     @Transactional
-    public ResponseEntity<LoginResponseDto> save(Member member) {
+    @Override
+    public LoginResponseDto save(Member member) {
         List<String> roles = member.getRoles().stream().map(Role::getName).collect(Collectors.toList());
 
         String accessToken = jwtTokenizer.createAccessToken(member.getMemberId(), null, member.getEmail(), roles);
@@ -42,11 +44,12 @@ public class TokenServiceImp implements TokenService {
                 .build();
         refreshRepository.save(refreshToken1);
         log.info("로그인 요청 성공");
-        return ResponseEntity.ok().body(LoginResponseDto.builder()
+        return LoginResponseDto.builder()
                 .name(member.getName())
                 .accessToken(accessToken)
-                .build());
+                .build();
     }
+
     @Transactional
     public ResponseEntity<?> accessToken(String accessToken) {
         log.info("에세스 토큰 재요청.");
@@ -80,13 +83,12 @@ public class TokenServiceImp implements TokenService {
 
     @Transactional
     @Override
-    public ResponseEntity<String> deleteRefreshToken(String accessToken) {
+    public void deleteRefreshToken(String accessToken) {
         String[] arr = accessToken.split(" ");
         Claims claims = jwtTokenizer.parseAccessToken(arr[1]);
         Long memberId = Long.valueOf((Integer) claims.get("memberId"));
         refreshRepository.deleteByMemberMemberId(memberId);
         redisUtil.createData(accessToken, "blacklist", 30 * 60L);//access시간이랑 같게 해야됨.
-        return ResponseEntity.ok().body("로그아웃 되었습니다.");
     }
 
     @Transactional

@@ -20,13 +20,12 @@ public class FcmTokenServiceImp implements FcmTokenService {
     private final FcmTokenRepository fcmTokenRepository;
 
     @Override
-    public ResponseEntity<?> createFcmToken(Member member, String token) {
+    public void createFcmToken(Member member, String token) {
         FcmToken fcmToken=FcmToken.builder()
                 .member(member)
                 .fcmToken(token)
                 .build();
         fcmTokenRepository.save(fcmToken);
-        return ResponseEntity.status(HttpStatus.CREATED).body("생성 완료.");
     }
 
     //업데이트 로직.

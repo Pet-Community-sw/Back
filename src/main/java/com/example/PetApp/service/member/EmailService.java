@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface EmailService {
-    ResponseEntity<?> sendMail(String email);
+    void sendMail(String email);
 
-    ResponseEntity<?> verifyCode(String email, String code);
+    void verifyCode(String email, String code);
 }

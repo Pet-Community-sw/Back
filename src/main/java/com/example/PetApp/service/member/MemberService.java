@@ -6,23 +6,23 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface MemberService {
-    ResponseEntity<?> createMember(MemberSignDto memberSignDto);
+    MemberSignResponseDto createMember(MemberSignDto memberSignDto);
 
-    ResponseEntity<?> login(LoginDto loginDto);
+    LoginResponseDto login(LoginDto loginDto);
 
-    ResponseEntity<?> findById(String phoneNumber);
+    FindByIdResponseDto findById(String phoneNumber);
 
-    ResponseEntity<?> sendEmail(SendEmailDto sendEmailDto);
+    void sendEmail(SendEmailDto sendEmailDto);
 
-    ResponseEntity<String> logout(String accessToken);
+    void logout(String accessToken);
 
-    ResponseEntity<?> verifyCode(String email, String code);
+    void verifyCode(String email, String code);
 
-    ResponseEntity<?> resetPassword(ResetPasswordDto resetPasswordDto, String email);
+    void resetPassword(ResetPasswordDto resetPasswordDto, String email);
 
-    ResponseEntity<?> getMember(Long memberId, String email);
+    GetMemberResponseDto getMember(Long memberId, String email);
 
-    ResponseEntity<String> deleteMember(String email);
+    void deleteMember(String email);
 
-    ResponseEntity<?> createFcmToken(FcmTokenDto fcmTokenDto);
+    void createFcmToken(FcmTokenDto fcmTokenDto);
 }

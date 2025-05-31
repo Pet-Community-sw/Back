@@ -23,7 +23,7 @@ public class EmailServiceImp implements EmailService{
     private final RedisUtil redisUtil;
 
     @Override
-    public ResponseEntity<?> sendMail(String toEmail) {
+    public void sendMail(String toEmail) {
         if (redisUtil.existData(toEmail)) {
             redisUtil.deleteData(toEmail);
         }
@@ -32,7 +32,6 @@ public class EmailServiceImp implements EmailService{
             MimeMessage message = createEmail(toEmail, emailCode);
             javaMailSender.send(message);
 
-            return ResponseEntity.ok().body("해당 이메일로 인증번호 전송했습니다.");
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         } catch (UnsupportedEncodingException e) {
@@ -72,15 +71,13 @@ public class EmailServiceImp implements EmailService{
     }
 
     @Override
-    public ResponseEntity<?> verifyCode(String email, String code) {
+    public void verifyCode(String email, String code) {
         String authCode = redisUtil.getData(email);
         log.info("email : {}, code : {}",email,code);
         if (authCode == null) {
-            return ResponseEntity.badRequest().body("인증번호가 만료되었습니다. 다시 시도해주세요.");
-        } else if (code.equals(authCode)) {
-            return ResponseEntity.ok("인증 성공했습니다.");
-        } else {
-            return ResponseEntity.badRequest().body("인증번호가 일치하지 않습니다.");
+            throw new IllegalArgumentException("인증번호가 만료되었습니다. 다시 시도해주세요.");
+        } else if (!(authCode.equals(code))) {
+            throw new IllegalArgumentException("인증번호가 일지하치 않습니다.");
         }
     }
 }

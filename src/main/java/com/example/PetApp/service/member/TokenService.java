@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface TokenService {
-    ResponseEntity<String> deleteRefreshToken(String accessToken);
+    void deleteRefreshToken(String accessToken);
 
-    ResponseEntity<LoginResponseDto> save(Member member);
+    LoginResponseDto save(Member member);
 }

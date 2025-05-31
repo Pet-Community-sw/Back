@@ -8,5 +8,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface FcmTokenService {
 
-    ResponseEntity<?> createFcmToken(Member member, String token);
+    void createFcmToken(Member member, String token);
 }

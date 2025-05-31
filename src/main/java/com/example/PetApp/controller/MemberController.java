@@ -10,6 +10,7 @@ import com.example.PetApp.util.TimeAgoUtil;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -32,38 +33,41 @@ public class MemberController {
         if (bindingResult.hasErrors()) {
             return getBindingError(bindingResult);
         }
-        return memberService.createMember(memberSignDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.createMember(memberSignDto));
     }
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+    public LoginResponseDto login(@RequestBody LoginDto loginDto) {
         return memberService.login(loginDto);
     }
 
     @GetMapping("/{memberId}")
-    public ResponseEntity<?> getMember(@PathVariable Long memberId, Authentication authentication) {
+    public GetMemberResponseDto getMember(@PathVariable Long memberId, Authentication authentication) {
         return memberService.getMember(memberId, AuthUtil.getEmail(authentication));
     }
 
     @DeleteMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("Authorization") String accessToken) {
-        return memberService.logout(accessToken);
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String accessToken) {
+        memberService.logout(accessToken);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/find-id")
-    public ResponseEntity<?> findById(@RequestParam String phoneNumber) {
+    public FindByIdResponseDto findById(@RequestParam String phoneNumber) {
         return memberService.findById(phoneNumber);
     }
 
     @PostMapping("/send-email")
-    public ResponseEntity<?> sendEmail(@RequestBody SendEmailDto sendEmailDto) {
-        return memberService.sendEmail(sendEmailDto);
+    public ResponseEntity<String> sendEmail(@RequestBody SendEmailDto sendEmailDto) {
+        memberService.sendEmail(sendEmailDto);
+        return ResponseEntity.ok().body("인증번호가 이메일로 전송되었습니다.");
     }
 
     @PostMapping("/verify-code")
-    public ResponseEntity<?> verifyCode(@RequestBody AuthCodeDto authCodeDto) {
-        return memberService.verifyCode(authCodeDto.getEmail(), authCodeDto.getCode());
+    public ResponseEntity<String> verifyCode(@RequestBody AuthCodeDto authCodeDto) {
+        memberService.verifyCode(authCodeDto.getEmail(), authCodeDto.getCode());
+        return ResponseEntity.ok().body("인증 성공했습니다.");
     }
 
 
@@ -74,17 +78,20 @@ public class MemberController {
         if (bindingResult.hasErrors()) {
             return getBindingError(bindingResult);
         }
-        return memberService.resetPassword(resetPasswordDto, AuthUtil.getEmail(authentication));
+        memberService.resetPassword(resetPasswordDto, AuthUtil.getEmail(authentication));
+        return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습나다.");
     }
 
     @DeleteMapping()
     public ResponseEntity<String> deleteMember(Authentication authentication) {
-        return memberService.deleteMember(AuthUtil.getEmail(authentication));
+        memberService.deleteMember(AuthUtil.getEmail(authentication));
+        return ResponseEntity.ok().body("탈퇴했습니다.");
     }
 
     @PostMapping("/fcm-token")
-    public ResponseEntity<?> createFcmToken(@RequestBody FcmTokenDto fcmTokenDto) {
-        return memberService.createFcmToken(fcmTokenDto);
+    public ResponseEntity<String> createFcmToken(@RequestBody FcmTokenDto fcmTokenDto) {
+        memberService.createFcmToken(fcmTokenDto);
+        return ResponseEntity.ok().body("fcm토큰 생성완료.");
     }
 
     @NotNull
