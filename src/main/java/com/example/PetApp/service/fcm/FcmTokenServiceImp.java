@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -17,17 +18,12 @@ import java.util.Optional;
 public class FcmTokenServiceImp implements FcmTokenService {
 
     private final FcmTokenRepository fcmTokenRepository;
-    private final MemberRepository memberRepository;
 
     @Override
-    public ResponseEntity<?> createFcmToken(FcmTokenDto fcmTokenDto) {
-        Optional<Member> member = memberRepository.findById(fcmTokenDto.getMemberId());
-        if (member.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 유저는 없습니다.");
-        }
+    public ResponseEntity<?> createFcmToken(Member member, String token) {
         FcmToken fcmToken=FcmToken.builder()
-                .member(member.get())
-                .fcmToken(fcmTokenDto.getFcmToken())
+                .member(member)
+                .fcmToken(token)
                 .build();
         fcmTokenRepository.save(fcmToken);
         return ResponseEntity.status(HttpStatus.CREATED).body("생성 완료.");
