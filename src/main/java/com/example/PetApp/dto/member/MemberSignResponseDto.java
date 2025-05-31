@@ -10,6 +10,4 @@ import lombok.*;
 public class MemberSignResponseDto {
 
     private Long memberId;
-
-    private String name;
 }

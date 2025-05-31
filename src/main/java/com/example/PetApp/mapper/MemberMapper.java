@@ -2,8 +2,6 @@ package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.dto.member.MemberSignDto;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class MemberMapper {
 
@@ -16,4 +14,5 @@ public class MemberMapper {
                 .memberImageUrl(imageFileName)
                 .build();
     }
+
 }

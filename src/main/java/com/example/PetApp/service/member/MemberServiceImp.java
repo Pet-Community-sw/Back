@@ -38,15 +38,18 @@ public class MemberServiceImp implements MemberService{
     @Override
     public ResponseEntity<?> createMember(MemberSignDto memberSignDto) {
         log.info("createMember 요청 : {}",memberSignDto.toString());
-        Role role = roleRepository.findByName("ROLE_USER").get();
         String imageFileName = FileUploadUtil.fileUpload(memberSignDto.getMemberImageUrl(), memberUploadDir);
         Member member = MemberMapper.toEntity(memberSignDto, passwordEncoder.encode(memberSignDto.getPassword()), imageFileName);
-        member.addRole(role);
+        setRole(member);
         memberRepository.save(member);
-        return ResponseEntity.status(HttpStatus.CREATED).body(MemberSignResponseDto.builder() 이거 바꿔야돰.
+        return ResponseEntity.status(HttpStatus.CREATED).body(MemberSignResponseDto.builder()
                 .memberId(member.getMemberId())
-                .name(member.getName())
                 .build());
+    }
+
+    private void setRole(Member member) {
+        Role role = roleRepository.findByName("ROLE_USER").get();
+        member.addRole(role);
     }
 
     @Transactional
