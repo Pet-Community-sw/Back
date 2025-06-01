@@ -16,6 +16,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:/Users/choiseonjae/Desktop/PetApp/posts/");
         registry.addResourceHandler("/members/**")
                 .addResourceLocations("file:/Users/choiseonjae/Desktop/PetApp/members/");
+        registry.addResourceHandler("/basic/**")
+                .addResourceLocations("file:/Users/choiseonjae/Desktop/PetApp/basic/");
     }
 
     @Override

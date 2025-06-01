@@ -41,7 +41,7 @@ public class MemberServiceImp implements MemberService{
         if (memberRepository.existsByEmail(memberSignDto.getEmail())) {
             throw new ConflictException("이미 가입된 회원입니다.");
         }
-        String imageFileName = FileUploadUtil.fileUpload(memberSignDto.getMemberImageUrl(), memberUploadDir);
+        String imageFileName = FileUploadUtil.fileUpload(memberSignDto.getMemberImageUrl(), memberUploadDir, null);
         Member member = MemberMapper.toEntity(memberSignDto, passwordEncoder.encode(memberSignDto.getPassword()), imageFileName);
         setRole(member);
         memberRepository.save(member);
