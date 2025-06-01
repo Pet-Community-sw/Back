@@ -15,37 +15,36 @@ import org.springframework.web.bind.annotation.*;
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final AuthUtil authUtil;
 
     @PostMapping
     public ResponseEntity<?> createReview(@RequestBody CreateReviewDto createReviewDto, Authentication authentication) {
-        return reviewService.createReview(createReviewDto, authUtil.getEmail(authentication));
+        return reviewService.createReview(createReviewDto, AuthUtil.getEmail(authentication));
     }
 
     @GetMapping("/{memberId}/list/member")
     public ResponseEntity<?> getReviewListByMember(@PathVariable Long memberId, Authentication authentication) {
-        return reviewService.getReviewListByMember(memberId, authUtil.getEmail(authentication));
+        return reviewService.getReviewListByMember(memberId, AuthUtil.getEmail(authentication));
     }
 
     @GetMapping("/{profileId}/list/profile")
     public ResponseEntity<?> getReviewListByProfile(@PathVariable Long profileId, Authentication authentication) {
-        return reviewService.getReviewListByProfile(profileId, authUtil.getEmail(authentication));
+        return reviewService.getReviewListByProfile(profileId, AuthUtil.getEmail(authentication));
     }
 
     @GetMapping("/{reviewId}")
     public ResponseEntity<?> getReview(@PathVariable Long reviewId, Authentication authentication) {
-        return reviewService.getReview(reviewId, authUtil.getEmail(authentication));
+        return reviewService.getReview(reviewId, AuthUtil.getEmail(authentication));
     }
 
     @PutMapping("/{reviewId}")
     public ResponseEntity<?> updateReview(@PathVariable Long reviewId,
                                           @RequestBody UpdateReviewDto updateReviewDto,
                                           Authentication authentication) {
-        return reviewService.updateReview(reviewId, updateReviewDto, authUtil.getEmail(authentication));
+        return reviewService.updateReview(reviewId, updateReviewDto, AuthUtil.getEmail(authentication));
     }
 
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<?> deleteReview(@PathVariable Long reviewId, Authentication authentication) {
-        return reviewService.deleteReview(reviewId, authUtil.getEmail(authentication));
+        return reviewService.deleteReview(reviewId, AuthUtil.getEmail(authentication));
     }
 }

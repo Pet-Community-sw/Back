@@ -1,7 +1,6 @@
 package com.example.PetApp.service.member;
 
 import com.example.PetApp.dto.member.*;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service

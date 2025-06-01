@@ -3,6 +3,7 @@ package com.example.PetApp.service.member;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Role;
 import com.example.PetApp.dto.member.*;
+import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.exception.UnAuthorizedException;
 import com.example.PetApp.mapper.MemberMapper;
@@ -13,7 +14,6 @@ import com.example.PetApp.util.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +38,9 @@ public class MemberServiceImp implements MemberService{
     @Override
     public MemberSignResponseDto createMember(MemberSignDto memberSignDto) {
         log.info("createMember 요청 : {}",memberSignDto.toString());
+        if (memberRepository.existsByEmail(memberSignDto.getEmail())) {
+            throw new ConflictException("이미 가입된 회원입니다.");
+        }
         String imageFileName = FileUploadUtil.fileUpload(memberSignDto.getMemberImageUrl(), memberUploadDir);
         Member member = MemberMapper.toEntity(memberSignDto, passwordEncoder.encode(memberSignDto.getPassword()), imageFileName);
         setRole(member);
@@ -56,7 +59,7 @@ public class MemberServiceImp implements MemberService{
         log.info("login 요청 : {}", loginDto.toString());
         Member member = memberRepository.findByEmail(loginDto.getEmail())
                 .orElseThrow(() -> new NotFoundException("이메일 혹은 비밀번호가 일치하지 않습니다."));
-        if (!passwordEncoder.matches(member.getPassword(), loginDto.getPassword())) {
+        if (!passwordEncoder.matches(loginDto.getPassword(),member.getPassword())) {
             throw new UnAuthorizedException("이메일 혹은 비밀번호가 일치하지 않습니다.");
         }
         return tokenService.save(member);
@@ -125,7 +128,8 @@ public class MemberServiceImp implements MemberService{
     @Override
     public void deleteMember(String email) {
         log.info("deleteMember 요청 email:{}", email);
-        Member member = memberRepository.findByEmail(email).get();
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("없는 회원입니다."));
         memberRepository.delete(member);
     }
 

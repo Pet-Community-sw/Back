@@ -45,7 +45,10 @@ public class Member {//수정 필요
     @CreationTimestamp
     private LocalDateTime memberTime;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private RefreshToken refreshToken;
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private FcmToken fcmToken;
 
     @Builder.Default

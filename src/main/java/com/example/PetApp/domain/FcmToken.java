@@ -21,7 +21,7 @@ public class FcmToken {
 
     private String fcmToken;
 
-    @OneToOne(mappedBy = "fcmToken",fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
