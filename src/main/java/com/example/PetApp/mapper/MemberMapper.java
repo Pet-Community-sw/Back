@@ -1,6 +1,7 @@
 package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.Member;
+import com.example.PetApp.dto.member.LoginResponseDto;
 import com.example.PetApp.dto.member.MemberSignDto;
 
 public class MemberMapper {
@@ -12,6 +13,13 @@ public class MemberMapper {
                 .password(encodedPassword)
                 .phoneNumber(memberSignDto.getPhoneNumber())
                 .memberImageUrl(imageFileName)
+                .build();
+    }
+
+    public static LoginResponseDto toLoginResponseDto(Member member, String accessToken) {
+        return LoginResponseDto.builder()
+                .name(member.getName())
+                .accessToken(accessToken)
                 .build();
     }
 

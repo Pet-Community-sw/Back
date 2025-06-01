@@ -1,5 +1,7 @@
 package com.example.PetApp.controller;
 
+import com.example.PetApp.dto.member.AccessTokenResponseDto;
+import com.example.PetApp.service.member.TokenService;
 import com.example.PetApp.service.member.TokenServiceImp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TokenController {
 
-    private final TokenServiceImp tokenServiceImp;
+    private final TokenService tokenService;
 
     @PostMapping("/token")
-    public ResponseEntity<?> accessToken(@RequestHeader("Authorization") String accessToken) {
-        return tokenServiceImp.accessToken(accessToken);
+    public AccessTokenResponseDto accessToken(@RequestHeader("Authorization") String accessToken) {
+        return tokenService.accessToken(accessToken);
     }
 }
