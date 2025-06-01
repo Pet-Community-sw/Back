@@ -14,7 +14,7 @@ public class FileUploadUtil {
     public static String fileUpload(MultipartFile imageUrl, String uploadDir, String imageKind) {
         UUID uuid = UUID.randomUUID();//기본 이미지를 넣어야할듯.
         String imageFileName;
-        if (imageUrl.isEmpty()||imageKind==null) {
+        if (imageUrl.isEmpty()) {
             return "/basic/Profile_avatar_placeholder_large.png";
         }else {
             imageFileName = uuid + "_" + imageUrl.getOriginalFilename();

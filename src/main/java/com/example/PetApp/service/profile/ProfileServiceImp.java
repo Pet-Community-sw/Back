@@ -202,13 +202,8 @@ public class ProfileServiceImp implements ProfileService {
         } else if (!(profile.get().getMember().equals(member))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
         }
-        List<String> roles = member
-                .getRoles()
-                .stream()
-                .map(Role::getName)
-                .collect(Collectors.toList());
 
-        String accessToken1 = jwtTokenizer.createAccessToken(member.getMemberId(), profileId, member.getEmail(), roles);
+        String accessToken1 = jwtTokenizer.createAccessToken(member.getMemberId(), profileId, member.getEmail());
         redisUtil.createData(accessToken, "blacklist", 30 * 60L);//에세스토큰 유효시간
         AccessTokenToProfileIdResponseDto accessTokenToProfileIdResponseDto = AccessTokenToProfileIdResponseDto.builder()
                 .profileId(profileId)
