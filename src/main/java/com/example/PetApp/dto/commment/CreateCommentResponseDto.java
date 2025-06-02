@@ -1,16 +1,13 @@
 package com.example.PetApp.dto.commment;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
-public class LikeListDto {
+public class CreateCommentResponseDto {
 
-    private String memberName;
-    private String memberImageUrl;
+    private Long commentId;
 }

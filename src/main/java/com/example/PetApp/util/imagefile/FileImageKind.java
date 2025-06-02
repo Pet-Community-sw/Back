@@ -1,4 +1,4 @@
-package com.example.PetApp.util;
+package com.example.PetApp.util.imagefile;
 
 import lombok.Getter;
 import lombok.Setter;

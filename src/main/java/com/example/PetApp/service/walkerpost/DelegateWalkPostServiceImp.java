@@ -5,7 +5,7 @@ import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.repository.jpa.DelegateWalkPostRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
-import com.example.PetApp.service.memberChatRoom.MemberChatRoomService;
+import com.example.PetApp.service.memberchatRoom.MemberChatRoomService;
 import com.example.PetApp.service.walkrecord.WalkRecordService;
 import com.example.PetApp.util.SendNotificationUtil;
 import com.example.PetApp.util.TimeAgoUtil;

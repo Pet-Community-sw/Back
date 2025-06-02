@@ -1,4 +1,4 @@
-package com.example.PetApp.service.memberChatRoom;
+package com.example.PetApp.service.memberchatRoom;
 
 import com.example.PetApp.domain.Member;
 import org.springframework.http.ResponseEntity;

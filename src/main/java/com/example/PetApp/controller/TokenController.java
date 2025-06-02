@@ -1,7 +1,7 @@
 package com.example.PetApp.controller;
 
 import com.example.PetApp.dto.member.AccessTokenResponseDto;
-import com.example.PetApp.service.member.TokenService;
+import com.example.PetApp.service.token.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

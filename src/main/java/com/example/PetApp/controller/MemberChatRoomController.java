@@ -1,6 +1,6 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.service.memberChatRoom.MemberChatRoomService;
+import com.example.PetApp.service.memberchatRoom.MemberChatRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

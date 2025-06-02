@@ -5,7 +5,7 @@ import com.example.PetApp.dto.profile.*;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
-import com.example.PetApp.service.dogBreed.PetBreedService;
+import com.example.PetApp.service.dogbreed.PetBreedService;
 import com.example.PetApp.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.Period;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

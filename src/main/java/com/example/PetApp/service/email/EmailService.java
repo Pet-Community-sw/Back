@@ -1,4 +1,4 @@
-package com.example.PetApp.service.member;
+package com.example.PetApp.service.email;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

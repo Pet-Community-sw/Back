@@ -1,4 +1,4 @@
-package com.example.PetApp.service.member;
+package com.example.PetApp.service.token;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RefreshToken;
@@ -107,10 +107,6 @@ public class TokenServiceImp implements TokenService {//리펙토링 필요.
             }
         }else
             throw new IllegalArgumentException("잘못된 tokenType");
-    }
-
-    public enum TokenType {
-        ACCESS, REFRESH
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.PetApp.dto.commment;
 
 
+import com.example.PetApp.service.comment.PostType;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -12,9 +13,6 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @NotBlank
 public class CommentDto {
-    public enum PostType {
-        COMMUNITY,RECOMMEND
-    }
 
     private Long postId;
 

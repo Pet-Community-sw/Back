@@ -4,14 +4,14 @@ import com.example.PetApp.domain.LikeT;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.RecommendRoutePost;
-import com.example.PetApp.dto.commment.CommentDto;
-import com.example.PetApp.dto.commment.LikeListDto;
+import com.example.PetApp.dto.like.LikeListDto;
 import com.example.PetApp.dto.like.LikeDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
+import com.example.PetApp.service.comment.PostType;
 import com.example.PetApp.util.SendNotificationUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
@@ -81,7 +81,7 @@ public class LikeServiceImp implements LikeService {
     @Override//리펙토링 필수.
     public ResponseEntity<Object> createAndDeleteLike(LikeDto likeDto, String email) throws JsonProcessingException {
         Member member = memberRepository.findByEmail(email).get();
-        if (likeDto.getPostType()== CommentDto.PostType.COMMUNITY) {
+        if (likeDto.getPostType()== PostType.COMMUNITY) {
             Optional<Post> post = postRepository.findById(likeDto.getPostId());
             if (post.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");
@@ -98,7 +98,7 @@ public class LikeServiceImp implements LikeService {
 
                 return createLike(post.get(), member);
             }
-        } else if (likeDto.getPostType() == CommentDto.PostType.RECOMMEND) {
+        } else if (likeDto.getPostType() == PostType.RECOMMEND) {
             Optional<RecommendRoutePost> post = recommendRoutePostRepository.findById(likeDto.getPostId());
             if (post.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 게시물은 없습니다.");

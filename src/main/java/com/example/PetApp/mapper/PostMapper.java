@@ -59,7 +59,7 @@ public class PostMapper {
                 .createdAt(TimeAgoUtil.getTimeAgo(post.getPostTime()))
                 .like(isLike)
                 .build();
-        List<GetCommentsResponseDto> commentsResponseDtos = CommentMapper.getCommentsResponseDtos(post, member);
+        List<GetCommentsResponseDto> commentsResponseDtos = CommentMapper.toGetCommentsResponseDtos(post, member);
 
         return GetPostResponseDto.builder()
                 .content(post.getContent())

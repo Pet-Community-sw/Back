@@ -1,4 +1,4 @@
-package com.example.PetApp.service.member;
+package com.example.PetApp.service.token;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.dto.member.AccessTokenResponseDto;
