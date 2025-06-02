@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostListResponseDto {
+public class PostResponseDto {
 
     private Long postId;
 
@@ -19,7 +19,7 @@ public class PostListResponseDto {
 
     private String memberImageUrl;
 
-    private String timeAgo;
+    private String createdAt;
 
     private Long viewCount;
 

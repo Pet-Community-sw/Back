@@ -9,6 +9,7 @@ import com.example.PetApp.mapper.MemberMapper;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.service.fcm.FcmTokenService;
 import com.example.PetApp.util.FileUploadUtil;
+import com.example.PetApp.util.FileImageKind;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +39,7 @@ public class MemberServiceImp implements MemberService{
         if (memberRepository.existsByEmail(memberSignDto.getEmail())) {
             throw new ConflictException("이미 가입된 회원입니다.");
         }
-        String imageFileName = FileUploadUtil.fileUpload(memberSignDto.getMemberImageUrl(), memberUploadDir, "members");
+        String imageFileName = FileUploadUtil.fileUpload(memberSignDto.getMemberImageUrl(), memberUploadDir, FileImageKind.MEMBER);
         Member member = MemberMapper.toEntity(memberSignDto, passwordEncoder.encode(memberSignDto.getPassword()), imageFileName);
         memberRepository.save(member);
         return new MemberSignResponseDto(member.getMemberId());

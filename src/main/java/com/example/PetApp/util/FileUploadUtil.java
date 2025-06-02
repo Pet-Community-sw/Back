@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Slf4j
 public class FileUploadUtil {
-    public static String fileUpload(MultipartFile imageUrl, String uploadDir, String imageKind) {
+    public static String fileUpload(MultipartFile imageUrl, String uploadDir, FileImageKind fileImageKind) {
         UUID uuid = UUID.randomUUID();//기본 이미지를 넣어야할듯.
         String imageFileName;
         if (imageUrl.isEmpty()) {
@@ -25,7 +25,7 @@ public class FileUploadUtil {
                 log.error("사진 저장중 에러");
                 throw new RuntimeException(e);
             }
-            return "/"+imageKind+"/"+imageFileName;
+            return "/"+ fileImageKind.getType()+"/"+imageFileName;
         }
     }
 }
