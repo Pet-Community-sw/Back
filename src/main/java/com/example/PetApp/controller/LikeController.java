@@ -2,8 +2,10 @@ package com.example.PetApp.controller;
 
 
 import com.example.PetApp.dto.like.LikeDto;
-import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
+import com.example.PetApp.dto.like.LikeResponseDto;
+import com.example.PetApp.service.comment.PostType;
 import com.example.PetApp.service.like.LikeService;
+import com.example.PetApp.util.AuthUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,20 +19,13 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    @GetMapping("/post/{postId}")
-    public ResponseEntity<?> getLike(@PathVariable Long postId) {
-        return likeService.getLike(postId);
-    }
-
-    //이상함
-    @GetMapping("/recommend-route-post/{recommendRoutePostId}")
-    private ResponseEntity<?> getLikeByRecommendRoutePost(@PathVariable Long recommendRoutePostId) {
-        return likeService.getLikeByRecommendRoutePost(recommendRoutePostId);
+    @GetMapping("/{postType}/{postId}")
+    public LikeResponseDto getLikes(@PathVariable PostType postType, @PathVariable Long postId) {
+        return likeService.getLikes(postType, postId);
     }
 
     @PostMapping()
-    public ResponseEntity<?> createAndDeleteLike(@RequestBody LikeDto likeDto, Authentication authentication) throws JsonProcessingException {
-        String email = authentication.getPrincipal().toString();
-        return likeService.createAndDeleteLike(likeDto, email);
+    public ResponseEntity<?> createAndDeleteLike(@RequestBody LikeDto likeDto, Authentication authentication) {
+        return likeService.createAndDeleteLike(likeDto, AuthUtil.getEmail(authentication));
     }
 }

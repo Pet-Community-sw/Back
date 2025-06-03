@@ -29,7 +29,7 @@ public class CommentController {
     }
 
     @PostMapping()
-    public CreateCommentResponseDto createComment(@RequestBody CommentDto commentDto, Authentication authentication) throws JsonProcessingException {
+    public CreateCommentResponseDto createComment(@RequestBody CommentDto commentDto, Authentication authentication) {
         return commentService.createComment(commentDto, AuthUtil.getEmail(authentication));
     }
 

@@ -4,14 +4,13 @@ import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.CreateCommentResponseDto;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.commment.UpdateCommentDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public interface CommentService {
-    CreateCommentResponseDto createComment(CommentDto commentDto, String email) throws JsonProcessingException;
+    CreateCommentResponseDto createComment(CommentDto commentDto, String email);
 
     void deleteComment(Long commentId, String email);
 
