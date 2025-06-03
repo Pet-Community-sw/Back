@@ -3,6 +3,7 @@ package com.example.PetApp.service.memberchatRoom;
 import com.example.PetApp.domain.ChatMessage;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.MemberChatRoom;
+import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
 import com.example.PetApp.dto.memberchat.MemberChatRoomsResponseDto;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
@@ -120,9 +121,9 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
         return ResponseEntity.ok().body("삭제 완료.");
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
-    public ResponseEntity<?> getMessages(Long memberChatRoomId, String email, int page) {
+    public ChatMessageResponseDto getMessages(Long memberChatRoomId, String email, int page) {
         Member member = memberRepository.findByEmail(email).get();
         return chattingReader.getMessages(memberChatRoomId, member.getMemberId(), ChatMessage.ChatRoomType.ONE, page);
     }

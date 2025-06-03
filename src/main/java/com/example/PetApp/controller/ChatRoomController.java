@@ -1,12 +1,9 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.domain.ChatMessage;
 import com.example.PetApp.dto.MessageResponse;
-import com.example.PetApp.dto.groupchat.ChatMessageDto;
 import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
 import com.example.PetApp.dto.groupchat.ChatRoomsResponseDto;
 import com.example.PetApp.dto.groupchat.UpdateChatRoomDto;
-import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.chat.ChatRoomService;
 import com.example.PetApp.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.example.PetApp.domain.ChatMessage.*;
 
 
 @RestController

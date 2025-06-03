@@ -1,6 +1,7 @@
 package com.example.PetApp.service.memberchatRoom;
 
 import com.example.PetApp.domain.Member;
+import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,6 @@ public interface MemberChatRoomService {
 
     ResponseEntity<?> deleteMemberChatRoom(Long userChatRoomId, String email);
 
-    ResponseEntity<?> getMessages(Long memberChatRoomId, String email, int page);
+    ChatMessageResponseDto getMessages(Long memberChatRoomId, String email, int page);
 
 }

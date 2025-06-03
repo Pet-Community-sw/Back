@@ -3,6 +3,7 @@ package com.example.PetApp.controller;
 import com.example.PetApp.dto.MessageResponse;
 import com.example.PetApp.dto.chatroom.CreateChatRoomResponseDto;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostDto;
+import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostResponseDto;
 import com.example.PetApp.dto.walkingtogetherpost.GetWalkingTogetherPostResponseDto;
 import com.example.PetApp.dto.walkingtogetherpost.UpdateWalkingTogetherPostDto;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
@@ -25,7 +26,7 @@ public class WalkingTogetherPostController {
 
 
     @GetMapping("/{walkingTogetherPostId}")
-    private ResponseEntity<?> getWalkingTogetherPost(@PathVariable Long walkingTogetherPostId, Authentication authentication) {
+    private GetWalkingTogetherPostResponseDto getWalkingTogetherPost(@PathVariable Long walkingTogetherPostId, Authentication authentication) {
         return walkingTogetherPostService.getWalkingTogetherPost(walkingTogetherPostId, AuthUtil.getProfileId(authentication));
     }
 
@@ -35,7 +36,7 @@ public class WalkingTogetherPostController {
     }
 
     @PostMapping
-    private ResponseEntity<?> createWalkingTogetherPost(@RequestBody CreateWalkingTogetherPostDto createWalkingTogetherPostDto, Authentication authentication) {
+    private CreateWalkingTogetherPostResponseDto createWalkingTogetherPost(@RequestBody CreateWalkingTogetherPostDto createWalkingTogetherPostDto, Authentication authentication) {
         return walkingTogetherPostService.createWalkingTogetherPost(createWalkingTogetherPostDto, AuthUtil.getProfileId(authentication));
     }
 
