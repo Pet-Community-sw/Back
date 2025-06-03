@@ -2,6 +2,7 @@ package com.example.PetApp.dto.groupchat;
 
 import com.example.PetApp.domain.ChatRoom;
 import com.example.PetApp.domain.Profile;
+import com.example.PetApp.dto.profile.ChatRoomProfilesResponseDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -26,7 +27,7 @@ public class ChatRoomsResponseDto {
 
     private LocalDateTime chatRoomTime;
 
-    private Set<Long> profiles = new HashSet<>();
+    private Set<ChatRoomProfilesResponseDto> profiles = new HashSet<>();
 
     private String lastMessage;
 
@@ -45,9 +46,14 @@ public class ChatRoomsResponseDto {
                 .chatLimitCount(chatRoom.getLimitCount())
                 .currentCount(chatRoom.getProfiles().size())
                 .chatRoomTime(chatRoom.getChatRoomTime())
-                .profiles(chatRoom.getProfiles().stream()
-                        .map(Profile::getProfileId) // Profile → ID만 추출
-                        .collect(Collectors.toSet()))
+                .profiles(
+                        chatRoom.getProfiles().stream()
+                                .map(profile -> ChatRoomProfilesResponseDto.builder()
+                                        .profileId(profile.getProfileId())
+                                        .profileImageUrl(profile.getPetImageUrl())
+                                        .build())
+                                .collect(Collectors.toSet())
+                )
                 .lastMessage(lastMessage)
                 .unReadCount(unReadCount)
                 .lastMessageTime(lastMessageTime)

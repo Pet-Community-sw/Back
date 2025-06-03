@@ -40,7 +40,9 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
 
         List<MemberChatRoomsResponseDto> memberChatRoomsResponseDtos = memberChatRooms.stream()
                 .map(memberChatRoom -> {
-                    String roomName = filterMember(memberChatRoom.getMembers(), member).getName();
+                    Member anotherMember = filterMember(memberChatRoom.getMembers(), member);
+                    String roomName = anotherMember.getName();
+                    String roomImageUrl = anotherMember.getMemberImageUrl();
                     String lastMessage = redisTemplate.opsForValue().get("memberChat:lastMessage" + memberChatRoom.getMemberChatRoomId());
                     String count = redisTemplate.opsForValue().get("unReadMemberChat:" + memberChatRoom.getMemberChatRoomId() + ":" + member.getMemberId());
                     String lastMessageTime = redisTemplate.opsForValue().get("memberChat:lastMessageTime:" + memberChatRoom.getMemberChatRoomId());
@@ -51,6 +53,7 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
                             }
                             return MemberChatRoomsResponseDto.builder()
                                     .chatName(roomName)
+                                    .chatImageUrl(roomImageUrl)
                                     .lastMessage(lastMessage)
                                     .unReadCount(unReadCount)
                                     .lastMessageTime(lastMessageLocalDateTime)

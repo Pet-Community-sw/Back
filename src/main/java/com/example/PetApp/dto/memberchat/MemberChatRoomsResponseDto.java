@@ -15,6 +15,8 @@ public class MemberChatRoomsResponseDto {
 
     private String chatName;//상대 memberName
 
+    private String chatImageUrl;//상대 memberImageUrl
+
     private String lastMessage;
 
     private int unReadCount;
