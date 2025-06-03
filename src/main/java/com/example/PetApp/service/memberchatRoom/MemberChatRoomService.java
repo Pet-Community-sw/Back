@@ -2,20 +2,23 @@ package com.example.PetApp.service.memberchatRoom;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
-import org.springframework.http.ResponseEntity;
+import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
+import com.example.PetApp.dto.memberchat.MemberChatRoomsResponseDto;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface MemberChatRoomService {
-    ResponseEntity<?> getMemberChatRooms(String email);
+    List<MemberChatRoomsResponseDto> getMemberChatRooms(String email);
 
-    ResponseEntity<?> createMemberChatRoom(Member fromMember, Member member);
+    CreateMemberChatRoomResponseDto createMemberChatRoom(Member fromMember, Member member);
 
-    ResponseEntity<?> createMemberChatRoom(Long memberId, String email);
+    CreateMemberChatRoomResponseDto createMemberChatRoom(Long memberId, String email);
 
-    ResponseEntity<?> updateMemberChatRoom(Long memberChatRoomId, String userChatRoomName, String email);
+    void updateMemberChatRoom(Long memberChatRoomId, String userChatRoomName, String email);
 
-    ResponseEntity<?> deleteMemberChatRoom(Long userChatRoomId, String email);
+    void deleteMemberChatRoom(Long userChatRoomId, String email);
 
     ChatMessageResponseDto getMessages(Long memberChatRoomId, String email, int page);
 

@@ -1,14 +1,19 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.dto.delegateWalkpost.CreateDelegateWalkPostDto;
-import com.example.PetApp.dto.delegateWalkpost.UpdateDelegateWalkPostDto;
-import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
+import com.example.PetApp.domain.Applicant;
+import com.example.PetApp.dto.MessageResponse;
+import com.example.PetApp.dto.delegateWalkpost.*;
+import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
 import com.example.PetApp.service.walkerpost.DelegateWalkPostService;
+import com.example.PetApp.util.AuthUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,80 +25,68 @@ public class DelegateWalkPostController {
 
     @GetMapping("/check")
     public ResponseEntity<?> checkProfile(Authentication authentication) {
-        return delegateWalkPostService.checkProfile(getProfileId(authentication));
+        return delegateWalkPostService.checkProfile(AuthUtil.getProfileId(authentication));
     }
 
     @PostMapping
-    public ResponseEntity<?> createDelegateWalkPost(@RequestBody CreateDelegateWalkPostDto createDelegateWalkPostDto, Authentication authentication) {
-        return delegateWalkPostService.createDelegateWalkPost(createDelegateWalkPostDto, getProfileId(authentication));
+    public CreateDelegateWalkPostResponseDto createDelegateWalkPost(@RequestBody CreateDelegateWalkPostDto createDelegateWalkPostDto, Authentication authentication) {
+        return delegateWalkPostService.createDelegateWalkPost(createDelegateWalkPostDto, AuthUtil.getProfileId(authentication));
     }
 
     @PostMapping("/{delegateWalkPostId}")
-    public ResponseEntity<?> applyToDelegateWalkPost(@PathVariable Long delegateWalkPostId,
+    public ApplyToDelegateWalkPostResponseDto applyToDelegateWalkPost(@PathVariable Long delegateWalkPostId,
                                                @RequestBody String content,
                                                Authentication authentication) {
-        return delegateWalkPostService.applyToDelegateWalkPost(delegateWalkPostId, content, getEmail(authentication));
+        return delegateWalkPostService.applyToDelegateWalkPost(delegateWalkPostId, content, AuthUtil.getEmail(authentication));
     }
 
     @GetMapping("/by-location")
-    public ResponseEntity<?> getDelegateWalkPostsByLocation(@RequestParam Double minLongitude,
-                                            @RequestParam Double minLatitude,
-                                            @RequestParam Double maxLongitude,
-                                            @RequestParam Double maxLatitude,
-                                            Authentication authentication) {
-        String email = getEmail(authentication);
-        return delegateWalkPostService.getDelegateWalkPostsByLocation(minLongitude, minLatitude, maxLongitude, maxLatitude, email);
+    public List<GetDelegateWalkPostsResponseDto> getDelegateWalkPostsByLocation(@RequestParam Double minLongitude,
+                                                                                @RequestParam Double minLatitude,
+                                                                                @RequestParam Double maxLongitude,
+                                                                                @RequestParam Double maxLatitude,
+                                                                                Authentication authentication) {
+        return delegateWalkPostService.getDelegateWalkPostsByLocation(minLongitude, minLatitude, maxLongitude, maxLatitude,AuthUtil.getEmail(authentication));
     }
 
     @GetMapping("/by-place")
-    public ResponseEntity<?> getDelegateWalkPostsByPlace(@RequestParam Double longitude,
-                                            @RequestParam Double latitude,
-                                            Authentication authentication) {
-        String email = getEmail(authentication);
-        return delegateWalkPostService.getDelegateWalkPostsByPlace(longitude, latitude, email);
+    public List<GetDelegateWalkPostsResponseDto> getDelegateWalkPostsByPlace(@RequestParam Double longitude,
+                                                                             @RequestParam Double latitude,
+                                                                             Authentication authentication) {
+        return delegateWalkPostService.getDelegateWalkPostsByPlace(longitude, latitude, AuthUtil.getEmail(authentication));
     }
 
     @GetMapping("/{delegateWalkPostId}")
-    public ResponseEntity<?> getDelegateWalkPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
-        String email = getEmail(authentication);
-        return delegateWalkPostService.getDelegateWalkPost(delegateWalkPostId, email);
+    public GetPostResponseDto getDelegateWalkPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
+        return delegateWalkPostService.getDelegateWalkPost(delegateWalkPostId, AuthUtil.getEmail(authentication));
     }
 
     @GetMapping("/applicants/{delegateWalkPostId}")
-    public ResponseEntity<?> getApplicants(@PathVariable Long delegateWalkPostId, Authentication authentication) {
-        return delegateWalkPostService.getApplicants(delegateWalkPostId, getProfileId(authentication));
+    public Set<Applicant> getApplicants(@PathVariable Long delegateWalkPostId, Authentication authentication) {
+        return delegateWalkPostService.getApplicants(delegateWalkPostId, AuthUtil.getProfileId(authentication));
     }
 
+
+    @PutMapping("/start-authorized/{delegateWalkPostId}")//산책 시작권한을 줌.
+    public ResponseEntity<MessageResponse> grantAuthorize(@PathVariable Long delegateWalkPostId, Authentication authentication) {
+        return delegateWalkPostService.grantAuthorize(delegateWalkPostId, AuthUtil.getProfileId(authentication));
+    }
 
     @PutMapping("/{delegateWalkPostId}")
-    public ResponseEntity<?> updateDelegateWalkPost(@PathVariable Long delegateWalkPostId, @RequestBody UpdateDelegateWalkPostDto updateDelegateWalkPostDto, Authentication authentication) {
-        String email = getEmail(authentication);
-        return delegateWalkPostService.updateDelegateWalkPost(delegateWalkPostId, updateDelegateWalkPostDto, email);
-    }
-
-    @PutMapping("/start-authorized/{delegateWalkPostId}")
-    public ResponseEntity<?> updateDelegateWalkPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
-        return delegateWalkPostService.updateStartDelegateWalkPost(delegateWalkPostId, getProfileId(authentication));
+    public ResponseEntity<MessageResponse> updateDelegateWalkPost(@PathVariable Long delegateWalkPostId, @RequestBody UpdateDelegateWalkPostDto updateDelegateWalkPostDto, Authentication authentication) {
+        delegateWalkPostService.updateDelegateWalkPost(delegateWalkPostId, updateDelegateWalkPostDto, AuthUtil.getEmail(authentication));
+        return ResponseEntity.ok(new MessageResponse("수정 되었습니다."));
     }
 
     @DeleteMapping("/{delegateWalkPostId}")
-    public ResponseEntity<?> deleteDelegateWalkPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
-        String email = getEmail(authentication);
-        return delegateWalkPostService.deleteDelegateWalkPost(delegateWalkPostId, email);
+    public ResponseEntity<MessageResponse> deleteDelegateWalkPost(@PathVariable Long delegateWalkPostId, Authentication authentication) {
+        delegateWalkPostService.deleteDelegateWalkPost(delegateWalkPostId, AuthUtil.getEmail(authentication));
+        return ResponseEntity.ok(new MessageResponse("삭제 되었습니다."));
     }
 
     @PostMapping("/select-applicant/{delegateWalkPostId}")
-    public ResponseEntity<?> selectApplicant(@PathVariable Long delegateWalkPostId, @RequestBody Long memberId, Authentication authentication) throws JsonProcessingException {
-        return delegateWalkPostService.selectApplicant(delegateWalkPostId, memberId, getEmail(authentication));
+    public CreateMemberChatRoomResponseDto selectApplicant(@PathVariable Long delegateWalkPostId, @RequestBody Long memberId, Authentication authentication) throws JsonProcessingException {
+        return delegateWalkPostService.selectApplicant(delegateWalkPostId, memberId, AuthUtil.getEmail(authentication));
     }
 
-
-    private static String getEmail(Authentication authentication) {
-        return authentication.getPrincipal().toString();
-    }
-
-    private static Long getProfileId(Authentication authentication) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
-        return jwtAuthenticationToken.getProfileId();
-    }
 }

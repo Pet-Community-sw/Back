@@ -4,23 +4,23 @@ import com.example.PetApp.domain.ChatMessage;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.MemberChatRoom;
 import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
+import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
 import com.example.PetApp.dto.memberchat.MemberChatRoomsResponseDto;
+import com.example.PetApp.exception.ConflictException;
+import com.example.PetApp.exception.ForbiddenException;
+import com.example.PetApp.exception.NotFoundException;
+import com.example.PetApp.mapper.MemberChatRoomMapper;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.service.chat.ChattingReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,13 +33,13 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
     private final StringRedisTemplate redisTemplate;
     private final ChattingReader chattingReader;
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
-    public ResponseEntity<?> getMemberChatRooms(String email) {
+    public List<MemberChatRoomsResponseDto> getMemberChatRooms(String email) {
         Member member = memberRepository.findByEmail(email).get();
         List<MemberChatRoom> memberChatRooms = memberChatRoomRepository.findAllByMembersContains(member);
 
-        List<MemberChatRoomsResponseDto> memberChatRoomsResponseDtos = memberChatRooms.stream()
+        return memberChatRooms.stream()
                 .map(memberChatRoom -> {
                     Member anotherMember = filterMember(memberChatRoom.getMembers(), member);
                     String roomName = anotherMember.getName();
@@ -47,78 +47,57 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
                     String lastMessage = redisTemplate.opsForValue().get("memberChat:lastMessage" + memberChatRoom.getMemberChatRoomId());
                     String count = redisTemplate.opsForValue().get("unReadMemberChat:" + memberChatRoom.getMemberChatRoomId() + ":" + member.getMemberId());
                     String lastMessageTime = redisTemplate.opsForValue().get("memberChat:lastMessageTime:" + memberChatRoom.getMemberChatRoomId());
-                            int unReadCount = count != null ? Integer.parseInt(count) : 0;
-                            LocalDateTime lastMessageLocalDateTime = null;
-                            if (lastMessageTime != null) {
-                                lastMessageLocalDateTime = LocalDateTime.parse(lastMessageTime);
-                            }
-                            return MemberChatRoomsResponseDto.builder()
-                                    .chatName(roomName)
-                                    .chatImageUrl(roomImageUrl)
-                                    .lastMessage(lastMessage)
-                                    .unReadCount(unReadCount)
-                                    .lastMessageTime(lastMessageLocalDateTime)
-                                    .build();
+                    return MemberChatRoomMapper.toMemberChatRoomsResponseDto(roomName, roomImageUrl, lastMessage, count, lastMessageTime);
                 }).collect(Collectors.toList());
-        return ResponseEntity.ok(memberChatRoomsResponseDtos);
-
     }
 
     @Transactional
     @Override
-    public ResponseEntity<?> createMemberChatRoom(Member fromMember, Member member) {//방 제목을 어떻게 할까
+    public CreateMemberChatRoomResponseDto createMemberChatRoom(Member fromMember, Member member) {//방 제목을 어떻게 할까 대리 산책자 구인했을 때 채팅방
+        MemberChatRoom memberChatRoom = getMemberChatRoom(fromMember, member);
+        MemberChatRoom newMemberChatRoom = memberChatRoomRepository.save(memberChatRoom);
+        return new CreateMemberChatRoomResponseDto(newMemberChatRoom.getMemberChatRoomId());
+    }
+
+    @Transactional
+    @Override
+    public CreateMemberChatRoomResponseDto createMemberChatRoom(Long memberId, String email) {
+        Member fromMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다."));
+        Member member = memberRepository.findByEmail(email).get();
+        if (memberChatRoomRepository.existsByMembers(fromMember, member)) {
+            throw new ConflictException("이미 있는 방입니다.");
+        }
+        MemberChatRoom memberChatRoom = getMemberChatRoom(fromMember, member);
+        MemberChatRoom newMemberChatRoom = memberChatRoomRepository.save(memberChatRoom);
+        return new CreateMemberChatRoomResponseDto(newMemberChatRoom.getMemberChatRoomId());
+    }
+
+    private static MemberChatRoom getMemberChatRoom(Member fromMember, Member member) {
         List<Member> members = new ArrayList<>();
         members.add(fromMember);
         members.add(member);
-        MemberChatRoom memberChatRoom = MemberChatRoom.builder()
+        return MemberChatRoom.builder()
                 .members(members)
                 .build();
-        MemberChatRoom newMemberChatRoom = memberChatRoomRepository.save(memberChatRoom);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("memberChatRoomId", newMemberChatRoom.getMemberChatRoomId()));
     }
 
     @Transactional
     @Override
-    public ResponseEntity<?> createMemberChatRoom(Long memberId, String email) {
-        Optional<Member> fromMember = memberRepository.findById(memberId);
-        if (fromMember.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FOUND).body("해당 유저를 찾을 수 없습니다.");
-        }
+    public void updateMemberChatRoom(Long memberChatRoomId, String userChatRoomName, String email) {
+        //여기에 무엇을
+    }
+
+    @Transactional
+    @Override
+    public void deleteMemberChatRoom(Long memberChatRoomId, String email) {
         Member member = memberRepository.findByEmail(email).get();
-        if (memberChatRoomRepository.existsByMembers(fromMember.get(), member)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 있는 방입니다.");
-        }
-
-        List<Member> members = new ArrayList<>();
-        members.add(fromMember.get());
-        members.add(member);
-        MemberChatRoom memberChatRoom = MemberChatRoom.builder()
-                .members(members)
-                .build();
-        MemberChatRoom newMemberChatRoom = memberChatRoomRepository.save(memberChatRoom);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("memberChatRoomId", newMemberChatRoom.getMemberChatRoomId()));
-    }
-
-    @Transactional
-    @Override
-    public ResponseEntity<?> updateMemberChatRoom(Long memberChatRoomId, String userChatRoomName, String email) {
-
-        return null;
-    }
-
-    @Transactional
-    @Override
-    public ResponseEntity<?> deleteMemberChatRoom(Long memberChatRoomId, String email) {
-        Member member = memberRepository.findByEmail(email).get();
-        Optional<MemberChatRoom> memberChatRoom = memberChatRoomRepository.findById(memberChatRoomId);
-        if (memberChatRoom.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 방을 찾을 수 없습니다.");
-        }
-        if (!(memberChatRoom.get().getMembers().contains(member))) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
+        MemberChatRoom memberChatRoom = memberChatRoomRepository.findById(memberChatRoomId)
+                .orElseThrow(() -> new NotFoundException("해당 채팅방을 찾을 수 없습니다."));
+        if (!(memberChatRoom.getMembers().contains(member))) {
+            throw new ForbiddenException("권한이 없습니다.");
         }
         memberChatRoomRepository.deleteById(memberChatRoomId);
-        return ResponseEntity.ok().body("삭제 완료.");
     }
 
     @Transactional(readOnly = true)

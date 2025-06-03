@@ -1,32 +1,35 @@
 package com.example.PetApp.service.walkerpost;
 
-import com.example.PetApp.dto.delegateWalkpost.CreateDelegateWalkPostDto;
-import com.example.PetApp.dto.delegateWalkpost.UpdateDelegateWalkPostDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.PetApp.domain.Applicant;
+import com.example.PetApp.dto.delegateWalkpost.*;
+import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
+
 @Service
 public interface DelegateWalkPostService {
-    ResponseEntity<?> createDelegateWalkPost(CreateDelegateWalkPostDto createDelegateWalkPostDto, Long profileId);
+    CreateDelegateWalkPostResponseDto createDelegateWalkPost(CreateDelegateWalkPostDto createDelegateWalkPostDto, Long profileId);
 
-    ResponseEntity<?> applyToDelegateWalkPost(Long delegateWalkPostId, String content, String email);
+    ApplyToDelegateWalkPostResponseDto applyToDelegateWalkPost(Long delegateWalkPostId, String content, String email);
 
-    ResponseEntity<?> getDelegateWalkPostsByLocation(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, String email);
+    List<GetDelegateWalkPostsResponseDto> getDelegateWalkPostsByLocation(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, String email);
 
-    ResponseEntity<?> getDelegateWalkPostsByPlace(Double longitude, Double latitude, String email);
+    List<GetDelegateWalkPostsResponseDto> getDelegateWalkPostsByPlace(Double longitude, Double latitude, String email);
 
-    ResponseEntity<?> getDelegateWalkPost(Long delegateWalkPostId, String email);
+    GetPostResponseDto getDelegateWalkPost(Long delegateWalkPostId, String email);
 
-    ResponseEntity<?> updateDelegateWalkPost(Long delegateWalkPostId, UpdateDelegateWalkPostDto updateDelegateWalkPostDto, String email);
+    void updateDelegateWalkPost(Long delegateWalkPostId, UpdateDelegateWalkPostDto updateDelegateWalkPostDto, String email);
 
-    ResponseEntity<?> deleteDelegateWalkPost(Long delegateWalkPostId, String email);
+    void deleteDelegateWalkPost(Long delegateWalkPostId, String email);
 
-    ResponseEntity<?> getApplicants(Long delegateWalkPostId, Long profileId);
+    Set<Applicant> getApplicants(Long delegateWalkPostId, Long profileId);
 
     ResponseEntity<?> checkProfile(Long profileId);
 
-    ResponseEntity<?> selectApplicant(Long delegateWalkPostId, Long memberId, String email);
+    CreateMemberChatRoomResponseDto selectApplicant(Long delegateWalkPostId, Long memberId, String email);
 
-    ResponseEntity<?> updateStartDelegateWalkPost(Long delegateWalkPostId, Long profileId);
+    ResponseEntity<?> grantAuthorize(Long delegateWalkPostId, Long profileId);
 }
