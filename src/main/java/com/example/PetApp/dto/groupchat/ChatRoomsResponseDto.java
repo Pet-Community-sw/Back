@@ -38,31 +38,4 @@ public class ChatRoomsResponseDto {
     private boolean isOwner;
 
 
-
-    public static ChatRoomsResponseDto from(ChatRoom chatRoom, Long profileId, String lastMessage, int unReadCount, LocalDateTime lastMessageTime) {
-        return ChatRoomsResponseDto.builder()
-                .chatRoomId(chatRoom.getChatRoomId())
-                .chatName(chatRoom.getName())
-                .chatLimitCount(chatRoom.getLimitCount())
-                .currentCount(chatRoom.getProfiles().size())
-                .chatRoomTime(chatRoom.getChatRoomTime())
-                .profiles(
-                        chatRoom.getProfiles().stream()
-                                .map(profile -> ChatRoomProfilesResponseDto.builder()
-                                        .profileId(profile.getProfileId())
-                                        .profileImageUrl(profile.getPetImageUrl())
-                                        .build())
-                                .collect(Collectors.toSet())
-                )
-                .lastMessage(lastMessage)
-                .unReadCount(unReadCount)
-                .lastMessageTime(lastMessageTime)
-                .isOwner(isCheck(chatRoom, profileId))
-                .build();
-    }
-
-    private static boolean isCheck(ChatRoom chatRoom, Long profileId) {
-        return chatRoom.getWalkingTogetherPost().getProfile().getProfileId().equals(profileId);
-    }
-
 }

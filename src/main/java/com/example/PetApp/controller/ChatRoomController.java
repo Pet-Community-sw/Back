@@ -1,13 +1,20 @@
 package com.example.PetApp.controller;
 
 import com.example.PetApp.domain.ChatMessage;
+import com.example.PetApp.dto.MessageResponse;
+import com.example.PetApp.dto.groupchat.ChatMessageDto;
+import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
+import com.example.PetApp.dto.groupchat.ChatRoomsResponseDto;
 import com.example.PetApp.dto.groupchat.UpdateChatRoomDto;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.chat.ChatRoomService;
+import com.example.PetApp.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.example.PetApp.domain.ChatMessage.*;
 
@@ -20,35 +27,27 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     //변경해야됩니다. jwt토큰에 profileId집어 넣었어요
     @GetMapping()
-    private ResponseEntity<?> chatRoomList(Authentication authentication) {
-        Long profileId = getProfileId( authentication);
-        return chatRoomService.getChatRooms(profileId);
+    private List<ChatRoomsResponseDto> chatRoomList(Authentication authentication) {
+        return chatRoomService.getChatRooms(AuthUtil.getProfileId(authentication));
     }
 
     @GetMapping("/{chatRoomId}")
-    private ResponseEntity<?> getMessages(@PathVariable Long chatRoomId,
-                                          @RequestParam(defaultValue = "0") int page,
-                                          Authentication authentication
+    private ChatMessageResponseDto getMessages(@PathVariable Long chatRoomId,
+                                               @RequestParam(defaultValue = "0") int page,
+                                               Authentication authentication
     ) {
-        Long profileId = getProfileId( authentication);
-        return chatRoomService.getMessages(chatRoomId, profileId, page);
+        return chatRoomService.getMessages(chatRoomId, AuthUtil.getProfileId(authentication), page);
     }
 
     @PutMapping("/{chatRoomId}")
-    private ResponseEntity<?> updateChatRoom(@PathVariable Long chatRoomId, @RequestBody UpdateChatRoomDto updateChatRoomDto, Authentication authentication) {
-        Long profileId = getProfileId( authentication);
-        return chatRoomService.updateChatRoom(chatRoomId, updateChatRoomDto, profileId);
+    private ResponseEntity<MessageResponse> updateChatRoom(@PathVariable Long chatRoomId, @RequestBody UpdateChatRoomDto updateChatRoomDto, Authentication authentication) {
+        chatRoomService.updateChatRoom(chatRoomId, updateChatRoomDto, AuthUtil.getProfileId(authentication));
+        return ResponseEntity.ok(new MessageResponse("수정 되었습니다."));
     }
 
     @DeleteMapping("/{chatRoomId}")
-    private ResponseEntity<?> deleteChatRoom(@PathVariable Long chatRoomId, Authentication authentication) {
-        Long profileId = getProfileId(authentication);
-        return chatRoomService.deleteChatRoom(chatRoomId, profileId);
-    }
-
-    private static Long getProfileId(Authentication authentication) {
-
-        JwtAuthenticationToken authentication1 = (JwtAuthenticationToken) authentication;
-        return Long.valueOf(authentication1.getProfileId().toString());
+    private ResponseEntity<MessageResponse> deleteChatRoom(@PathVariable Long chatRoomId, Authentication authentication) {
+        chatRoomService.deleteChatRoom(chatRoomId, AuthUtil.getProfileId(authentication));
+        return ResponseEntity.ok(new MessageResponse("삭제 되었습니다."));
     }
 }

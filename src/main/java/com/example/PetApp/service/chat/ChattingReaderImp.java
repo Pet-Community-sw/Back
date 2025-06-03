@@ -4,6 +4,9 @@ import com.example.PetApp.domain.*;
 import com.example.PetApp.dto.groupchat.ChatMessageDto;
 import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
 import com.example.PetApp.dto.groupchat.UpdateChatUnReadCountDto;
+import com.example.PetApp.exception.ForbiddenException;
+import com.example.PetApp.exception.NotFoundException;
+import com.example.PetApp.mapper.ChatRoomMapper;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
@@ -20,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,52 +42,61 @@ public class ChattingReaderImp implements ChattingReader{
     private final ChatMessageRepository chatMessageRepository;
 
 
-    @Transactional
     @Override
-    public ResponseEntity<?> getMessages(Long chatRoomId, Long userId, ChatMessage.ChatRoomType chatRoomType, int page) {
+    public ChatMessageResponseDto getMessages(Long chatRoomId, Long userId, ChatMessage.ChatRoomType chatRoomType, int page) {
         log.info("getMessages 요청 chatRoomId : {}, userId :{}, chatRoomType : {}", chatRoomId, userId, chatRoomType);
-        Pageable pageRequest = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "messageTime"));
-        String key = null;
-        if (chatRoomType == ChatMessage.ChatRoomType.MANY) {
-            Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
-            Optional<Profile> profile = profileRepository.findById(userId);
-            if (chatRoom.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 채팅방이 없습니다.");
-            } else if (profile.isEmpty() || !(chatRoom.get().getProfiles().contains(profile.get()))) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-            }
-            key = "unReadChatCount:" + chatRoomId + ":" + userId;
-        } else if (chatRoomType == ChatMessage.ChatRoomType.ONE) {
-            Optional<MemberChatRoom> memberChatRoom = memberChatRoomRepository.findById(chatRoomId);
-            Optional<Member> member = memberRepository.findById(userId);
-            if (memberChatRoom.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 채팅방이 없습니다.");
-            } else if (member.isEmpty() || !(memberChatRoom.get().getMembers().contains(member.get()))) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-            }
-            key = "unReadMemberChatCount:" + chatRoomId + ":" + userId;
-        }
 
-        redisTemplate.delete(key);
+        validateUserInChatRoom(chatRoomId, userId, chatRoomType);
+
+        String unreadKey = makeUnreadKey(chatRoomId, userId, chatRoomType);
+        redisTemplate.delete(unreadKey);
+
+        Pageable pageRequest = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "messageTime"));
         Page<ChatMessage> messages = chatMessageRepository.findAllByChatRoomIdAndChatRoomType(chatRoomId, chatRoomType, pageRequest);
 
-        List<ChatMessage> content = messages.getContent();
+        updateProfilesForMessages(messages.getContent(), userId);
 
-        for (ChatMessage chatMessage : content) {
+        List<ChatMessageDto> chatMessageDtos = ChatRoomMapper.toChatMessageDtos(messages.getContent());
+
+        return new ChatMessageResponseDto(chatRoomId, chatMessageDtos);
+    }
+
+
+    private void validateUserInChatRoom(Long chatRoomId, Long userId, ChatMessage.ChatRoomType chatRoomType) {
+        if (chatRoomType == ChatMessage.ChatRoomType.MANY) {
+            ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                    .orElseThrow(() -> new NotFoundException("해당 채팅방이 없습니다."));
+            Profile profile = profileRepository.findById(userId)
+                    .orElseThrow(() -> new ForbiddenException("프로필 설정 해주세요."));
+            if (!chatRoom.getProfiles().contains(profile)) {
+                throw new ForbiddenException("권한이 없습니다.");
+            }
+        } else if (chatRoomType == ChatMessage.ChatRoomType.ONE) {
+            MemberChatRoom memberChatRoom = memberChatRoomRepository.findById(chatRoomId)
+                    .orElseThrow(() -> new NotFoundException("해당 채팅방이 없습니다."));
+            Member member = memberRepository.findById(userId)
+                    .orElseThrow(() -> new NotFoundException("해당 회원이 없습니다."));
+            if (!memberChatRoom.getMembers().contains(member)) {
+                throw new ForbiddenException("권한이 없습니다.");
+            }
+        } else {
+            throw new IllegalArgumentException("지원하지 않는 채팅방 타입입니다.");
+        }
+    }
+
+    private String makeUnreadKey(Long chatRoomId, Long userId, ChatMessage.ChatRoomType chatRoomType) {
+        if (chatRoomType == ChatMessage.ChatRoomType.MANY) {
+            return "unReadChatCount:" + chatRoomId + ":" + userId;
+        } else if (chatRoomType == ChatMessage.ChatRoomType.ONE) {
+            return "unReadMemberChatCount:" + chatRoomId + ":" + userId;
+        }
+        throw new IllegalArgumentException("지원하지 않는 채팅방 타입입니다.");
+    }
+
+    private void updateProfilesForMessages(List<ChatMessage> messages, Long userId) {
+        for (ChatMessage chatMessage : messages) {
             updateChatMessageProfile(chatMessage, userId);
         }
-        List<ChatMessageDto> chatMessageDtos = content.stream()
-                .map(chatMessage -> new ChatMessageDto(
-                        chatMessage.getSenderId(),
-                        chatMessage.getSenderName(),
-                        chatMessage.getSenderImageUrl(),
-                        chatMessage.getMessage(),
-                        chatMessage.getChatUnReadCount(),
-                        chatMessage.getMessageTime()
-                ))
-                .collect(Collectors.toList());
-        ChatMessageResponseDto messagesList = new ChatMessageResponseDto(chatRoomId, chatMessageDtos);
-        return ResponseEntity.ok(messagesList);
     }
 
     public void updateChatMessageProfile(ChatMessage chatMessage, Long currentUserId) {
@@ -103,12 +114,9 @@ public class ChattingReaderImp implements ChattingReader{
 
         chatMessageRepository.save(chatMessage);//카톡처럼 많은 트래픽이 발생안할것같아 이렇게함.
 
-        UpdateChatUnReadCountDto updateChatUnReadDto=UpdateChatUnReadCountDto.builder()
-                .chatRoomId(chatMessage.getChatRoomId())
-                .id(chatMessage.getId())
-                .chatUnReadCount(chatMessage.getChatUnReadCount())
-                .build();
-        simpMessagingTemplate.convertAndSend("/sub/chat/update/unReadCount", updateChatUnReadDto);//깃에 작성해야됨.
+        UpdateChatUnReadCountDto updateChatUnReadCountDto = ChatRoomMapper.toUpdateChatUnReadCountDto(chatMessage);
+
+        simpMessagingTemplate.convertAndSend("/sub/chat/update/unReadCount", updateChatUnReadCountDto);//깃에 작성해야됨.
         //이거 api명세서 작성해야됨. 안읽은 수 처리.
     }
 }

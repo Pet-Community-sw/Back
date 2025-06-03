@@ -1,30 +1,24 @@
 package com.example.PetApp.service.chat;
 
 import com.example.PetApp.domain.*;
+import com.example.PetApp.dto.chatroom.CreateChatRoomResponseDto;
 import com.example.PetApp.dto.groupchat.*;
+import com.example.PetApp.exception.ConflictException;
+import com.example.PetApp.exception.ForbiddenException;
+import com.example.PetApp.exception.NotFoundException;
+import com.example.PetApp.mapper.ChatRoomMapper;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
-import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
-import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.example.PetApp.domain.ChatMessage.*;
@@ -41,69 +35,34 @@ public class ChatRoomServiceImp implements ChatRoomService {
     private final ChattingReader chattingReader;
 
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
-    public ResponseEntity<?> getChatRooms(Long profileId) {
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("권한이 없습니다.");
-        }
-        Set<ChatRoom> chatRoomList = chatRoomRepository.findAllByProfilesContains(profile.get());
-        List<ChatRoomsResponseDto> chatRoomsResponseDtos = chatRoomList.stream().map(chatRoom -> {
-            String lastMessage = redisTemplate.opsForValue().get("chat:lastMessage" + chatRoom.getChatRoomId());
-            String lastMessageTime = redisTemplate.opsForValue().get("chat:lastMessageTime" + chatRoom.getChatRoomId());
-            String count = redisTemplate.opsForValue().get("unRead:" + chatRoom.getChatRoomId() + ":" + profileId);
-            int unReadCount = count != null ? Integer.parseInt(count) : 0;
-            LocalDateTime lastMessageLocalDateTime = null;
-            if (lastMessageTime != null) {
-                lastMessageLocalDateTime = LocalDateTime.parse(lastMessageTime);
-            }
-            return ChatRoomsResponseDto.from(chatRoom, profile.get().getProfileId(), lastMessage, unReadCount, lastMessageLocalDateTime);
-        }).collect(Collectors.toList());
-        return ResponseEntity.ok(chatRoomsResponseDtos);
+    public List<ChatRoomsResponseDto> getChatRooms(Long profileId) {
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new ForbiddenException("권한이 없습니다."));
+        List<ChatRoom> chatRoomList = chatRoomRepository.findAllByProfilesContains(profile);
+        return chatRoomList.stream()
+                .map(chatRoom -> toChatRoomsResponseDtoWithRedis(chatRoom, profile.getProfileId()))
+                .collect(Collectors.toList());
     }
+
 
     @Transactional
     @Override
-    public ResponseEntity<?> createChatRoom(WalkingTogetherPost walkingTogetherPost, Profile profile) {
+    public CreateChatRoomResponseDto createChatRoom(WalkingTogetherPost walkingTogetherPost, Profile profile) {
         Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByWalkingTogetherPost(walkingTogetherPost);
         if (chatRoom2.isEmpty()) {//채팅방이 없으면 새로운생성 있으면 profiles에 신청자 Profile 추가
-            ChatRoom chatRoom = ChatRoom.builder()
-                    .name(walkingTogetherPost.getProfile().getPetName()+"님의 방")
-                    .limitCount(walkingTogetherPost.getLimitCount())//나중에 게시물에서 인원 수를 고정.
-                    .walkingTogetherPost(walkingTogetherPost)
-                    //이게 수정에서 가능하려나?
-                    .build();
-            chatRoom.addProfiles(walkingTogetherPost.getProfile());//글 작성자.
-            chatRoom.addProfiles(profile);//신청하는사람.
+            ChatRoom chatRoom = ChatRoomMapper.toEntity(walkingTogetherPost, profile);
             ChatRoom chatRoom1 = chatRoomRepository.save(chatRoom);
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("chatRoomId",chatRoom1.getChatRoomId()));
+            return new CreateChatRoomResponseDto(chatRoom1.getChatRoomId(), true);
         } else {
             if (walkingTogetherPost.getLimitCount() <= chatRoom2.get().getProfiles().size()) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("인원초과");//채팅방 limitCount설정.
+                throw new ConflictException("인원초과");//채팅방 limitCount설정.
             }
             ChatRoom chatRoom = chatRoom2.get();
             chatRoom.addProfiles(profile);
-            return ResponseEntity.ok().build();
+            return new CreateChatRoomResponseDto(chatRoom.getChatRoomId(), false);
         }
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<?> deleteChatRoom(Long chatRoomId, Long profileId) {
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        ChatRoom chatRoom1 = chatRoom.get();
-        List<Profile> profiles = chatRoom1.getProfiles();
-        profiles.remove(profile.get());
-        chatRoom1.setProfiles(profiles);//방 사용자 수가 1이되면 채팅방 전체 삭제.
-        if (chatRoomRepository.countByProfile(chatRoomId) == 1) {
-            profiles.clear();
-            chatRoom1.setProfiles(profiles);//여기까지되는데
-            chatMessageRepository.deleteByChatRoomId(chatRoomId);//채팅방 삭제.
-            chatRoomRepository.deleteByChatRoom(chatRoomId);//이게 왜안되는교?
-        }
-        return ResponseEntity.ok().body("삭제 되었습니다.");
     }
 
     @Override
@@ -118,26 +77,53 @@ public class ChatRoomServiceImp implements ChatRoomService {
     }
 
     @Transactional
-    @Override//방장만 수정할 수 있도록 설정.
-    public ResponseEntity<?> updateChatRoom(Long chatRoomId, UpdateChatRoomDto updateChatRoomDto, Long profileId) {
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatRoomId);
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (chatRoom.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 채팅방이 없습니다.");
+    @Override
+    public void deleteChatRoom(Long chatRoomId, Long profileId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new NotFoundException("해당 채팅방은 없습니다."));
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new ForbiddenException("프로필 등록해주세요."));
+        List<Profile> profiles = chatRoom.getProfiles();
+        if (!(profiles.contains(profile))) {
+            throw new ForbiddenException("권한이 없습니다.");
         }
-        if (profile.isEmpty()||!(chatRoom.get().getWalkingTogetherPost().getProfile().getProfileId().equals(profile.get().getProfileId()))) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
+        profiles.remove(profile);
+        chatRoom.setProfiles(profiles);//방 사용자 수가 1이되면 채팅방 전체 삭제.
+        if (chatRoomRepository.countByProfile(chatRoomId) <= 1) {
+            chatMessageRepository.deleteByChatRoomId(chatRoomId);//채팅방 메시지 삭제.
+            chatRoomRepository.deleteByChatRoom(chatRoomId);//이게 왜안되는교?
         }
-        ChatRoom chatRoom1 = chatRoom.get();
-        chatRoom1.setName(updateChatRoomDto.getChatRoomName());
-        chatRoom1.setLimitCount(updateChatRoomDto.getLimitCount());
-        return ResponseEntity.ok().body("수정 되었습니다.");
     }
 
     @Transactional
+    @Override//방장만 수정할 수 있도록 설정.
+    public void updateChatRoom(Long chatRoomId, UpdateChatRoomDto updateChatRoomDto, Long profileId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new NotFoundException("해당 채팅방은 없습니다."));
+        Profile profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new ForbiddenException("프로필 등록해주세요."));
+        if (!(chatRoom.getWalkingTogetherPost().getProfile().getProfileId().equals(profile.getProfileId()))) {
+            throw new ForbiddenException("수정 권한이 없습니다.");
+        }
+        chatRoom.setName(updateChatRoomDto.getChatRoomName());
+        chatRoom.setLimitCount(updateChatRoomDto.getLimitCount());
+    }
+
+    @Transactional(readOnly = true)
     @Override
-    public ResponseEntity<?> getMessages(Long chatRoomId, Long userId, int page) {
+    public ChatMessageResponseDto getMessages(Long chatRoomId, Long userId, int page) {
         return chattingReader.getMessages(chatRoomId, userId, ChatRoomType.MANY, page);
     }
 
+    private ChatRoomsResponseDto toChatRoomsResponseDtoWithRedis(ChatRoom chatRoom, Long profileId) {
+        String lastMessage = redisTemplate.opsForValue().get("chat:lastMessage" + chatRoom.getChatRoomId());
+        String lastMessageTime = redisTemplate.opsForValue().get("chat:lastMessageTime" + chatRoom.getChatRoomId());
+        String count = redisTemplate.opsForValue().get("unRead:" + chatRoom.getChatRoomId() + ":" + profileId);
+        int unReadCount = count != null ? Integer.parseInt(count) : 0;
+        LocalDateTime lastMessageLocalDateTime = null;
+        if (lastMessageTime != null) {
+            lastMessageLocalDateTime = LocalDateTime.parse(lastMessageTime);
+        }
+        return ChatRoomMapper.toChatRoomsResponseDto(chatRoom, profileId, lastMessage, unReadCount, lastMessageLocalDateTime);
+    }
 }

@@ -1,13 +1,12 @@
 package com.example.PetApp.service.chat;
 
-import com.example.PetApp.domain.ChatMessage;
-import org.springframework.http.ResponseEntity;
+import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
 import org.springframework.stereotype.Service;
 
 import static com.example.PetApp.domain.ChatMessage.*;
 
 @Service
 public interface ChattingReader  {
-    ResponseEntity<?> getMessages(Long chatRoomId, Long userId, ChatRoomType chatRoomType, int page);
+    ChatMessageResponseDto getMessages(Long chatRoomId, Long userId, ChatRoomType chatRoomType, int page);
 
 }

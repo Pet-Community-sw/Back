@@ -1,13 +1,20 @@
 package com.example.PetApp.controller;
 
+import com.example.PetApp.dto.MessageResponse;
+import com.example.PetApp.dto.chatroom.CreateChatRoomResponseDto;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostDto;
+import com.example.PetApp.dto.walkingtogetherpost.GetWalkingTogetherPostResponseDto;
 import com.example.PetApp.dto.walkingtogetherpost.UpdateWalkingTogetherPostDto;
 import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.walkingtogetherpost.WalkingTogetherPostService;
+import com.example.PetApp.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,41 +26,41 @@ public class WalkingTogetherPostController {
 
     @GetMapping("/{walkingTogetherPostId}")
     private ResponseEntity<?> getWalkingTogetherPost(@PathVariable Long walkingTogetherPostId, Authentication authentication) {
-        Long profileId = getProfileId(authentication);
-        return walkingTogetherPostService.getWalkingTogetherPost(walkingTogetherPostId, profileId);
+        return walkingTogetherPostService.getWalkingTogetherPost(walkingTogetherPostId, AuthUtil.getProfileId(authentication));
     }
 
     @GetMapping("/by-recommend-route-post/{recommendRoutePostId}")
-    private ResponseEntity<?> getWalkingTogetherPostsList(@PathVariable Long recommendRoutePostId, Authentication authentication) {
-        Long profileId = getProfileId(authentication);
-        return walkingTogetherPostService.getWalkingTogetherPostsList(recommendRoutePostId, profileId);
+    private List<GetWalkingTogetherPostResponseDto> getWalkingTogetherPosts(@PathVariable Long recommendRoutePostId, Authentication authentication) {
+        return walkingTogetherPostService.getWalkingTogetherPosts(recommendRoutePostId, AuthUtil.getProfileId(authentication));
     }
 
     @PostMapping
     private ResponseEntity<?> createWalkingTogetherPost(@RequestBody CreateWalkingTogetherPostDto createWalkingTogetherPostDto, Authentication authentication) {
-        Long profileId = getProfileId(authentication);
-        return walkingTogetherPostService.createWalkingTogetherPost(createWalkingTogetherPostDto, profileId);
+        return walkingTogetherPostService.createWalkingTogetherPost(createWalkingTogetherPostDto, AuthUtil.getProfileId(authentication));
     }
 
     @PutMapping("/{walkingTogetherPostId}")
-    private ResponseEntity<?> updateWalkingTogetherPost(@PathVariable Long walkingTogetherPostId, @RequestBody UpdateWalkingTogetherPostDto updateWalkingTogetherPostDto, Authentication authentication) {
-        Long profileId = getProfileId(authentication);
-        return walkingTogetherPostService.updateWalkingTogetherPost(walkingTogetherPostId, updateWalkingTogetherPostDto, profileId);
+    private ResponseEntity<MessageResponse> updateWalkingTogetherPost(@PathVariable Long walkingTogetherPostId, @RequestBody UpdateWalkingTogetherPostDto updateWalkingTogetherPostDto, Authentication authentication) {
+        walkingTogetherPostService.updateWalkingTogetherPost(walkingTogetherPostId,
+                updateWalkingTogetherPostDto,
+                AuthUtil.getProfileId(authentication));
+        return ResponseEntity.ok(new MessageResponse("수정 되었습니다."));
     }
 
     @DeleteMapping("/{walkingTogetherPostId}")
-    private ResponseEntity<?> deleteWalkingTogetherPost(@PathVariable Long walkingTogetherPostId, Authentication authentication) {
-        Long profileId = getProfileId(authentication);
-        return walkingTogetherPostService.deleteWalkingTogetherPost(walkingTogetherPostId, profileId);
+    private ResponseEntity<MessageResponse> deleteWalkingTogetherPost(@PathVariable Long walkingTogetherPostId, Authentication authentication) {
+        walkingTogetherPostService.deleteWalkingTogetherPost(walkingTogetherPostId, AuthUtil.getProfileId(authentication));
+        return ResponseEntity.ok(new MessageResponse("삭제 되었습니다."));
     }
 
     @PostMapping("/{walkingTogetherPostId}")
-    private ResponseEntity<?> startMatch(@PathVariable Long walkingTogetherPostId, Authentication authentication) {
-        Long profileId = getProfileId(authentication);
-        return walkingTogetherPostService.startMatch(walkingTogetherPostId, profileId);
-    }
-
-    private static Long getProfileId(Authentication authentication) {
-        return ((JwtAuthenticationToken) authentication).getProfileId();
+    private ResponseEntity<MessageResponse> startMatch(@PathVariable Long walkingTogetherPostId, Authentication authentication) {
+        CreateChatRoomResponseDto createChatRoomResponseDto =
+                walkingTogetherPostService.startMatch(walkingTogetherPostId, AuthUtil.getProfileId(authentication));
+        if (createChatRoomResponseDto.isCreated()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse(createChatRoomResponseDto.getChatRoomId().toString()));
+        } else {
+            return ResponseEntity.ok(new MessageResponse("매칭 완료."));
+        }
     }
 }
