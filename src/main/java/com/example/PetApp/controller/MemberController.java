@@ -66,14 +66,13 @@ public class MemberController {
     }
 
 
-    @PutMapping("/reset-password")
+    @PutMapping("/reset-password")//수정 필요 토큰 있을 때와 없을 때
     public ResponseEntity<MessageResponse> resetPassword(@RequestBody @Valid ResetPasswordDto resetPasswordDto,
-                                        BindingResult bindingResult,
-                                        Authentication authentication) {
+                                        BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return getBindingError(bindingResult);
         }
-        memberService.resetPassword(resetPasswordDto, AuthUtil.getEmail(authentication));
+        memberService.resetPassword(resetPasswordDto);
         return ResponseEntity.ok(new MessageResponse("비밀번호가 성공적으로 변경되었습나다."));
     }
 

@@ -27,8 +27,6 @@ public class NotificationService {
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, Object> notificationRedisTemplate;
     private final ObjectMapper objectMapper;
-    private final TimeAgoUtil timeAgoUtil;
-
 
 
     public ResponseEntity<?> getNotifications(String email) {//몇분 전 추가해야할듯.
@@ -39,7 +37,7 @@ public class NotificationService {
                 .map(message -> {
                     try {
                         NotificationListDto notificationListDto = objectMapper.readValue((String) message, NotificationListDto.class);
-                        notificationListDto.setCreatedAt(timeAgoUtil.getTimeAgo(notificationListDto.getNotificationTime()));
+                        notificationListDto.setCreatedAt(TimeAgoUtil.getTimeAgo(notificationListDto.getNotificationTime()));
                         return notificationListDto;
                         //readValue는 String,class로 기대를함. 그래서 명시적(String)으로 형변환.
                     } catch (JsonProcessingException e) {

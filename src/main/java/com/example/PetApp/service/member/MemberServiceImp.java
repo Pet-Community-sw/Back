@@ -59,6 +59,11 @@ public class MemberServiceImp implements MemberService{
         return tokenService.save(member);
     }
 
+    @Override
+    public void verifyCode(String email, String code) {//sendEmail할 때 이메일 유효성 검사 했으므로 안해줘도 됨.
+        emailService.verifyCode(email, code);
+    }
+
     @Transactional(readOnly = true)
     @Override
     public FindByIdResponseDto findById(String phoneNumber) {
@@ -84,20 +89,27 @@ public class MemberServiceImp implements MemberService{
         tokenService.deleteRefreshToken(accessToken);
     }
 
-    @Override
-    public void verifyCode(String email, String code) {//sendEmail할 때 이메일 유효성 검사 했으므로 안해줘도 됨.
-        emailService.verifyCode(email, code);
-    }
-
     @Transactional(readOnly = true)
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email).orElseThrow(()->new NotFoundException("없는 유저입니다."));
     }
 
+//    @Transactional
+//    @Override
+//    public void resetPassword(ResetPasswordDto resetPasswordDto, String email) {
+//        Member member = memberRepository.findByEmail(email).get();
+//        if (passwordEncoder.matches(resetPasswordDto.getNewPassword(),member.getPassword())) {
+//            throw new IllegalArgumentException("전 비밀번호와 다르게 설정해야합니다.");
+//        } else {
+//            member.setPassword(passwordEncoder.encode(resetPasswordDto.getNewPassword()));
+//        }
+//    }
+
     @Transactional
     @Override
-    public void resetPassword(ResetPasswordDto resetPasswordDto, String email) {
-        Member member = memberRepository.findByEmail(email).get();
+    public void resetPassword(ResetPasswordDto resetPasswordDto) {
+        log.info("resetPassword 요청 email : {}, newPassword : {}", resetPasswordDto.getEmail(), resetPasswordDto.getNewPassword());
+        Member member = memberRepository.findByEmail(resetPasswordDto.getEmail()).get();
         if (passwordEncoder.matches(resetPasswordDto.getNewPassword(),member.getPassword())) {
             throw new IllegalArgumentException("전 비밀번호와 다르게 설정해야합니다.");
         } else {

@@ -30,7 +30,6 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
 
     private final RecommendRoutePostRepository recommendRoutePostRepository;
     private final MemberRepository memberRepository;
-    private final TimeAgoUtil timeAgoUtil;
     private final LikeRepository likeRepository;
 
     @Transactional
@@ -89,7 +88,7 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
                 .memberId(post.get().getMember().getMemberId())
                 .memberName(post.get().getMember().getName())
                 .memberImageUrl(post.get().getMember().getMemberImageUrl())
-                .createdAt(timeAgoUtil.getTimeAgo(post.get().getRecommendRouteTime()))
+                .createdAt(TimeAgoUtil.getTimeAgo(post.get().getRecommendRouteTime()))
                 .likeCount(likeRepository.countByRecommendRoutePost(post.get()))
                 .isOwner(post.get().getMember().getMemberId().equals(member.getMemberId()))
                 .isLike(likeRepository.existsByRecommendRoutePostAndMember(post.get(), member))
@@ -142,7 +141,7 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
                         likeRepository.countByRecommendRoutePost(recommendRoutePost),
                         recommendRoutePost.getLocationLongitude(),
                         recommendRoutePost.getLocationLatitude(),
-                        timeAgoUtil.getTimeAgo(recommendRoutePost.getRecommendRouteTime()),
+                        TimeAgoUtil.getTimeAgo(recommendRoutePost.getRecommendRouteTime()),
                         member.getMemberId().equals(recommendRoutePost.getMember().getMemberId()),
                         likeRepository.existsByRecommendRoutePostAndMember(recommendRoutePost, member)
                 )).collect(Collectors.toList());

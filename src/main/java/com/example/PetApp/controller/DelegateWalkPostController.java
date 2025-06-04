@@ -67,10 +67,10 @@ public class DelegateWalkPostController {
     }
 
 
-    @PutMapping("/start-authorized/{delegateWalkPostId}")//산책 시작권한을 줌.
-    public ResponseEntity<MessageResponse> grantAuthorize(@PathVariable Long delegateWalkPostId, Authentication authentication) {
-        return delegateWalkPostService.grantAuthorize(delegateWalkPostId, AuthUtil.getProfileId(authentication));
-    }
+//    @PutMapping("/start-authorized/{delegateWalkPostId}")//산책 시작권한을 줌.
+//    public ResponseEntity<MessageResponse> grantAuthorize(@PathVariable Long delegateWalkPostId, Authentication authentication) {
+//        return delegateWalkPostService.grantAuthorize(delegateWalkPostId, AuthUtil.getProfileId(authentication));
+//    }
 
     @PutMapping("/{delegateWalkPostId}")
     public ResponseEntity<MessageResponse> updateDelegateWalkPost(@PathVariable Long delegateWalkPostId, @RequestBody UpdateDelegateWalkPostDto updateDelegateWalkPostDto, Authentication authentication) {

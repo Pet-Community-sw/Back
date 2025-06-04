@@ -2,17 +2,15 @@ package com.example.PetApp.repository.jpa;
 
 import com.example.PetApp.domain.*;
 import com.example.PetApp.dto.like.LikeCountDto;
-import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 public interface LikeRepository extends JpaRepository<LikeT, Long> {
 
-    @Query("select new com.example.PetApp.dto.like.LikeResponseDto(l.post.postId, count(1))" +
+    @Query("select new com.example.PetApp.dto.like.LikeCountDto(l.post.postId, count(1))" +
             "from LikeT l where l.post in :posts " +
             "group by l.post.postId")
     List<LikeCountDto> countByPosts(@Param("posts") List<Post> posts);

@@ -32,19 +32,24 @@ public class TokenServiceImp implements TokenService {//리펙토링 필요.
     @Transactional
     @Override
     public LoginResponseDto save(Member member) {
-        refreshRepository.deleteByMember(member);
+        Optional<RefreshToken> byMember = refreshRepository.findByMember(member);
 
         String accessToken = jwtTokenizer.createAccessToken(member.getMemberId(), null, member.getEmail());
         String refreshToken = jwtTokenizer.createRefreshToken(member.getMemberId(), member.getEmail());
 
-        RefreshToken refreshToken1 = RefreshToken.builder()
-                .member(member)
-                .refreshToken(refreshToken)
-                .build();
-        refreshRepository.save(refreshToken1);
+        if (byMember.isEmpty()) {
+            RefreshToken refreshToken1 = RefreshToken.builder()
+                    .member(member)
+                    .refreshToken(refreshToken)
+                    .build();
+            refreshRepository.save(refreshToken1);
+        } else {
+            byMember.get().setRefreshToken(refreshToken);
+        }
         log.info("로그인 요청 성공");
         return MemberMapper.toLoginResponseDto(member, accessToken);
     }
+
 
     @Transactional
     @Override
