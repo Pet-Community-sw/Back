@@ -3,8 +3,11 @@ package com.example.PetApp.service.walkrecord;
 import com.example.PetApp.domain.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.WalkRecord;
+import com.example.PetApp.dto.walkrecord.CreateWalkRecordResponseDto;
 import com.example.PetApp.dto.walkrecord.GetWalkRecordLocationResponseDto;
 import com.example.PetApp.dto.walkrecord.GetWalkRecordResponseDto;
+import com.example.PetApp.exception.NotFoundException;
+import com.example.PetApp.mapper.WalkRecordMapper;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.WalkRecordRepository;
 import com.example.PetApp.util.HaversineUtil;
@@ -21,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -37,27 +39,16 @@ public class WalkRecordServiceImp implements WalkRecordService{
 
     @Transactional
     @Override
-    public ResponseEntity<?> createWalkRecord(DelegateWalkPost delegateWalkPost) {
+    public CreateWalkRecordResponseDto createWalkRecord(DelegateWalkPost delegateWalkPost) {
         log.info("createWalkRecord 요청");
-        Optional<Member> member = memberRepository.findById(delegateWalkPost.getSelectedApplicantMemberId());
-        if (member.isEmpty()) {
-            log.warn("해당 대리산책자 유저가 없습니다. id = {}", delegateWalkPost.getSelectedApplicantMemberId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 대리산책자 유저가 없습니다.");
-        }
-        WalkRecord walkRecord=WalkRecord.builder()
-                .walkStatus(WalkRecord.WalkStatus.READY)
-                .delegateWalkPost(delegateWalkPost)
-                .member(member.get())
-                .build();
+        Member member = memberRepository.findById(delegateWalkPost.getSelectedApplicantMemberId())
+                .orElseThrow(()->new NotFoundException("해당 대리산책자 유저가 없습니다."));
+        log.warn("해당 대리산책자 유저가 없습니다. id = {}", delegateWalkPost.getSelectedApplicantMemberId());
+        WalkRecord walkRecord = WalkRecordMapper.toEntity(delegateWalkPost, member);
         WalkRecord savedWalkRecord = walkRecordRepository.save(walkRecord);
-        try {
-            sendNotificationUtil.sendNotification(member.get(), "산책 권한이 부여 되었습니다.");
-            log.info("산책 권한 부여 알림 전송 완료");
-        } catch (JsonProcessingException e) {
-            log.error("산책 권한 알림 전송 실패", e);
-            throw new RuntimeException("알림 보내는 도중 예외 발생",e);
-        }
-        return ResponseEntity.ok().body(Map.of("walkRecordId", savedWalkRecord.getWalkRecordId()));
+        sendNotificationUtil.sendNotification(member, "산책 권한이 부여 되었습니다.");
+        log.info("산책 권한 부여 알림 전송 완료");
+        return new CreateWalkRecordResponseDto(savedWalkRecord.getWalkRecordId());
     }
 
     @Transactional

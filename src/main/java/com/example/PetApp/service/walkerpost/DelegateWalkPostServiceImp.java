@@ -3,6 +3,7 @@ package com.example.PetApp.service.walkerpost;
 import com.example.PetApp.domain.*;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
+import com.example.PetApp.dto.walkrecord.CreateWalkRecordResponseDto;
 import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
@@ -95,6 +96,8 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
     public CreateMemberChatRoomResponseDto selectApplicant(Long delegateWalkPostId, Long memberId, String email) {
         log.info("selectApplicant 요청 delegateWalkPostId : {}, email : {}", delegateWalkPostId, email);
         Member member = memberRepository.findByEmail(email).get();
+        Member applicantMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException("해당 지원자는 없습니다."));
         DelegateWalkPost delegateWalkPost = delegateWalkPostRepository.findById(delegateWalkPostId)
                 .orElseThrow(() -> new NotFoundException("해당 대리산책자 게시글은 없습니다."));
         if (!(delegateWalkPost.getProfile().getMember().equals(member))) {
@@ -105,17 +108,13 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
         delegateWalkPost.setStatus(DelegateWalkPost.DelegateWalkStatus.COMPLETED);
         delegateWalkPost.setSelectedApplicantMemberId(memberId);
         //켈린더에 넣는 로직필요.
-        try {
-            sendNotificationUtil.sendNotification(memberRepository.findById(memberId).get(),"대리산책자 지원에 선정되었습니다!" );
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("알림 전송 중 에러 발생", e);
-        }
+        sendNotification(applicantMember, "대리산책자 지원에 선정되었습니다.");
         return memberChatRoomService.createMemberChatRoom(member, memberRepository.findById(memberId).get());
     }
 
     @Transactional//산책 허가.
     @Override
-    public ResponseEntity<?> grantAuthorize(Long delegateWalkPostId, Long profileId) {
+    public CreateWalkRecordResponseDto grantAuthorize(Long delegateWalkPostId, Long profileId) {
         DelegateWalkPost delegateWalkPost = delegateWalkPostRepository.findById(delegateWalkPostId)
                 .orElseThrow(() -> new NotFoundException("해당 대리산책자 게시글은 없습니다."));
         if (!(delegateWalkPost.getProfile().getProfileId().equals(profileId))) {
@@ -184,14 +183,22 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
                 .memberId(member.getMemberId())
                 .content(content)
                 .build());
-        sendNotification(member, delegateWalkPost);
+        sendToDelegateWalkPostNotification(member, delegateWalkPost);
         return new ApplyToDelegateWalkPostResponseDto(member.getMemberId());
     }
 
-    private void sendNotification(Member member, DelegateWalkPost delegateWalkPost) {
+
+
+
+    private void sendToDelegateWalkPostNotification(Member member, DelegateWalkPost delegateWalkPost) {
         String message = member.getName() + "님이 회원님의 대리산책자 게시글에 지원했습니다.";
+        sendNotification(delegateWalkPost.getProfile().getMember(), message);
+
+    }
+
+    private void sendNotification(Member member, String message) {
         try {
-            sendNotificationUtil.sendNotification(delegateWalkPost.getProfile().getMember(), message);
+            sendNotificationUtil.sendNotification(member, message);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("알림 전송중 에러 발생 ",e);
         }

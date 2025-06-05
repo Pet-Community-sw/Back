@@ -4,9 +4,9 @@ import com.example.PetApp.domain.Applicant;
 import com.example.PetApp.dto.MessageResponse;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
+import com.example.PetApp.dto.walkrecord.CreateWalkRecordResponseDto;
 import com.example.PetApp.service.walkerpost.DelegateWalkPostService;
 import com.example.PetApp.util.AuthUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -67,10 +67,10 @@ public class DelegateWalkPostController {
     }
 
 
-//    @PutMapping("/start-authorized/{delegateWalkPostId}")//산책 시작권한을 줌.
-//    public ResponseEntity<MessageResponse> grantAuthorize(@PathVariable Long delegateWalkPostId, Authentication authentication) {
-//        return delegateWalkPostService.grantAuthorize(delegateWalkPostId, AuthUtil.getProfileId(authentication));
-//    }
+    @PutMapping("/start-authorized/{delegateWalkPostId}")//산책 시작권한을 줌.
+    public CreateWalkRecordResponseDto grantAuthorize(@PathVariable Long delegateWalkPostId, Authentication authentication) {
+        return delegateWalkPostService.grantAuthorize(delegateWalkPostId, AuthUtil.getProfileId(authentication));
+    }
 
     @PutMapping("/{delegateWalkPostId}")
     public ResponseEntity<MessageResponse> updateDelegateWalkPost(@PathVariable Long delegateWalkPostId, @RequestBody UpdateDelegateWalkPostDto updateDelegateWalkPostDto, Authentication authentication) {
@@ -85,7 +85,7 @@ public class DelegateWalkPostController {
     }
 
     @PostMapping("/select-applicant/{delegateWalkPostId}")
-    public CreateMemberChatRoomResponseDto selectApplicant(@PathVariable Long delegateWalkPostId, @RequestBody Long memberId, Authentication authentication) throws JsonProcessingException {
+    public CreateMemberChatRoomResponseDto selectApplicant(@PathVariable Long delegateWalkPostId, @RequestBody Long memberId, Authentication authentication) {
         return delegateWalkPostService.selectApplicant(delegateWalkPostId, memberId, AuthUtil.getEmail(authentication));
     }
 

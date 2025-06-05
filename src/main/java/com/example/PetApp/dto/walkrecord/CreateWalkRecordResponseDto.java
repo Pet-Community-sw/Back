@@ -1,12 +1,14 @@
 package com.example.PetApp.dto.walkrecord;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
-public class CreateWalkRecordDto {
+@AllArgsConstructor
+public class CreateWalkRecordResponseDto {
+    private Long walkRecordId;
 
 }

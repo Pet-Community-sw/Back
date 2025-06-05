@@ -3,6 +3,7 @@ package com.example.PetApp.service.walkerpost;
 import com.example.PetApp.domain.Applicant;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
+import com.example.PetApp.dto.walkrecord.CreateWalkRecordResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,5 @@ public interface DelegateWalkPostService {
 
     CreateMemberChatRoomResponseDto selectApplicant(Long delegateWalkPostId, Long memberId, String email);
 
-    ResponseEntity<?> grantAuthorize(Long delegateWalkPostId, Long profileId);
+    CreateWalkRecordResponseDto grantAuthorize(Long delegateWalkPostId, Long profileId);
 }
