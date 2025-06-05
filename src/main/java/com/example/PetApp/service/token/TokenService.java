@@ -12,4 +12,7 @@ public interface TokenService {
     LoginResponseDto save(Member member);
 
     AccessTokenResponseDto accessToken(String accessToken);
+
+
+    AccessTokenResponseDto createResetPasswordJwt(String email);
 }

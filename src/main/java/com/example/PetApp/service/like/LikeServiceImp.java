@@ -127,10 +127,6 @@ public class LikeServiceImp implements LikeService {
             throw new IllegalArgumentException("지원하지 않는 타입입니다.");
         }
         String message = liker.getName() + "님이 회원님의 게시물을 좋아합니다.";
-        try {
             sendNotificationUtil.sendNotification(postOwner, message);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("알림 전송 중 에러", e);
-        }
     }
 }

@@ -15,11 +15,10 @@ public interface MemberService {
 
     void logout(String accessToken);
 
-    void verifyCode(String email, String code);
+    AccessTokenResponseDto verifyCode(String email, String code);
 
-//    void resetPassword(ResetPasswordDto resetPasswordDto, String email);
+    void resetPassword(ResetPasswordDto resetPasswordDto, String email);
 
-    void resetPassword(ResetPasswordDto resetPasswordDto);
 
     GetMemberResponseDto getMember(Long memberId, String email);
 

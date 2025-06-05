@@ -60,8 +60,9 @@ public class MemberServiceImp implements MemberService{
     }
 
     @Override
-    public void verifyCode(String email, String code) {//sendEmail할 때 이메일 유효성 검사 했으므로 안해줘도 됨.
+    public AccessTokenResponseDto verifyCode(String email, String code) {//sendEmail할 때 이메일 유효성 검사 했으므로 안해줘도 됨.
         emailService.verifyCode(email, code);
+        return tokenService.createResetPasswordJwt(email);
     }
 
     @Transactional(readOnly = true)
@@ -107,9 +108,9 @@ public class MemberServiceImp implements MemberService{
 
     @Transactional
     @Override
-    public void resetPassword(ResetPasswordDto resetPasswordDto) {
-        log.info("resetPassword 요청 email : {}, newPassword : {}", resetPasswordDto.getEmail(), resetPasswordDto.getNewPassword());
-        Member member = memberRepository.findByEmail(resetPasswordDto.getEmail()).get();
+    public void resetPassword(ResetPasswordDto resetPasswordDto, String email) {
+        log.info("resetPassword 요청 email : {}, newPassword : {}", email, resetPasswordDto.getNewPassword());
+        Member member = memberRepository.findByEmail(email).get();
         if (passwordEncoder.matches(resetPasswordDto.getNewPassword(),member.getPassword())) {
             throw new IllegalArgumentException("전 비밀번호와 다르게 설정해야합니다.");
         } else {

@@ -13,7 +13,6 @@ import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
 import com.example.PetApp.util.SendNotificationUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -86,11 +85,7 @@ public class CommentServiceImp implements CommentService {
 
     private void sendCommentNotification(Member postmember, Member member) {
         String message = member.getName() + "님이 회원님의 게시물에 댓글을 남겼습니다.";
-        try {
-            sendNotificationUtil.sendNotification(postmember, message); // 알림 전송
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("알림 전송 중 에러", e);
-        }
+        sendNotificationUtil.sendNotification(postmember, message); // 알림 전송
     }
 
     private CommentAndMemberDto getCommentAndPostOwner(CommentDto commentDto, Member member){

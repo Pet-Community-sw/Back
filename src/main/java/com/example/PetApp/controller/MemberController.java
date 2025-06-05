@@ -60,19 +60,20 @@ public class MemberController {
     }
 
     @PostMapping("/verify-code")
-    public ResponseEntity<MessageResponse> verifyCode(@RequestBody AuthCodeDto authCodeDto) {
-        memberService.verifyCode(authCodeDto.getEmail(), authCodeDto.getCode());
-        return ResponseEntity.ok(new MessageResponse("인증 성공했습니다."));
+    public AccessTokenResponseDto verifyCode(@RequestBody AuthCodeDto authCodeDto) {
+        return memberService.verifyCode(authCodeDto.getEmail(), authCodeDto.getCode());
     }
 
 
     @PutMapping("/reset-password")//수정 필요 토큰 있을 때와 없을 때
     public ResponseEntity<MessageResponse> resetPassword(@RequestBody @Valid ResetPasswordDto resetPasswordDto,
-                                        BindingResult bindingResult) {
+                                                         BindingResult bindingResult,
+                                                         Authentication authentication) {
+
         if (bindingResult.hasErrors()) {
             return getBindingError(bindingResult);
         }
-        memberService.resetPassword(resetPasswordDto);
+        memberService.resetPassword(resetPasswordDto, AuthUtil.getEmail(authentication));
         return ResponseEntity.ok(new MessageResponse("비밀번호가 성공적으로 변경되었습나다."));
     }
 

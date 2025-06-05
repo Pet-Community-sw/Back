@@ -63,6 +63,12 @@ public class TokenServiceImp implements TokenService {//리펙토링 필요.
         return reissueAccessToken(accessToken, claims, memberId, refreshToken);
     }
 
+    @Override
+    public AccessTokenResponseDto createResetPasswordJwt(String email) {
+        String accessToken = jwtTokenizer.createAccessToken(null, null, email);
+        return new AccessTokenResponseDto(accessToken);
+    }
+
 
     @Transactional
     @Override
