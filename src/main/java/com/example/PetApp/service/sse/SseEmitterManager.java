@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -26,8 +27,7 @@ public class SseEmitterManager {
 
     private final Map<Long, SseEmitter> sseEmitterMap = new ConcurrentHashMap<>();//스레드 중복 방지
 
-
-
+    @Transactional(readOnly = true)
     public SseEmitter subscribe(String token) {
         String email = jwtTokenizer.parseAccessToken(token).getSubject();
         Member member = memberRepository.findByEmail(email).get();
