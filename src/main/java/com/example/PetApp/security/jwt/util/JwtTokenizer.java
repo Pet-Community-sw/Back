@@ -43,6 +43,12 @@ public class JwtTokenizer {
                 .compact();
     }
 
+    public String createResetPasswordToken(String email) {//임시 토큰용
+        final long RESET_TOKEN_EXPIRE_COUNT = 3 * 60 * 1000L;
+        return createToken(null, null, email, RESET_TOKEN_EXPIRE_COUNT, accessKey);
+    }
+
+
     public String createAccessToken(Long id, Long profileId, String email) {
         return createToken(id, profileId, email, ACCESS_TOKEN_EXPIRE_COUNT, accessKey);
     }
