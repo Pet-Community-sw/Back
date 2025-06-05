@@ -2,10 +2,11 @@ package com.example.PetApp.service.recommendroutepost;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RecommendRoutePost;
-import com.example.PetApp.dto.recommendroutepost.CreateRecommendRoutePostDto;
-import com.example.PetApp.dto.recommendroutepost.GetRecommendPostResponseDto;
-import com.example.PetApp.dto.recommendroutepost.GetRecommendRoutePostsResponseDto;
-import com.example.PetApp.dto.recommendroutepost.UpdateRecommendRoutePostDto;
+import com.example.PetApp.dto.like.LikeCountDto;
+import com.example.PetApp.dto.recommendroutepost.*;
+import com.example.PetApp.exception.ForbiddenException;
+import com.example.PetApp.exception.NotFoundException;
+import com.example.PetApp.mapper.RecommendRoutePostMapper;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
@@ -13,14 +14,13 @@ import com.example.PetApp.util.TimeAgoUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,116 +34,103 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
 
     @Transactional
     @Override
-    public ResponseEntity<?> createRecommendRoutePost(CreateRecommendRoutePostDto createRecommendRoutePostDto, String email) {
+    public CreateRecommendRoutePostResponseDto createRecommendRoutePost(CreateRecommendRoutePostDto createRecommendRoutePostDto, String email) {
+        log.info("createRecommendRoutePost 요청 email : {}", email);
         Member member = memberRepository.findByEmail(email).get();
-        log.info("createRecommendRoutePost 요청 memberId : {}", member.getMemberId());
-        RecommendRoutePost recommendRoutePost=RecommendRoutePost.builder()
-                .title(createRecommendRoutePostDto.getTitle())
-                .content(createRecommendRoutePostDto.getContent())
-                .locationLongitude(createRecommendRoutePostDto.getLocationLongitude())
-                .locationLatitude(createRecommendRoutePostDto.getLocationLatitude())
-                .member(member)
-                .build();
+        RecommendRoutePost recommendRoutePost = RecommendRoutePostMapper.toEntity(createRecommendRoutePostDto, member);
         RecommendRoutePost saveRecommendRoutePost = recommendRoutePostRepository.save(recommendRoutePost);
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("recommendRoutePostId", saveRecommendRoutePost.getRecommendRouteId()));
+        return new CreateRecommendRoutePostResponseDto(saveRecommendRoutePost.getRecommendRouteId());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)//페이징 처리를 해야됨. 40개 정도 내보내면 프론트가 페이지 처리할 수 있으려나?
     @Override
-    public ResponseEntity<?> getRecommendRoutePosts(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, String email) {
+    public List<GetRecommendRoutePostsResponseDto> getRecommendRoutePosts(Double minLongitude,
+                                                                          Double minLatitude,
+                                                                          Double maxLongitude,
+                                                                          Double maxLatitude,
+                                                                          int page,
+                                                                          String email) {
+        log.info("getRecommendRoutePostsByLocation 요청 email : {}", email);
         Member member = memberRepository.findByEmail(email).get();
-        log.info("getRecommendRoutePostsByLocation 요청 memberId : {}", member.getMemberId());
-        List<RecommendRoutePost> recommendRoutePosts = recommendRoutePostRepository.findByRecommendRoutePostByLocation(minLongitude - 0.01, minLatitude - 0.01, maxLongitude + 0.01, maxLatitude + 0.01);
-        List<GetRecommendRoutePostsResponseDto> list = getRecommendRoutePostsList(recommendRoutePosts,member);
-
-        return ResponseEntity.ok(list);
-
+        Pageable pageable = PageRequest.of(page, 10);
+        List<RecommendRoutePost> recommendRoutePosts = recommendRoutePostRepository
+                .findByRecommendRoutePostByLocation(minLongitude - 0.01,
+                        minLatitude - 0.01,
+                        maxLongitude + 0.01,
+                        maxLatitude + 0.01,
+                        pageable)
+                .getContent();
+        return RecommendRoutePostMapper.toRecommendRoutePostsList(recommendRoutePosts,
+                getLikeCountMap(recommendRoutePosts),
+                likeRepository.findLikedRecommendIds(member, recommendRoutePosts),
+                member);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
-    public ResponseEntity<?> getRecommendRoutePosts(Double longitude, Double latitude, String email) {
+    public List<GetRecommendRoutePostsResponseDto> getRecommendRoutePosts(Double longitude, Double latitude, int page, String email) {
+        log.info("getRecommendRoutePostsByPlace 요청 email : {}", email);
         Member member = memberRepository.findByEmail(email).get();
-        log.info("getRecommendRoutePostsByPlace 요청 memberId : {}", member.getMemberId());
-        List<RecommendRoutePost> recommendRoutePosts = recommendRoutePostRepository.findByRecommendRoutePostByPlace(longitude, latitude);
-        List<GetRecommendRoutePostsResponseDto> list = getRecommendRoutePostsList(recommendRoutePosts,member);
+        Pageable pageable = PageRequest.of(page, 10);
+        List<RecommendRoutePost> recommendRoutePosts = recommendRoutePostRepository.findByRecommendRoutePostByPlace(longitude,
+                        latitude,
+                        pageable)
+                .getContent();
 
-        return ResponseEntity.ok(list);
-
+        return RecommendRoutePostMapper.toRecommendRoutePostsList(recommendRoutePosts,
+                getLikeCountMap(recommendRoutePosts),
+                likeRepository.findLikedRecommendIds(member, recommendRoutePosts),
+                member);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
-    public ResponseEntity<?> getRecommendRoutePost(Long recommendRoutePostId, String email) {
+    public GetRecommendPostResponseDto getRecommendRoutePost(Long recommendRoutePostId, String email) {
+        log.info("getRecommendRoutePost 요청 email : {}", email);
         Member member = memberRepository.findByEmail(email).get();
-        log.info("getRecommendRoutePost 요청 memberId : {}", member.getMemberId());
-        Optional<RecommendRoutePost> post = recommendRoutePostRepository.findById(recommendRoutePostId);
-        if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 산책길 추천 게시물은 없습니다.");
-        }
-        GetRecommendPostResponseDto getRecommendPostResponseDto=GetRecommendPostResponseDto.builder()
-                .recommendRoutePostId(post.get().getRecommendRouteId())
-                .title(post.get().getTitle())
-                .content(post.get().getContent())
-                .memberId(post.get().getMember().getMemberId())
-                .memberName(post.get().getMember().getName())
-                .memberImageUrl(post.get().getMember().getMemberImageUrl())
-                .createdAt(TimeAgoUtil.getTimeAgo(post.get().getRecommendRouteTime()))
-                .likeCount(likeRepository.countByRecommendRoutePost(post.get()))
-                .isOwner(post.get().getMember().getMemberId().equals(member.getMemberId()))
-                .isLike(likeRepository.existsByRecommendRoutePostAndMember(post.get(), member))
-                .build();
-        return ResponseEntity.ok(getRecommendPostResponseDto);
+        RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(recommendRoutePostId)
+                .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시물은 없습니다."));
+        return RecommendRoutePostMapper.toGetRecommendPostResponseDto(member,
+                recommendRoutePost,
+                likeRepository.countByRecommendRoutePost(recommendRoutePost),
+                likeRepository.existsByRecommendRoutePostAndMember(recommendRoutePost, member)
+        );
 
     }
 
     @Transactional
     @Override
-    public ResponseEntity<?> updateRecommendRoutePost(Long recommendRoutePostId, UpdateRecommendRoutePostDto updateRecommendRoutePostDto, String email) {
+    public void updateRecommendRoutePost(Long recommendRoutePostId, UpdateRecommendRoutePostDto updateRecommendRoutePostDto, String email) {
         Member member = memberRepository.findByEmail(email).get();
         log.info("updateRecommendRoutePost 요청 memberId : {}", member.getMemberId());
-        Optional<RecommendRoutePost> post = recommendRoutePostRepository.findById(recommendRoutePostId);
-        if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 산책길 추천 게시물은 없습니다.");
-        } else if (post.get().getMember().equals(member)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
+        RecommendRoutePost post = recommendRoutePostRepository.findById(recommendRoutePostId)
+                .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
+        if (post.getMember().equals(member)) {
+            throw new ForbiddenException("수정 권한이 없습니다.");
         }
-        post.get().setTitle(updateRecommendRoutePostDto.getTitle());
-        post.get().setContent(updateRecommendRoutePostDto.getContent());
-
-        return ResponseEntity.ok().body("수정 완료.");
+        post.setTitle(updateRecommendRoutePostDto.getTitle());
+        post.setContent(updateRecommendRoutePostDto.getContent());
     }
 
     @Transactional
     @Override
-    public ResponseEntity<?> deleteRecommendRoutePost(Long recommendRoutePostId, String email) {
+    public void deleteRecommendRoutePost(Long recommendRoutePostId, String email) {
+        log.info("deleteRecommendRoutePost 요청 email : {}", email);
         Member member = memberRepository.findByEmail(email).get();
-        log.info("deleteRecommendRoutePost 요청 memberId : {}", member.getMemberId());
-        Optional<RecommendRoutePost> post = recommendRoutePostRepository.findById(recommendRoutePostId);
-        if (post.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 산책길 추천 게시물은 없습니다.");
-        } else if (post.get().getMember().equals(member)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없습니다.");
+        RecommendRoutePost post = recommendRoutePostRepository.findById(recommendRoutePostId)
+                .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
+        if (post.getMember().equals(member)) {
+            throw new ForbiddenException("삭제 권한이 없습니다.");
         }
         recommendRoutePostRepository.deleteById(recommendRoutePostId);
-        return ResponseEntity.ok().body("삭제 완료.");
     }
 
-    @NotNull
-    private List<GetRecommendRoutePostsResponseDto> getRecommendRoutePostsList(List<RecommendRoutePost> recommendRoutePosts, Member member) {
-        return recommendRoutePosts.stream()
-                .map(recommendRoutePost -> new GetRecommendRoutePostsResponseDto(
-                        recommendRoutePost.getRecommendRouteId(),
-                        recommendRoutePost.getTitle(),
-                        recommendRoutePost.getMember().getMemberId(),
-                        recommendRoutePost.getMember().getName(),
-                        recommendRoutePost.getMember().getMemberImageUrl(),
-                        likeRepository.countByRecommendRoutePost(recommendRoutePost),
-                        recommendRoutePost.getLocationLongitude(),
-                        recommendRoutePost.getLocationLatitude(),
-                        TimeAgoUtil.getTimeAgo(recommendRoutePost.getRecommendRouteTime()),
-                        member.getMemberId().equals(recommendRoutePost.getMember().getMemberId()),
-                        likeRepository.existsByRecommendRoutePostAndMember(recommendRoutePost, member)
-                )).collect(Collectors.toList());
+    private Map<Long, Long> getLikeCountMap(List<RecommendRoutePost> recommendRoutePosts) {
+        List<LikeCountDto> likeCountDtos = likeRepository.countByRecommendRoutePost(recommendRoutePosts);
+        return likeCountDtos.stream().collect(Collectors.toMap(
+                LikeCountDto::getPostId,
+                LikeCountDto::getLikeCount
+        ));
     }
+
 }

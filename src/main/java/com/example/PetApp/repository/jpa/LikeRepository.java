@@ -15,9 +15,16 @@ public interface LikeRepository extends JpaRepository<LikeT, Long> {
             "group by l.post.postId")
     List<LikeCountDto> countByPosts(@Param("posts") List<Post> posts);
 
-    @Query("SELECT l.post.postId FROM LikeT l WHERE l.member = :member AND l.post IN :posts")
+    @Query("select l.post.postId from LikeT l where l.member = :member AND l.post in :posts")
     List<Long> findLikedPostIds(@Param("member") Member member, @Param("posts") List<Post> posts);
 
+    @Query("select new com.example.PetApp.dto.like.LikeCountDto(l.recommendRoutePost.recommendRouteId, count(1))" +
+            "from LikeT l where l.recommendRoutePost in :recommendRoutePost " +
+            "group by l.recommendRoutePost.recommendRouteId")
+    List<LikeCountDto> countByRecommendRoutePost(@Param("recommendRoutePost") List<RecommendRoutePost> recommendRoutePosts);
+
+    @Query("select l.recommendRoutePost.recommendRouteId from LikeT l where l.member=:member and l.recommendRoutePost in :recommendRoutePosts")
+    List<Long> findLikedRecommendIds(@Param("member") Member member, @Param("recommendRoutePosts") List<RecommendRoutePost> recommendRoutePosts);
 
     Long countByPost(Post post);
 

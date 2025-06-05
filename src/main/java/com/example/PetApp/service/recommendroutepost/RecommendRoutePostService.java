@@ -1,23 +1,23 @@
 package com.example.PetApp.service.recommendroutepost;
 
-import com.example.PetApp.dto.recommendroutepost.CreateRecommendRoutePostDto;
-import com.example.PetApp.dto.recommendroutepost.UpdateRecommendRoutePostDto;
-import org.springframework.http.ResponseEntity;
+import com.example.PetApp.dto.recommendroutepost.*;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface RecommendRoutePostService {
-    ResponseEntity<?> createRecommendRoutePost(CreateRecommendRoutePostDto createRecommendRoutePostDto, String email);
+    CreateRecommendRoutePostResponseDto createRecommendRoutePost(CreateRecommendRoutePostDto createRecommendRoutePostDto, String email);
 
 
-    ResponseEntity<?> getRecommendRoutePosts(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, String email);
+    List<GetRecommendRoutePostsResponseDto> getRecommendRoutePosts(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, int page, String email);
 
-    ResponseEntity<?> getRecommendRoutePosts(Double longitude, Double latitude, String email);
+    List<GetRecommendRoutePostsResponseDto> getRecommendRoutePosts(Double longitude, Double latitude, int page, String email);
 
-    ResponseEntity<?> getRecommendRoutePost(Long recommendRoutePostId, String email);
+    GetRecommendPostResponseDto getRecommendRoutePost(Long recommendRoutePostId, String email);
 
-    ResponseEntity<?> updateRecommendRoutePost(Long recommendRoutePostId, UpdateRecommendRoutePostDto updateRecommendRoutePostDto, String email);
+    void updateRecommendRoutePost(Long recommendRoutePostId, UpdateRecommendRoutePostDto updateRecommendRoutePostDto, String email);
 
 
-    ResponseEntity<?> deleteRecommendRoutePost(Long recommendRoutePostId, String email);
+    void deleteRecommendRoutePost(Long recommendRoutePostId, String email);
 }
