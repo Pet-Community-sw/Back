@@ -1,5 +1,8 @@
 package com.example.PetApp.controller;
 
+import com.example.PetApp.dto.MessageResponse;
+import com.example.PetApp.dto.walkrecord.GetWalkRecordLocationResponseDto;
+import com.example.PetApp.dto.walkrecord.GetWalkRecordResponseDto;
 import com.example.PetApp.service.walkrecord.WalkRecordService;
 import com.example.PetApp.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
@@ -14,22 +17,24 @@ public class WalkRecordController {
     private final WalkRecordService walkRecordService;
 
     @GetMapping("/{walkRecordId}")
-    public ResponseEntity<?> getWalkRecord(@PathVariable Long walkRecordId, Authentication authentication) {
+    public GetWalkRecordResponseDto getWalkRecord(@PathVariable Long walkRecordId, Authentication authentication) {
         return walkRecordService.getWalkRecord(walkRecordId, AuthUtil.getEmail(authentication));
     }
 
     @GetMapping("/{walkRecordId}/location")
-    public ResponseEntity<?> getWalkRecordLocation(@PathVariable Long walkRecordId, Authentication authentication) {
+    public GetWalkRecordLocationResponseDto getWalkRecordLocation(@PathVariable Long walkRecordId, Authentication authentication) {
         return walkRecordService.getWalkRecordLocation(walkRecordId, AuthUtil.getEmail(authentication));
     }
 
     @PutMapping("/{walkRecordId}/start")
-    public ResponseEntity<?> updateStartWalkRecord(@PathVariable Long walkRecordId, Authentication authentication) {
-        return walkRecordService.updateStartWalkRecord(walkRecordId, AuthUtil.getEmail(authentication));
+    public ResponseEntity<MessageResponse> updateStartWalkRecord(@PathVariable Long walkRecordId, Authentication authentication) {
+        walkRecordService.updateStartWalkRecord(walkRecordId, AuthUtil.getEmail(authentication));
+        return ResponseEntity.ok(new MessageResponse("start"));
     }
 
     @PutMapping("/{walkRecordId}/finish")
-    public ResponseEntity<?> updateFinishWalkRecord(@PathVariable Long walkRecordId, Authentication authentication) {
-        return walkRecordService.updateFinishWalkRecord(walkRecordId, AuthUtil.getEmail(authentication));
+    public ResponseEntity<MessageResponse> updateFinishWalkRecord(@PathVariable Long walkRecordId, Authentication authentication) {
+        walkRecordService.updateFinishWalkRecord(walkRecordId, AuthUtil.getEmail(authentication));
+        return ResponseEntity.ok(new MessageResponse("finish"));
     }
 }

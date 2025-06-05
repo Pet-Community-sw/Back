@@ -197,11 +197,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
     }
 
     private void sendNotification(Member member, String message) {
-        try {
             sendNotificationUtil.sendNotification(member, message);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("알림 전송중 에러 발생 ",e);
-        }
     }
 }
 

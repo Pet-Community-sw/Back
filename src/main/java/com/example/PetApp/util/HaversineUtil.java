@@ -1,11 +1,9 @@
 package com.example.PetApp.util;
 
-import org.springframework.stereotype.Component;
 
-@Component
 public class HaversineUtil {
     //거리 계산 공식(Haversine)
-    public double calculateDistanceInMeters(double lat1, double lon1, double lat2, double lon2) {
+    public static double calculateDistanceInMeters(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371000; // Earth radius in meters
 
         double latDistance = Math.toRadians(lat2 - lat1);

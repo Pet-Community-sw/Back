@@ -34,7 +34,7 @@ public class SendNotificationUtil {
         try {
             json = objectMapper.writeValueAsString(notificationListDto);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("알림 보내는 도중 예외 발생",e);
         }
         notificationRedisTemplate.opsForValue().set(key, json, Duration.ofDays(3));
         if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember("foreGroundMembers:", member.getMemberId().toString()))) {
