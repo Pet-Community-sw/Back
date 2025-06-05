@@ -1,7 +1,6 @@
 package com.example.PetApp.service.profile;
 
-import com.example.PetApp.dto.profile.ProfileDto;
-import com.example.PetApp.dto.profile.ProfileListResponseDto;
+import com.example.PetApp.dto.profile.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -9,17 +8,15 @@ import java.util.List;
 
 @Service
 public interface ProfileService {
-    ResponseEntity addProfile(ProfileDto addProfileDto, String email);
+    CreateProfileResponseDto createProfile(ProfileDto addProfileDto, String email);
 
-    List<ProfileListResponseDto> profileList(String email);
+    List<ProfileListResponseDto> getProfiles(String email);
 
-    ResponseEntity getProfile(Long profileId, String email);
+    GetProfileResponseDto getProfile(Long profileId, String email);
 
-    Long getCount(String email);
+    void updateProfile(Long profileId, ProfileDto addProfileDto, String email);
 
-    ResponseEntity updateProfile(Long profileId, ProfileDto addProfileDto, String email);
+    void deleteProfile(Long profileId, String email);
 
-    ResponseEntity deleteByProfileId(Long profileId, String email);
-
-    ResponseEntity<?> accessTokenToProfileId(String accessToken, Long profileId, String email);
+    AccessTokenByProfileIdResponseDto accessTokenByProfile(String accessToken, Long profileId, String email);
 }

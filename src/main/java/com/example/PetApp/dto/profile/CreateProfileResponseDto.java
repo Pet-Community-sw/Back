@@ -4,12 +4,9 @@ import lombok.*;
 
 @Getter
 @Setter
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class AddProfileResponseDto {
+public class CreateProfileResponseDto {
 
     private Long profileId;
 
-    private String accessToken;
 }
