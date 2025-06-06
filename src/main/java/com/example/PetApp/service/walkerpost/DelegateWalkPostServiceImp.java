@@ -46,8 +46,8 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
                 .orElseThrow(() -> new ForbiddenException("프로필 등록해주세요."));
         DelegateWalkPost delegateWalkPost = DelegateWalkPostMapper.toEntity(createDelegateWalkPostDto, profile);
 
-        DelegateWalkPost savedDelegateWalkPost = delegateWalkPostRepository.save(delegateWalkPost);
-        return new CreateDelegateWalkPostResponseDto(savedDelegateWalkPost.getDelegateWalkPostId());
+        delegateWalkPostRepository.save(delegateWalkPost);
+        return new CreateDelegateWalkPostResponseDto(delegateWalkPost.getDelegateWalkPostId());
     }
 
     @Transactional(readOnly = true)

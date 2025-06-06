@@ -2,7 +2,9 @@ package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.PetBreed;
 import com.example.PetApp.domain.Profile;
+import com.example.PetApp.domain.RecommendRoutePost;
 import com.example.PetApp.domain.WalkingTogetherPost;
+import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostDto;
 import com.example.PetApp.dto.walkingtogetherpost.GetWalkingTogetherPostResponseDto;
 import com.example.PetApp.util.TimeAgoUtil;
 
@@ -10,6 +12,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class WalkingTogetherPostMapper {
+
+    public static WalkingTogetherPost toEntity(Profile profile, RecommendRoutePost recommendRoutePost, CreateWalkingTogetherPostDto createWalkingTogetherPostDto) {
+        return WalkingTogetherPost.builder()
+                .profile(profile)
+                .recommendRoutePost(recommendRoutePost)
+                .scheduledTime(createWalkingTogetherPostDto.getScheduledTime())
+                .limitCount(createWalkingTogetherPostDto.getLimitCount())
+                .build();
+    }
 
 
     public static List<GetWalkingTogetherPostResponseDto> toGetWalkingTogetherPostResponseDtos(List<WalkingTogetherPost> walkingTogetherPosts,

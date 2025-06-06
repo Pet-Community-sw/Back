@@ -59,5 +59,5 @@ public class Member {//수정 필요
 
     @Builder.Default
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Profile> profile = new ArrayList<>();
+    private List<Profile> profiles = new ArrayList<>();
 }

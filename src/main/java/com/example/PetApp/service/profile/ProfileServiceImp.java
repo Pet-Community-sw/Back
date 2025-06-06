@@ -52,8 +52,8 @@ public class ProfileServiceImp implements ProfileService {
         String imageFileName = FileUploadUtil.fileUpload(profileDto.getPetImageUrl(), profileUploadDir, FileImageKind.PROFILE);
         Profile profile = ProfileMapper.toEntity(profileDto, member, imageFileName);
         validateBreed(profileDto, profile);
-        Profile addProfile = profileRepository.save(profile);
-        return new CreateProfileResponseDto(addProfile.getProfileId());
+        profileRepository.save(profile);
+        return new CreateProfileResponseDto(profile.getProfileId());
     }
 
 

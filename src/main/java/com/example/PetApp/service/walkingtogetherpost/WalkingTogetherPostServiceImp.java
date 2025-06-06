@@ -73,16 +73,11 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
                 .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시물은 없습니다."));
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new ForbiddenException("프로필 설정 해주세요."));
-        WalkingTogetherPost walkingTogetherPost = WalkingTogetherPost.builder()
-                .profile(profile)
-                .recommendRoutePost(recommendRoutePost)
-                .scheduledTime(createWalkingTogetherPostDto.getScheduledTime())
-                .limitCount(createWalkingTogetherPostDto.getLimitCount())
-                .build();
+        WalkingTogetherPost walkingTogetherPost = WalkingTogetherPostMapper.toEntity(profile, recommendRoutePost, createWalkingTogetherPostDto);
         walkingTogetherPost.addMatchPostProfiles(profileId);
         walkingTogetherPost.addAvoidBreeds(profile);
-        WalkingTogetherPost saveWalkingTogetherPost = walkingTogetherPostRepository.save(walkingTogetherPost);
-        return new CreateWalkingTogetherPostResponseDto(saveWalkingTogetherPost.getWalkingTogetherPostId());
+        walkingTogetherPostRepository.save(walkingTogetherPost);
+        return new CreateWalkingTogetherPostResponseDto(walkingTogetherPost.getWalkingTogetherPostId());
     }
 
     @Transactional

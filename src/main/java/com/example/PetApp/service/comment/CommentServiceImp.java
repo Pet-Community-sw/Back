@@ -38,7 +38,8 @@ public class CommentServiceImp implements CommentService {
         Member member = memberRepository.findByEmail(email).get();
         CommentAndMemberDto commentAndPostOwner = getCommentAndPostOwner(commentDto, member);
 
-        Comment comment = commentRepository.save(commentAndPostOwner.getComment());
+        Comment comment = commentAndPostOwner.getComment();
+        commentRepository.save(comment);
         sendCommentNotification(commentAndPostOwner.getMember(), member);
         return new CreateCommentResponseDto(comment.getCommentId());
     }

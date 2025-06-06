@@ -55,8 +55,8 @@ public class MemberChatRoomServiceImp implements MemberChatRoomService {
     @Override
     public CreateMemberChatRoomResponseDto createMemberChatRoom(Member fromMember, Member member) {//방 제목을 어떻게 할까 대리 산책자 구인했을 때 채팅방
         MemberChatRoom memberChatRoom = getMemberChatRoom(fromMember, member);
-        MemberChatRoom newMemberChatRoom = memberChatRoomRepository.save(memberChatRoom);
-        return new CreateMemberChatRoomResponseDto(newMemberChatRoom.getMemberChatRoomId());
+        memberChatRoomRepository.save(memberChatRoom);
+        return new CreateMemberChatRoomResponseDto(memberChatRoom.getMemberChatRoomId());
     }
 
     @Transactional
