@@ -31,9 +31,7 @@ public class EmailServiceImp implements EmailService{
             MimeMessage message = createEmail(toEmail, emailCode);
             javaMailSender.send(message);
 
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (MessagingException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }

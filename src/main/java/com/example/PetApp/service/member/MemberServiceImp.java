@@ -95,17 +95,6 @@ public class MemberServiceImp implements MemberService{
         return memberRepository.findByEmail(email).orElseThrow(()->new NotFoundException("없는 유저입니다."));
     }
 
-//    @Transactional
-//    @Override
-//    public void resetPassword(ResetPasswordDto resetPasswordDto, String email) {
-//        Member member = memberRepository.findByEmail(email).get();
-//        if (passwordEncoder.matches(resetPasswordDto.getNewPassword(),member.getPassword())) {
-//            throw new IllegalArgumentException("전 비밀번호와 다르게 설정해야합니다.");
-//        } else {
-//            member.setPassword(passwordEncoder.encode(resetPasswordDto.getNewPassword()));
-//        }
-//    }
-
     @Transactional
     @Override
     public void resetPassword(ResetPasswordDto resetPasswordDto, String email) {
@@ -125,10 +114,7 @@ public class MemberServiceImp implements MemberService{
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("해당 유저는 없습니다."));
 
-        return GetMemberResponseDto.builder()
-                .memberName(member.getName())
-                .memberImageUrl(member.getMemberImageUrl())
-                .build();
+        return MemberMapper.toGetMemberResponseDto(member);
     }
 
     @Transactional

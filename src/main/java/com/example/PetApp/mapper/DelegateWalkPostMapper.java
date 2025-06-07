@@ -76,7 +76,7 @@ public class DelegateWalkPostMapper {
     }
     public static boolean filter(DelegateWalkPost delegateWalkPost, Member member) {
         if (delegateWalkPost.isRequireProfile()) {
-            if (member.getProfile().size() != 0) {
+            if (member.getProfiles().size() != 0) {
                 return false;
             }else
                 return true;

@@ -41,6 +41,7 @@ public class WalkRecord {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Builder.Default
     @ElementCollection
     @CollectionTable(name = "walk_path_points", joinColumns = @JoinColumn(name = "walk_record_id"))
     @Column(name = "point")

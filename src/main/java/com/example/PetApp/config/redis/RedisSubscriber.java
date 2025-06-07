@@ -19,70 +19,103 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class RedisSubscriber {
+
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ObjectMapper objectMapper;
     private final StringRedisTemplate redisTemplate;
     private final ChatRoomRepository chatRoomRepository;
     private final MemberChatRoomRepository memberChatRoomRepository;
 
-    @Transactional//lazy 문제 분리 좀 시켜야됨. 추후에 리팩토링 진행해야됨.
-    public void sendMessage(String message) throws JsonProcessingException {
-        ChatMessage chatMessage = objectMapper.readValue(message, ChatMessage.class);
-        Map<Long, Long> unReadMap = new HashMap<>();
+    @Transactional
+    public void sendMessage(String message) {
+        ChatMessage chatMessage = deserializeMessage(message);
         if (chatMessage.getChatRoomType() == ChatMessage.ChatRoomType.MANY) {
-            ChatRoom chatRoom = chatRoomRepository.findById(chatMessage.getChatRoomId()).orElseThrow(() -> new RuntimeException("채탕방 없음"));
-
-            simpMessagingTemplate.convertAndSend("/sub/chat/" + chatMessage.getChatRoomId(), chatMessage);
-
-            redisTemplate.opsForValue().set("chat:lastMessage" + chatMessage.getChatRoomId(), chatMessage.getMessage());
-            redisTemplate.opsForValue().set("chat:lastMessageTime" + chatMessage.getChatRoomId(), String.valueOf(chatMessage.getMessageTime()));
-            Set<String> onlineProfiles = redisTemplate.opsForSet().members("chatRoomId:" + chatRoom.getChatRoomId() + ":onlineProfiles");
-
-            for (Profile profile : chatRoom.getProfiles()) {
-                if (!(profile.getProfileId().equals(chatMessage.getSenderId()))) {
-                    // onlineProfiles가 null이 아닌지 체크하고 포함 여부 확인
-                    boolean isOnline = onlineProfiles != null && onlineProfiles.contains(profile.getProfileId().toString());
-
-                    if (!isOnline) {  // 오프라인인 경우만 count 증가
-                        String key = "unReadChatCount:" + chatMessage.getChatRoomId() + ":" + profile.getProfileId();
-                        Long count = redisTemplate.opsForValue().increment(key);
-                        unReadMap.put(profile.getMember().getMemberId(), count);
-                    }
-                }
-            }
-
-            UpdateChatRoomList updateChatRoomList = UpdateChatRoomList.builder()
-                    .chatRoomId(chatRoom.getChatRoomId())
-                    .lastMessage(chatMessage.getMessage())
-                    .lastMessageTime(chatMessage.getMessageTime())
-                    .unReadCount(unReadMap)
-                    .build();
-            simpMessagingTemplate.convertAndSend("/sub/chat/update", updateChatRoomList);//채팅방에 대한 정보
+            handleGroupChatMessage(chatMessage);
         } else {
-            MemberChatRoom memberChatRoom = memberChatRoomRepository.findById(chatMessage.getChatRoomId()).orElseThrow(() -> new RuntimeException("채팅방 없음"));
-            simpMessagingTemplate.convertAndSend("/sub/member/chat/" + chatMessage.getChatRoomId(), chatMessage);
+            handleOneToOneChatMessage(chatMessage);
+        }
+    }
 
-            redisTemplate.opsForValue().set("memberChat:lastMessage" + chatMessage.getChatRoomId(), chatMessage.getMessage());
-            redisTemplate.opsForValue().set("memberChat:lastMessageTime" + chatMessage.getChatRoomId(), String.valueOf(chatMessage.getMessageTime()));
-            Set<String> onlineMembers = redisTemplate.opsForSet().members("memberChatRoomId:" + memberChatRoom.getMemberChatRoomId() + ":onlineMembers");
-            for (Member member : memberChatRoom.getMembers()) {
-                if (!member.getMemberId().equals(chatMessage.getSenderId())) {
-                    boolean isOnline = onlineMembers != null && onlineMembers.contains(member.getMemberId().toString());
-                    if (!isOnline) {
-                        String key = "unReadMemberChat:" + chatMessage.getChatRoomId() + ":" + member.getMemberId();
-                        Long count = redisTemplate.opsForValue().increment(key);
-                        unReadMap.put(member.getMemberId(), count);
-                    }
+    private ChatMessage deserializeMessage(String message) {
+        try {
+            return objectMapper.readValue(message, ChatMessage.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("RedisSubscriber: 메시지 역직렬화 실패", e);
+        }
+    }
+
+    private void handleGroupChatMessage(ChatMessage chatMessage) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatMessage.getChatRoomId())
+                .orElseThrow(() -> new RuntimeException("Group ChatRoom not found"));
+
+        simpMessagingTemplate.convertAndSend("/sub/chat/" + chatMessage.getChatRoomId(), chatMessage);
+        saveLastMessageToRedis("chat:lastMessage", "chat:lastMessageTime", chatMessage);
+
+        Set<String> onlineProfiles = redisTemplate.opsForSet().members(
+                "chatRoomId:" + chatRoom.getChatRoomId() + ":onlineProfiles");
+
+        Map<Long, Long> unReadMap = countUnreadForGroup(chatRoom, chatMessage, onlineProfiles);
+
+        sendChatRoomUpdate("/sub/chat/update", chatRoom.getChatRoomId(), chatMessage, unReadMap);
+    }
+
+    private void handleOneToOneChatMessage(ChatMessage chatMessage) {
+        MemberChatRoom chatRoom = memberChatRoomRepository.findById(chatMessage.getChatRoomId())
+                .orElseThrow(() -> new RuntimeException("MemberChatRoom not found"));
+
+        simpMessagingTemplate.convertAndSend("/sub/member/chat/" + chatMessage.getChatRoomId(), chatMessage);
+        saveLastMessageToRedis("memberChat:lastMessage", "memberChat:lastMessageTime", chatMessage);
+
+        Set<String> onlineMembers = redisTemplate.opsForSet().members(
+                "memberChatRoomId:" + chatRoom.getMemberChatRoomId() + ":onlineMembers");
+
+        Map<Long, Long> unReadMap = countUnreadForMembers(chatRoom, chatMessage, onlineMembers);
+
+        sendChatRoomUpdate("/sub/member/chat/update", chatRoom.getMemberChatRoomId(), chatMessage, unReadMap);
+    }
+
+    private void saveLastMessageToRedis(String messageKeyPrefix, String timeKeyPrefix, ChatMessage message) {
+        redisTemplate.opsForValue().set(messageKeyPrefix + message.getChatRoomId(), message.getMessage());
+        redisTemplate.opsForValue().set(timeKeyPrefix + message.getChatRoomId(), String.valueOf(message.getMessageTime()));
+    }
+
+    private Map<Long, Long> countUnreadForGroup(ChatRoom chatRoom, ChatMessage message, Set<String> onlineProfiles) {
+        Map<Long, Long> unReadMap = new HashMap<>();
+        for (Profile profile : chatRoom.getProfiles()) {
+            if (!profile.getProfileId().equals(message.getSenderId())) {
+                boolean isOnline = onlineProfiles != null && onlineProfiles.contains(profile.getProfileId().toString());
+                if (!isOnline) {
+                    String key = "unReadChatCount:" + message.getChatRoomId() + ":" + profile.getProfileId();
+                    Long count = redisTemplate.opsForValue().increment(key);
+                    unReadMap.put(profile.getMember().getMemberId(), count);
                 }
             }
-            UpdateChatRoomList updateChatRoomList = UpdateChatRoomList.builder()
-                    .chatRoomId(memberChatRoom.getMemberChatRoomId())
-                    .lastMessage(chatMessage.getMessage())
-                    .lastMessageTime(chatMessage.getMessageTime())
-                    .unReadCount(unReadMap)
-                    .build();
-            simpMessagingTemplate.convertAndSend("/sub/member/chat/update", updateChatRoomList);
-
         }
+        return unReadMap;
+    }
+
+    private Map<Long, Long> countUnreadForMembers(MemberChatRoom chatRoom, ChatMessage message, Set<String> onlineMembers) {
+        Map<Long, Long> unReadMap = new HashMap<>();
+        for (Member member : chatRoom.getMembers()) {
+            if (!member.getMemberId().equals(message.getSenderId())) {
+                boolean isOnline = onlineMembers != null && onlineMembers.contains(member.getMemberId().toString());
+                if (!isOnline) {
+                    String key = "unReadMemberChat:" + message.getChatRoomId() + ":" + member.getMemberId();
+                    Long count = redisTemplate.opsForValue().increment(key);
+                    unReadMap.put(member.getMemberId(), count);
+                }
+            }
+        }
+        return unReadMap;
+    }
+
+    private void sendChatRoomUpdate(String destination, Long roomId, ChatMessage message, Map<Long, Long> unReadMap) {
+        UpdateChatRoomList update = UpdateChatRoomList.builder()
+                .chatRoomId(roomId)
+                .lastMessage(message.getMessage())
+                .lastMessageTime(message.getMessageTime())
+                .unReadCount(unReadMap)
+                .build();
+        simpMessagingTemplate.convertAndSend(destination, update);
     }
 }

@@ -1,5 +1,7 @@
 package com.example.PetApp.controller;
 
+import com.example.PetApp.dto.MessageResponse;
+import com.example.PetApp.service.member.MemberService;
 import com.example.PetApp.service.member.MemberStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/status")
 @RequiredArgsConstructor
 public class MemberStatusController {
+
     private final MemberStatusService memberStatusService;
 
     @PostMapping
-    private ResponseEntity<?> MemberStatus(Authentication authentication) {
-        return memberStatusService.updateMemberStatus(authentication.getPrincipal().toString());
+    private ResponseEntity<MessageResponse> MemberStatus(Authentication authentication) {
+        memberStatusService.updateMemberStatus(authentication.getPrincipal().toString());
+        return ResponseEntity.ok(new MessageResponse("foreGround"));
     }
 }

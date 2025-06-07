@@ -14,9 +14,9 @@ public class FileUploadUtil {
     public static String fileUpload(MultipartFile imageUrl, String uploadDir, FileImageKind fileImageKind) {
         UUID uuid = UUID.randomUUID();//기본 이미지를 넣어야할듯.
         String imageFileName;
-        if (imageUrl.isEmpty()) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
             return "/basic/Profile_avatar_placeholder_large.png";
-        }else {
+        } else {
             imageFileName = uuid + "_" + imageUrl.getOriginalFilename();
             try {
                 Path path = Paths.get(uploadDir, imageFileName);
@@ -25,7 +25,7 @@ public class FileUploadUtil {
                 log.error("사진 저장중 에러");
                 throw new RuntimeException(e);
             }
-            return "/"+ fileImageKind.getType()+"/"+imageFileName;
+            return "/" + fileImageKind.getType() + "/" + imageFileName;
         }
     }
 }

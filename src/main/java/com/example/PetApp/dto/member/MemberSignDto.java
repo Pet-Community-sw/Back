@@ -10,6 +10,8 @@ import javax.validation.constraints.Pattern;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@ToString
 public class MemberSignDto {
     @NotEmpty
     @Pattern(regexp = "^[a-zA-Z가-힣\\\\s]{2,15}",
