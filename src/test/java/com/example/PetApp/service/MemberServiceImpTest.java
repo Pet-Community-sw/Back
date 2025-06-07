@@ -15,11 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.swing.text.html.Option;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -157,6 +155,42 @@ class MemberServiceImpTest {
 
         //then
         verify(emailService).sendMail(sendEmailDto.getEmail());
+    }
+
+    @Test
+    @DisplayName("resetPassword_성공")
+    void test7() {
+        //given
+        String email = "chltjswo789@naver.com";
+        ResetPasswordDto resetPasswordDto = new ResetPasswordDto("fpdlswj365!!");
+        Member member = createFakeMember();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(passwordEncoder.matches(resetPasswordDto.getNewPassword(), member.getPassword())).thenReturn(false);
+        when(passwordEncoder.encode(resetPasswordDto.getNewPassword())).thenReturn(resetPasswordDto.getNewPassword());
+
+        //when
+        memberServiceImp.resetPassword(resetPasswordDto, email);
+
+        //then
+        assertThat(member.getPassword()).isEqualTo(resetPasswordDto.getNewPassword());
+    }
+
+    @Test
+    @DisplayName("resetPassword_실패")
+    void test8() {
+        //given
+        String email = "chltjswo789@naver.com";
+        ResetPasswordDto resetPasswordDto = new ResetPasswordDto("fpdlswj365!");
+        Member member = createFakeMember();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(passwordEncoder.matches(resetPasswordDto.getNewPassword(), member.getPassword())).thenReturn(true);
+
+        //when & then
+        assertThatThrownBy(() -> memberServiceImp.resetPassword(resetPasswordDto, email))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("전 비밀번호와 다르게 설정해야합니다.");
     }
 
     @Test
