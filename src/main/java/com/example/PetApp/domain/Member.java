@@ -11,6 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "member")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)//JPA 내부에서는 접근 가능하고, 외부에서는 new로 빈 객체 생성 못 하게
 //기본 생성자를 protected로 두는 게 안전하고 객체지향적이다
 @AllArgsConstructor

@@ -6,8 +6,8 @@ import com.example.PetApp.dto.member.*;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.service.email.EmailService;
-import com.example.PetApp.service.member.MemberServiceImp;
 import com.example.PetApp.service.token.TokenService;
+import com.example.PetApp.util.Mapper;
 import com.example.PetApp.util.imagefile.FileImageKind;
 import com.example.PetApp.util.imagefile.FileUploadUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -26,14 +26,15 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MemberServiceImpTest {
+class MemberServiceTest {
 
     @InjectMocks
-    private MemberServiceImp memberServiceImp;
+    private com.example.PetApp.service.member.MemberServiceImp memberServiceImp;
     @Mock
     private MemberRepository memberRepository;
     @Mock
@@ -43,6 +44,7 @@ class MemberServiceImpTest {
     @Mock
     private EmailService emailService;
 
+    Member member = Mapper.createFakeMember();
 
     @Test
     @DisplayName("signup_성공")
@@ -55,11 +57,19 @@ class MemberServiceImpTest {
                 .phoneNumber("01043557198")
                 .memberImageUrl(null)
                 .build();
+
+        when(memberRepository.existsByEmail(memberSignDto.getEmail())).thenReturn(false);
+        when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> {
+            Member fakeMember = invocation.getArgument(0);
+            fakeMember.setMemberId(100L);
+            return fakeMember;
+        });
         //when
         MemberSignResponseDto member = memberServiceImp.createMember(memberSignDto);
 
         //then
         assertThat(member).isNotNull();
+        assertThat(member.getMemberId()).isEqualTo(100L);
     }
 
     @Test
@@ -106,7 +116,7 @@ class MemberServiceImpTest {
                 .password("1234")
                 .build();
 
-        Member member = createFakeMember();
+        Member member = Mapper.createFakeMember();
 
         LoginResponseDto loginResponseDto = LoginResponseDto.builder()
                 .name("최선재")
@@ -146,7 +156,7 @@ class MemberServiceImpTest {
     void test6() {
         //given
         SendEmailDto sendEmailDto = new SendEmailDto("chltjswo789@naver.com");
-        Member member = createFakeMember();
+        Member member = Mapper.createFakeMember();
 
         when(memberRepository.findByEmail(sendEmailDto.getEmail())).thenReturn(Optional.of(member));
 
@@ -163,7 +173,7 @@ class MemberServiceImpTest {
         //given
         String email = "chltjswo789@naver.com";
         ResetPasswordDto resetPasswordDto = new ResetPasswordDto("fpdlswj365!!");
-        Member member = createFakeMember();
+        Member member = Mapper.createFakeMember();
 
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
         when(passwordEncoder.matches(resetPasswordDto.getNewPassword(), member.getPassword())).thenReturn(false);
@@ -182,7 +192,7 @@ class MemberServiceImpTest {
         //given
         String email = "chltjswo789@naver.com";
         ResetPasswordDto resetPasswordDto = new ResetPasswordDto("fpdlswj365!");
-        Member member = createFakeMember();
+        Member member = Mapper.createFakeMember();
 
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
         when(passwordEncoder.matches(resetPasswordDto.getNewPassword(), member.getPassword())).thenReturn(true);
@@ -191,20 +201,6 @@ class MemberServiceImpTest {
         assertThatThrownBy(() -> memberServiceImp.resetPassword(resetPasswordDto, email))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("전 비밀번호와 다르게 설정해야합니다.");
-    }
-
-    @Test
-    @DisplayName("sendEmail_실패")
-
-    private static Member createFakeMember() {
-        return Member.builder()
-                .memberId(1L)
-                .name("최선재")
-                .email("chltjswo789@naver.com")
-                .password("fpdlswj365!")
-                .phoneNumber("01043557198")
-                .memberImageUrl(null)
-                .build();
     }
 
 

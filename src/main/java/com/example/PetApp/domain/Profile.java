@@ -40,6 +40,7 @@ public class Profile {
 
     private String extraInfo;
 
+    @Builder.Default
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "profile_breed",
             joinColumns = @JoinColumn(name = "profile_id"),
