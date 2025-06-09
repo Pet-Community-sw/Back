@@ -45,7 +45,7 @@ public class ChattingService {
     private final SendNotificationUtil sendNotificationUtil;
 
 
-    public void sendToMessage(ChatMessage chatMessage, Long id) throws JsonProcessingException {
+    public void sendToMessage(ChatMessage chatMessage, Long id){
         if (!chatMessage.getSenderId().equals(id)) {
             throw new IllegalArgumentException("사용자가 동일하지 않습니다.");
         }
@@ -143,7 +143,7 @@ public class ChattingService {
         log.info("오프라인 멤버 목록 설정 (ONE): {}", offlineMembers);
     }
 
-    private void sendChatNotification(ChatMessage chatMessage) throws JsonProcessingException {
+    private void sendChatNotification(ChatMessage chatMessage) {
         Long chatRoomId = chatMessage.getChatRoomId();
         Long senderId = chatMessage.getSenderId();
 

@@ -50,24 +50,25 @@ public class ChatRoomServiceImp implements ChatRoomService {
     @Transactional
     @Override
     public CreateChatRoomResponseDto createChatRoom(WalkingTogetherPost walkingTogetherPost, Profile profile) {
-        Optional<ChatRoom> chatRoom2 = chatRoomRepository.findByWalkingTogetherPost(walkingTogetherPost);
-        if (chatRoom2.isEmpty()) {//채팅방이 없으면 새로운생성 있으면 profiles에 신청자 Profile 추가
+        Optional<ChatRoom> chatRoom1 = chatRoomRepository.findByWalkingTogetherPost(walkingTogetherPost);
+        if (chatRoom1.isEmpty()) {//채팅방이 없으면 새로운생성 있으면 profiles에 신청자 Profile 추가
             ChatRoom chatRoom = ChatRoomMapper.toEntity(walkingTogetherPost, profile);
             chatRoomRepository.save(chatRoom);
             return new CreateChatRoomResponseDto(chatRoom.getChatRoomId(), true);
         } else {
-            if (walkingTogetherPost.getLimitCount() <= chatRoom2.get().getProfiles().size()) {
+            if (walkingTogetherPost.getLimitCount() <= chatRoom1.get().getProfiles().size()) {
                 throw new ConflictException("인원초과");//채팅방 limitCount설정.
             }
-            ChatRoom chatRoom = chatRoom2.get();
+            ChatRoom chatRoom = chatRoom1.get();
             chatRoom.addProfiles(profile);
             return new CreateChatRoomResponseDto(chatRoom.getChatRoomId(), false);
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Long> getProfiles(Long chatRoomId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new RuntimeException("채팅방 없습니다."));
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new NotFoundException("채팅방 없습니다."));
 
         return chatRoom
                 .getProfiles()
