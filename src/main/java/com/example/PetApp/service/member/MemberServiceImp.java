@@ -1,12 +1,14 @@
 package com.example.PetApp.service.member;
 
 import com.example.PetApp.domain.Member;
+import com.example.PetApp.domain.Role;
 import com.example.PetApp.dto.member.*;
 import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.exception.UnAuthorizedException;
 import com.example.PetApp.mapper.MemberMapper;
 import com.example.PetApp.repository.jpa.MemberRepository;
+import com.example.PetApp.repository.jpa.RoleRepository;
 import com.example.PetApp.service.email.EmailService;
 import com.example.PetApp.service.fcm.FcmTokenService;
 import com.example.PetApp.service.token.TokenService;
@@ -33,6 +35,7 @@ public class MemberServiceImp implements MemberService{
     private final TokenService tokenService;
     private final EmailService emailService;
     private final FcmTokenService fcmTokenService;
+    private final RoleRepository roleRepository;
 
     @Transactional
     @Override
@@ -56,6 +59,7 @@ public class MemberServiceImp implements MemberService{
         if (!passwordEncoder.matches(loginDto.getPassword(),member.getPassword())) {
             throw new UnAuthorizedException("이메일 혹은 비밀번호가 일치하지 않습니다.");
         }
+        setRole(member);
         return tokenService.save(member);
     }
 
@@ -133,5 +137,10 @@ public class MemberServiceImp implements MemberService{
         Member member = memberRepository.findById(fcmTokenDto.getMemberId())
                 .orElseThrow(() -> new NotFoundException("해당 유저는 없습니다."));
         fcmTokenService.createFcmToken(member, fcmTokenDto.getFcmToken());
+    }
+
+    private void setRole(Member member) {
+        Role role = roleRepository.findByName("ROLE_USER").get();
+        member.addRole(role);
     }
 }

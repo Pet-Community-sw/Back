@@ -121,7 +121,13 @@ public class ProfileServiceImp implements ProfileService {
             throw new ForbiddenException("권한이 없습니다.");
         }
         redisUtil.createData(accessToken, "blacklist", 30 * 60L);//에세스토큰 유효시간
-        String newAccessToken = jwtTokenizer.createAccessToken(member.getMemberId(), profileId, member.getEmail());
+        List<String> roles = member
+                .getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(Collectors.toList());
+
+        String newAccessToken = jwtTokenizer.createAccessToken(member.getMemberId(), profileId, member.getEmail(), roles);
         return ProfileMapper.toAccessTokenToProfileIdResponseDto(profileId, newAccessToken);
     }
 

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class RecommendRoutePostMapper {
-    public static RecommendRoutePost toEntity(CreateRecommendRoutePostDto createRecommendRoutePostDto, Member member) {
+    public static RecommendRoutePost  toEntity(CreateRecommendRoutePostDto createRecommendRoutePostDto, Member member) {
         return RecommendRoutePost.builder()
                 .title(createRecommendRoutePostDto.getTitle())
                 .content(createRecommendRoutePostDto.getContent())

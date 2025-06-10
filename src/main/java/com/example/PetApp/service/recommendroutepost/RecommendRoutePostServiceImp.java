@@ -116,7 +116,7 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
         recommendRoutePostRepository.deleteById(recommendRoutePostId);
     }
 
-    private Map<Long, Long> getLikeCountMap(List<RecommendRoutePost> recommendRoutePosts) {
+    public Map<Long, Long> getLikeCountMap(List<RecommendRoutePost> recommendRoutePosts) {
         List<LikeCountDto> likeCountDtos = likeRepository.countByRecommendRoutePost(recommendRoutePosts);
         return likeCountDtos.stream().collect(Collectors.toMap(
                 LikeCountDto::getPostId,

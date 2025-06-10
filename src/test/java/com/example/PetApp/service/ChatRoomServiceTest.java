@@ -15,7 +15,6 @@ import com.example.PetApp.repository.mongo.ChatMessageRepository;
 import com.example.PetApp.service.chat.ChatRoomServiceImp;
 import com.example.PetApp.service.chat.ChattingReader;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,8 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
-import javax.swing.text.html.Option;
-import java.lang.invoke.CallSite;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +78,6 @@ class ChatRoomServiceTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
         when(chatRoomRepository.findAllByProfilesContains(profile)).thenReturn(List.of(chatRoom));
-
 
         when(valueOperations.get("chat:lastMessage99")).thenReturn("안녕!");
         when(valueOperations.get("chat:lastMessageTime99")).thenReturn(LocalDateTime.now().toString());
@@ -478,7 +474,5 @@ class ChatRoomServiceTest {
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("수정 권한이 없습니다.");
     }
-
-
 }
 
