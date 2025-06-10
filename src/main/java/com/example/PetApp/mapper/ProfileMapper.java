@@ -18,7 +18,7 @@ public class ProfileMapper {
     public static Profile toEntity(ProfileDto profileDto, Member member, String imageFileName) {
         return Profile.builder()
                 .member(member)
-                .petImageUrl("/profiles/" + imageFileName)
+                .petImageUrl(imageFileName)
                 .petBirthDate(profileDto.getPetBirthDate())
                 .extraInfo(profileDto.getExtraInfo())
                 .petBreed(profileDto.getPetBreed())

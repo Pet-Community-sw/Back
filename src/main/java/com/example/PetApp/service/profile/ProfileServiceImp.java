@@ -15,6 +15,7 @@ import com.example.PetApp.util.imagefile.FileImageKind;
 import com.example.PetApp.util.imagefile.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,7 @@ public class ProfileServiceImp implements ProfileService {
     @Transactional//accesstoken 수정 필요 이름이 같은지 확인해야됨.
     @Override
     public CreateProfileResponseDto createProfile(ProfileDto profileDto, String email) {
-        log.info("addProfile 요청 email : {}", email);
+        log.info("createProfile 요청 email : {}", email);
         Member member = memberRepository.findByEmail(email).get();
         if (profileRepository.countByMember(member) >= 4) {
             throw new ConflictException("프로필은 최대 4개 입니다.");
@@ -53,6 +54,8 @@ public class ProfileServiceImp implements ProfileService {
         Profile profile = ProfileMapper.toEntity(profileDto, member, imageFileName);
         validateBreed(profileDto, profile);
         profileRepository.save(profile);
+        log.info("imageUrl: {}", imageFileName);
+
         return new CreateProfileResponseDto(profile.getProfileId());
     }
 
@@ -121,14 +124,19 @@ public class ProfileServiceImp implements ProfileService {
             throw new ForbiddenException("권한이 없습니다.");
         }
         redisUtil.createData(accessToken, "blacklist", 30 * 60L);//에세스토큰 유효시간
-        List<String> roles = member
+        List<String> roles = getRoles(member);
+
+        String newAccessToken = jwtTokenizer.createAccessToken(member.getMemberId(), profileId, member.getEmail(), roles);
+        return ProfileMapper.toAccessTokenToProfileIdResponseDto(profileId, newAccessToken);
+    }
+
+    @NotNull
+    private static List<String> getRoles(Member member) {
+        return member
                 .getRoles()
                 .stream()
                 .map(Role::getName)
                 .collect(Collectors.toList());
-
-        String newAccessToken = jwtTokenizer.createAccessToken(member.getMemberId(), profileId, member.getEmail(), roles);
-        return ProfileMapper.toAccessTokenToProfileIdResponseDto(profileId, newAccessToken);
     }
 
 

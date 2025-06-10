@@ -10,14 +10,14 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/profiles/**")
-                .addResourceLocations("file:/Users/choiseonjae/Desktop/PetApp/profiles/");
-        registry.addResourceHandler("/posts/**")
-                .addResourceLocations("file:/Users/choiseonjae/Desktop/PetApp/posts/");
-        registry.addResourceHandler("/members/**")
-                .addResourceLocations("file:/Users/choiseonjae/Desktop/PetApp/members/");
-        registry.addResourceHandler("/basic/**")
-                .addResourceLocations("file:/Users/choiseonjae/Desktop/PetApp/basic/");
+        registry.addResourceHandler("/image/profiles/**")
+                .addResourceLocations("file:///Users/choiseonjae/Desktop/PetApp/profiles/");
+        registry.addResourceHandler("/image/posts/**")
+                .addResourceLocations("file:///Users/choiseonjae/Desktop/PetApp/posts/");
+        registry.addResourceHandler("/image/members/**")
+                .addResourceLocations("file:///Users/choiseonjae/Desktop/PetApp/members/");
+        registry.addResourceHandler("/image/basic/**")
+                .addResourceLocations("file:///Users/choiseonjae/Desktop/PetApp/basic/");
     }
 
     @Override

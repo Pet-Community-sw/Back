@@ -25,7 +25,7 @@ public class FileUploadUtil {
                 log.error("사진 저장중 에러");
                 throw new RuntimeException(e);
             }
-            return "/" + fileImageKind.getType() + "/" + imageFileName;
+            return "/image/" + fileImageKind.getType() + "/" + imageFileName;
         }
     }
 }

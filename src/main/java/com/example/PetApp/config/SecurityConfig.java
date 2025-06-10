@@ -32,10 +32,12 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                .antMatchers("/image/profiles/**","/image/members/**","/image/posts/**", "/image/basic/**","/favicon.ico").permitAll()
                 .mvcMatchers("/ws-stomp/**", "/pub/**", "/sub/**").permitAll()
                 .mvcMatchers("/members/signup", "/members/accessToken", "/members/login",
-                        "/members/find-id", "/members/send-email", "/members/verify-code",
-                        "/members/reset-password").permitAll()
+        "/members/find-id", "/members/send-email", "/members/verify-code",
+        "/members/reset-password").permitAll()
+
                 .mvcMatchers(GET, "/**").hasAnyRole("USER", "ADMIN")
                 .mvcMatchers(POST, "/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()
