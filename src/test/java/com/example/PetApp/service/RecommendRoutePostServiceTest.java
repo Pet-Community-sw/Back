@@ -2,9 +2,9 @@ package com.example.PetApp.service;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RecommendRoutePost;
-import com.example.PetApp.dto.recommendroutepost.CreateRecommendRoutePostDto;
-import com.example.PetApp.dto.recommendroutepost.CreateRecommendRoutePostResponseDto;
-import com.example.PetApp.dto.recommendroutepost.GetRecommendRoutePostsResponseDto;
+import com.example.PetApp.dto.recommendroutepost.*;
+import com.example.PetApp.exception.ForbiddenException;
+import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
@@ -78,8 +78,8 @@ public class RecommendRoutePostServiceTest {
     }
 
     @Test
-    @DisplayName("getRecommendRoutePosts_성공")
-    void testGetRecommendRoutePosts() {
+    @DisplayName("getRecommendRoutePosts_by-location_성공")
+    void test2() {
         // given
         String email = "chltjswo789@naver.com";
         Member member = Member.builder()
@@ -122,6 +122,269 @@ public class RecommendRoutePostServiceTest {
         //then
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getTitle()).isEqualTo("산책로 2");
+    }
+
+    @Test
+    @DisplayName("getRecommendRoutePosts_by-place_성공")
+    void test3() {
+        // given
+        String email = "chltjswo789@naver.com";
+        Member member = Member.builder()
+                .memberId(1L)
+                .email(email)
+                .build();
+
+        RecommendRoutePost post1 = RecommendRoutePost.builder()
+                .recommendRouteId(1L)
+                .member(member)
+                .title("산책로 1")
+                .content("좋아요")
+                .locationLongitude(127.01)
+                .locationLatitude(37.55)
+                .recommendRouteTime(LocalDateTime.now())
+                .build();
+
+        RecommendRoutePost post2 = RecommendRoutePost.builder()
+                .recommendRouteId(2L)
+                .member(member)
+                .title("산책로 2")
+                .content("좋아요")
+                .locationLongitude(127.02)
+                .locationLatitude(37.56)
+                .recommendRouteTime(LocalDateTime.now())
+                .build();
+
+        List<RecommendRoutePost> posts = new ArrayList<>();
+        posts.add(post2);
+        posts.add(post1);
+        Page<RecommendRoutePost> fakePage = new PageImpl<>(posts);
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(recommendRoutePostRepository.findByRecommendRoutePostByPlace(anyDouble(), anyDouble(), any(Pageable.class))).thenReturn(fakePage);
+        when(likeRepository.findLikedRecommendIds(member, posts)).thenReturn(List.of(1L));
+
+        //when
+        List<GetRecommendRoutePostsResponseDto> result = recommendRoutePostServiceImp.getRecommendRoutePosts(127.02, 37.56, 0, email);
+
+        //then
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("getRecommendRoutePost_성공")
+    void test4() {
+        //given
+        Long recommendRoutePostId = 1L;
+        String email = "test";
+        Member member = Member.builder()
+                .memberId(1L)
+                .name("초이")
+                .memberImageUrl("abc")
+                .build();
+
+        RecommendRoutePost recommendRoutePost=RecommendRoutePost.builder()
+                .recommendRouteId(1L)
+                .title("a")
+                .content("b")
+                .member(member)
+                .locationLongitude(127.06)
+                .locationLatitude(32.02)
+                .recommendRouteTime(LocalDateTime.now())
+                .build();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
+        when(likeRepository.countByRecommendRoutePost(any(RecommendRoutePost.class))).thenReturn(3L);
+        when(likeRepository.existsByRecommendRoutePostAndMember(any(RecommendRoutePost.class), any(Member.class))).thenReturn(true);
+
+        //when
+        GetRecommendPostResponseDto result = recommendRoutePostServiceImp.getRecommendRoutePost(recommendRoutePostId, email);
+
+        //then
+        assertThat(result.getRecommendRoutePostId()).isEqualTo(recommendRoutePost.getRecommendRouteId());
+        assertThat(result.getTitle()).isEqualTo(recommendRoutePost.getTitle());
+        assertThat(result.getContent()).isEqualTo(recommendRoutePost.getContent());
+        assertThat(result.getLikeCount()).isEqualTo(3L);
+        assertThat(result.isLike()).isTrue();
+
+    }
+
+    @Test
+    @DisplayName("getRecommendRoutePost_산책길 추천 게시물이 없을 경우_실패")
+    void test5() {
+        //given
+        Long recommendRoutePostId = 1L;
+        String email = "test";
+
+        Member member = Member.builder()
+                .memberId(1L)
+                .build();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> recommendRoutePostServiceImp.getRecommendRoutePost(recommendRoutePostId, email))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("해당 산책길 추천 게시물은 없습니다.");
+    }
+
+    @Test
+    @DisplayName("updateRecommendRoutePost_성공")
+    void test6() {
+        //given
+        Long recommendRoutePostId = 1L;
+        String email = "test";
+
+        Member member=Member.builder()
+                .memberId(1L)
+                .build();
+
+        UpdateRecommendRoutePostDto updateRecommendRoutePostDto = UpdateRecommendRoutePostDto.builder()
+                .title("aa")
+                .content("bb")
+                .build();
+
+        RecommendRoutePost recommendRoutePost=RecommendRoutePost.builder()
+                .title("a")
+                .content("b")
+                .member(member)
+                .build();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
+
+        //when
+        recommendRoutePostServiceImp.updateRecommendRoutePost(recommendRoutePostId, updateRecommendRoutePostDto, email);
+
+        //then
+        assertThat(recommendRoutePost.getTitle()).isEqualTo("aa");
+        assertThat(recommendRoutePost.getContent()).isEqualTo("bb");
+    }
+
+    @Test
+    @DisplayName("updateRecommendRoutePost_산책길 추천 게시글이 없는경우_실패")
+    void test7() {
+        //given
+        Long recommendRoutePostId = 1L;
+        String email = "test";
+
+        Member member=Member.builder()
+                .memberId(1L)
+                .build();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> recommendRoutePostServiceImp.updateRecommendRoutePost(recommendRoutePostId, any(UpdateRecommendRoutePostDto.class), email))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("해당 산책길 추천 게시글은 없습니다.");
+    }
+
+    @Test
+    @DisplayName("updateRecommendRoutePost_수정 권한 없는경우_실패")
+    void test8() {
+        //given
+        Long recommendRoutePostId = 1L;
+        String email = "test";
+
+        Member member=Member.builder()
+                .memberId(1L)
+                .build();
+
+        Member fakeMember=Member.builder()
+                .memberId(2L)
+                .build();
+
+        RecommendRoutePost recommendRoutePost=RecommendRoutePost.builder()
+                .recommendRouteId(1L)
+                .member(member)
+                .build();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(fakeMember));
+        when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
+
+        //when & then
+        assertThatThrownBy(() -> recommendRoutePostServiceImp.updateRecommendRoutePost(recommendRoutePostId, any(UpdateRecommendRoutePostDto.class), email))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage("수정 권한이 없습니다.");
+    }
+
+    @Test
+    @DisplayName("deleteRecommendRoutePost_성공")
+    void test9() {
+        //given
+        Long recommendRoutePostId = 1L;
+        String email = "test";
+
+        Member member=Member.builder()
+                .memberId(1L)
+                .build();
+
+        RecommendRoutePost recommendRoutePost=RecommendRoutePost.builder()
+                .recommendRouteId(1L)
+                .member(member)
+                .build();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
+
+        //when
+        recommendRoutePostServiceImp.deleteRecommendRoutePost(recommendRoutePostId, email);
+
+        //then
+        verify(recommendRoutePostRepository).deleteById(recommendRoutePostId);
+
+    }
+
+    @Test
+    @DisplayName("deleteRecommendRoutePost_산책길 추천 게시글이 없는 경우_실패")
+    void test10() {
+        //given
+        Long recommendRoutePostId = 1L;
+        String email = "test";
+
+        Member member = Member.builder()
+                .memberId(1L)
+                .build();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> recommendRoutePostServiceImp.deleteRecommendRoutePost(recommendRoutePostId, email))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("해당 산책길 추천 게시글은 없습니다.");
+    }
+
+    @Test
+    @DisplayName("deleteRecommendRoutePost_삭제 권한이 없는 경우_실패")
+    void test11() {
+        //given
+        Long recommendRoutePostId = 1L;
+        String email = "test";
+
+        Member member=Member.builder()
+                .memberId(1L)
+                .build();
+
+        Member fakeMember=Member.builder()
+                .memberId(2L)
+                .build();
+
+        RecommendRoutePost recommendRoutePost=RecommendRoutePost.builder()
+                .recommendRouteId(1L)
+                .member(member)
+                .build();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(fakeMember));
+        when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
+
+        //when & then
+        assertThatThrownBy(() -> recommendRoutePostServiceImp.deleteRecommendRoutePost(recommendRoutePostId, email))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage("삭제 권한이 없습니다.");
     }
 
 }

@@ -63,10 +63,7 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
         log.info("getRecommendRoutePostsByPlace 요청 email : {}", email);
         Member member = memberRepository.findByEmail(email).get();
         Pageable pageable = PageRequest.of(page, 10);
-        List<RecommendRoutePost> recommendRoutePosts = recommendRoutePostRepository.findByRecommendRoutePostByPlace(longitude,
-                        latitude,
-                        pageable)
-                .getContent();
+        List<RecommendRoutePost> recommendRoutePosts = recommendRoutePostRepository.findByRecommendRoutePostByPlace(longitude, latitude, pageable).getContent();
 
         return RecommendRoutePostMapper.toRecommendRoutePostsList(recommendRoutePosts,
                 getLikeCountMap(recommendRoutePosts),
@@ -92,11 +89,11 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
     @Transactional
     @Override
     public void updateRecommendRoutePost(Long recommendRoutePostId, UpdateRecommendRoutePostDto updateRecommendRoutePostDto, String email) {
+        log.info("updateRecommendRoutePost 요청 recommendRoutePostId : {}, email : {}", recommendRoutePostId, email);
         Member member = memberRepository.findByEmail(email).get();
-        log.info("updateRecommendRoutePost 요청 memberId : {}", member.getMemberId());
         RecommendRoutePost post = recommendRoutePostRepository.findById(recommendRoutePostId)
                 .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
-        if (post.getMember().equals(member)) {
+        if (!(post.getMember().equals(member))) {
             throw new ForbiddenException("수정 권한이 없습니다.");
         }
         post.setTitle(updateRecommendRoutePostDto.getTitle());
@@ -106,11 +103,11 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
     @Transactional
     @Override
     public void deleteRecommendRoutePost(Long recommendRoutePostId, String email) {
-        log.info("deleteRecommendRoutePost 요청 email : {}", email);
+        log.info("deleteRecommendRoutePost 요청 recommendRoutePostId : {}, email : {}", recommendRoutePostId, email);
         Member member = memberRepository.findByEmail(email).get();
         RecommendRoutePost post = recommendRoutePostRepository.findById(recommendRoutePostId)
                 .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
-        if (post.getMember().equals(member)) {
+        if (!(post.getMember().equals(member))) {
             throw new ForbiddenException("삭제 권한이 없습니다.");
         }
         recommendRoutePostRepository.deleteById(recommendRoutePostId);

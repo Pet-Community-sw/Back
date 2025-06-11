@@ -2,9 +2,11 @@ package com.example.PetApp.service;
 
 
 import com.example.PetApp.domain.Member;
+import com.example.PetApp.domain.Role;
 import com.example.PetApp.dto.member.*;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.repository.jpa.MemberRepository;
+import com.example.PetApp.repository.jpa.RoleRepository;
 import com.example.PetApp.service.email.EmailService;
 import com.example.PetApp.service.token.TokenService;
 import com.example.PetApp.util.Mapper;
@@ -43,6 +45,9 @@ class MemberServiceTest {
     private TokenService tokenService;
     @Mock
     private EmailService emailService;
+
+    @Mock
+    private RoleRepository roleRepository;
 
     Member member = Mapper.createFakeMember();
 
@@ -104,7 +109,7 @@ class MemberServiceTest {
         String result = FileUploadUtil.fileUpload(null, "/uploads", FileImageKind.MEMBER);
 
         // then
-        assertThat(result).isEqualTo("/basic/Profile_avatar_placeholder_large.png");
+        assertThat(result).isEqualTo("/image/basic/Profile_avatar_placeholder_large.png");
     }
 
     @Test
@@ -114,6 +119,11 @@ class MemberServiceTest {
         LoginDto loginDto = LoginDto.builder()
                 .email("chltjswo789@naver.com")
                 .password("1234")
+                .build();
+
+        Role role = Role.builder()
+                .roleId(1L)
+                .name("ROLE_USER")
                 .build();
 
         Member member = Mapper.createFakeMember();
@@ -126,7 +136,7 @@ class MemberServiceTest {
         when(memberRepository.findByEmail(loginDto.getEmail())).thenReturn(Optional.of(member));
         when(passwordEncoder.matches("1234", "fpdlswj365!")).thenReturn(true);
         when(tokenService.save(member)).thenReturn(loginResponseDto);
-
+        when(roleRepository.findByName(any())).thenReturn(Optional.of(role));
         //when
         LoginResponseDto result = memberServiceImp.login(loginDto);
         //then
