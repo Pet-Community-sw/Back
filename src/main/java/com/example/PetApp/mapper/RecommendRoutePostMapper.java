@@ -34,7 +34,7 @@ public class RecommendRoutePostMapper {
                         recommendRoutePost.getMember().getMemberId(),
                         recommendRoutePost.getMember().getName(),
                         recommendRoutePost.getMember().getMemberImageUrl(),
-                        likeCountMap.get(recommendRoutePost.getRecommendRouteId()),
+                        likeCountMap.getOrDefault(recommendRoutePost.getRecommendRouteId(), 0L),
                         recommendRoutePost.getLocationLongitude(),
                         recommendRoutePost.getLocationLatitude(),
                         TimeAgoUtil.getTimeAgo(recommendRoutePost.getRecommendRouteTime()),

@@ -26,12 +26,13 @@ public interface RecommendRoutePostRepository extends JpaRepository<RecommendRou
     );
 
 
-    @Query(value = "select * from RecommendRoutePost r " +
-            "where r.locationLongitude between :minLongitude and :maxLongitude " +
-            "and r.locationLatitude between :minLatitude and :maxLatitude " +
-            "order by r.recommendRouteTime desc ",
+    @Query(value = "select * from recommend_route_post r " +
+                    "where r.location_longitude between :minLongitude and :maxLongitude " +
+                    "and r.location_latitude between :minLatitude and :maxLatitude " +
+                    "order by r.recommend_route_time desc",
             countQuery = "select count(1) from recommend_route_post r " +
-                    "where ST_Distance_Sphere(POINT(r.location_longitude, r.location_latitude), POINT(:longitude, :latitude)) <= 1000",
+                    "where r.location_longitude between :minLongitude and :maxLongitude " +
+                    "and r.location_latitude between :minLatitude and :maxLatitude",
             nativeQuery = true)
     Page<RecommendRoutePost> findByRecommendRoutePostByLocation(
             @Param("minLongitude") Double minLongitude,
@@ -40,4 +41,5 @@ public interface RecommendRoutePostRepository extends JpaRepository<RecommendRou
             @Param("maxLatitude") Double maxLatitude,
             Pageable pageable
     );
+
 }

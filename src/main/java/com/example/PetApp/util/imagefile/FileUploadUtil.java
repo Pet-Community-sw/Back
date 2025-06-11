@@ -15,7 +15,7 @@ public class FileUploadUtil {
         UUID uuid = UUID.randomUUID();//기본 이미지를 넣어야할듯.
         String imageFileName;
         if ((imageUrl == null || imageUrl.isEmpty() && fileImageKind == FileImageKind.MEMBER)) {
-            return "/basic/Profile_avatar_placeholder_large.png";
+            return "/image/basic/Profile_avatar_placeholder_large.png";
         } else {
             imageFileName = uuid + "_" + imageUrl.getOriginalFilename();
             try {
