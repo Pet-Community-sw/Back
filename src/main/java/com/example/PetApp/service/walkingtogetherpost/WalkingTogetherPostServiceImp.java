@@ -69,10 +69,10 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
     @Override
     public CreateWalkingTogetherPostResponseDto createWalkingTogetherPost(CreateWalkingTogetherPostDto createWalkingTogetherPostDto, Long profileId) {
         log.info("createWalkingTogetherPost 요청 profileId : {}", profileId);
-        RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(createWalkingTogetherPostDto.getRecommendRoutePostId())
-                .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시물은 없습니다."));
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new ForbiddenException("프로필 설정 해주세요."));
+        RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(createWalkingTogetherPostDto.getRecommendRoutePostId())
+                .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
         WalkingTogetherPost walkingTogetherPost = WalkingTogetherPostMapper.toEntity(profile, recommendRoutePost, createWalkingTogetherPostDto);
         walkingTogetherPost.addMatchPostProfiles(profileId);
         walkingTogetherPost.addAvoidBreeds(profile);
