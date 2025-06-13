@@ -151,7 +151,7 @@ public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
     }
 
     @Transactional(readOnly = true)
-    @Override//여기에 후기를 보여주는 로직이 있어야할듯.
+    @Override
     public Set<Applicant> getApplicants(Long delegateWalkPostId, Long profileId) {
         log.info("getApplicants 요청 delegateWalkPostId : {}, profileId : {}", delegateWalkPostId, profileId);
         Profile profile = profileRepository.findById(profileId)

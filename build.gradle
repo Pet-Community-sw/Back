@@ -49,6 +49,7 @@ dependencies {
 // Firebase Admin SDK
 	implementation 'com.google.firebase:firebase-admin:9.2.0' // 최신 버전 확인 필요
 	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2' //http에 요청을 편하기 보내기 위함.
+	testImplementation 'org.mockito:mockito-inline:5.2.0' // 또는 최신 버전
 
 
 }

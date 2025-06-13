@@ -2,7 +2,6 @@ package com.example.PetApp.service;
 
 import com.example.PetApp.domain.*;
 import com.example.PetApp.dto.chatroom.CreateChatRoomResponseDto;
-import com.example.PetApp.dto.recommendroutepost.CreateRecommendRoutePostDto;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostDto;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostResponseDto;
 import com.example.PetApp.dto.walkingtogetherpost.GetWalkingTogetherPostResponseDto;
@@ -11,9 +10,7 @@ import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.repository.jpa.*;
 import com.example.PetApp.service.chat.ChatRoomService;
-import com.example.PetApp.service.recommendroutepost.RecommendRoutePostServiceImp;
 import com.example.PetApp.service.walkingtogetherpost.WalkingTogetherPostServiceImp;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class WalkingTogetherPostTest {
+public class WalkingTogetherPostServiceTest {
     @InjectMocks
     private WalkingTogetherPostServiceImp walkingTogetherPostServiceImp;
     @Mock
