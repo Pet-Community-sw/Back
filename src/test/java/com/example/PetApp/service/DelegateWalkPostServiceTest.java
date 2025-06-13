@@ -683,11 +683,176 @@ public class DelegateWalkPostServiceTest {
                 .hasMessage("해당 지원자는 없습니다.");
     }
 
+    @Test
+    @DisplayName("updateDelegateWalkPost_성공")
+    void test22() {
+        //given
+        String email = "test";
+        Long delegateWalkPostId = 1L;
 
+        Member member = Member.builder()
+                .memberId(1L)
+                .build();
 
+        Profile profile = Profile.builder()
+                .profileId(3L)
+                .member(member)
+                .build();
 
+        DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
+                .delegateWalkPostId(2L)
+                .profile(profile)
+                .content("a")
+                .build();
 
+        UpdateDelegateWalkPostDto updateDelegateWalkPostDto = UpdateDelegateWalkPostDto.builder()
+                .title("aa")
+                .content("bb")
+                .price(2000L)
+                .allowedRedisMeters(10000)
+                .requireProfile(true)
+                .scheduledTime(LocalDateTime.now())
+                .build();
 
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
+
+        //when
+        delegateWalkPostServiceImp.updateDelegateWalkPost(delegateWalkPostId, updateDelegateWalkPostDto, email);
+
+        //then
+        assertThat(delegateWalkPost.getContent()).isEqualTo("bb");
+
+    }
+
+    @Test
+    @DisplayName("updateDelegateWalkPost_대리산책자 게시글이 없는 경우_실패")
+    void test23() {
+        //given
+        String email = "test";
+        Long delegateWalkPostId = 1L;
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(Member.builder().build()));
+        when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> delegateWalkPostServiceImp.updateDelegateWalkPost(delegateWalkPostId, any(UpdateDelegateWalkPostDto.class), email))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("해당 대리산책자 게시글은 없습니다.");
+    }
+
+    @Test
+    @DisplayName("updateDelegateWalkPost_수정 권한이 없는 경우_실패")
+    void test24() {
+        //given
+        String email = "test";
+        Long delegateWalkPostId = 1L;
+
+        Member member = Member.builder()
+                .memberId(1L)
+                .build();
+
+        Member fakeMember = Member.builder()
+                .memberId(2L)
+                .build();
+
+        Profile profile = Profile.builder()
+                .member(fakeMember)
+                .build();
+
+        DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
+                .profile(profile)
+                .build();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
+
+        //when & then
+        assertThatThrownBy(() -> delegateWalkPostServiceImp.updateDelegateWalkPost(delegateWalkPostId, any(UpdateDelegateWalkPostDto.class), email))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage("수정 권한 없음.");
+    }
+
+    @Test
+    @DisplayName("deleteDelegateWalkPost_성공")
+    void test25() {
+        //given
+        String email = "test";
+        Long delegateWalkPostId = 1L;
+
+        Member member = Member.builder()
+                .memberId(1L)
+                .build();
+
+        Profile profile = Profile.builder()
+                .profileId(3L)
+                .member(member)
+                .build();
+
+        DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
+                .delegateWalkPostId(2L)
+                .profile(profile)
+                .content("a")
+                .build();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
+
+        //when
+        delegateWalkPostServiceImp.deleteDelegateWalkPost(delegateWalkPostId, email);
+
+        //then
+        verify(delegateWalkPostRepository).deleteById(delegateWalkPostId);
+
+    }
+
+    @Test
+    @DisplayName("deleteDelegateWalkPost_대리산책자 게시글이 없는 경우_실패")
+    void test26() {
+        //given
+        String email = "test";
+        Long delegateWalkPostId = 1L;
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(Member.builder().build()));
+        when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> delegateWalkPostServiceImp.deleteDelegateWalkPost(delegateWalkPostId, email))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("해당 대리산책자 게시글은 없습니다.");
+    }
+
+    @Test
+    @DisplayName("deleteDelegateWalkPost_삭제 권한이 없는 경우_실패")
+    void test27() {
+        //given
+        String email = "test";
+        Long delegateWalkPostId = 1L;
+
+        Member member = Member.builder()
+                .memberId(1L)
+                .build();
+
+        Member fakeMember = Member.builder()
+                .memberId(2L)
+                .build();
+
+        Profile profile = Profile.builder()
+                .member(fakeMember)
+                .build();
+
+        DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
+                .profile(profile)
+                .build();
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
+
+        //when & then
+        assertThatThrownBy(() -> delegateWalkPostServiceImp.deleteDelegateWalkPost(delegateWalkPostId, email))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage("삭제 권한 없음.");
+    }
 
 
 }

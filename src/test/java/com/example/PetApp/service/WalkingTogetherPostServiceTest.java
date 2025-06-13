@@ -461,9 +461,4 @@ public class WalkingTogetherPostServiceTest {
                 .hasMessage("해당 종은 참여할 수 없습니다.");
     }
 
-
-
-
-
-
 }
