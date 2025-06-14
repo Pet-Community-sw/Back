@@ -54,6 +54,10 @@ dependencies {
 
 }
 
+test {
+	useJUnitPlatform() // ✅ 반드시 필요 (JUnit5일 경우)
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }

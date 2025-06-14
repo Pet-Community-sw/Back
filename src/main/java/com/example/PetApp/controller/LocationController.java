@@ -2,6 +2,7 @@ package com.example.PetApp.controller;
 
 import com.example.PetApp.dto.walkrecord.LocationMessage;
 import com.example.PetApp.service.walkrecord.LocationService;
+import com.example.PetApp.service.walkrecord.LocationServiceImp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
