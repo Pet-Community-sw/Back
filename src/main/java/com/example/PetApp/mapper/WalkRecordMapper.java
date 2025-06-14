@@ -21,7 +21,7 @@ public class WalkRecordMapper {
                 .walkRecordId(walkRecord.getWalkRecordId())
                 .startTime(walkRecord.getStartTime())
                 .finishTime(walkRecord.getFinishTime())
-                .WalkTime(CreatedAtUtil.createdAt(walkRecord.getStartTime(),walkRecord.getFinishTime()))
+                .walkTime(CreatedAtUtil.createdAt(walkRecord.getStartTime(),walkRecord.getFinishTime()))
                 .walkDistance(walkRecord.getWalkDistance())
                 .pathPoints(walkRecord.getPathPoints())
                 .build();

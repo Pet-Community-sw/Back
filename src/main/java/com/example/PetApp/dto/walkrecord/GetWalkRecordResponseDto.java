@@ -18,7 +18,7 @@ public class GetWalkRecordResponseDto {
 
     private LocalDateTime finishTime;
 
-    private String WalkTime;
+    private String walkTime;
 
     private Double walkDistance;
 
