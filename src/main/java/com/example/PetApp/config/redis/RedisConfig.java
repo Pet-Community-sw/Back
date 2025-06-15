@@ -25,18 +25,18 @@ public class RedisConfig {
     }
 
     @Bean//채팅을 위한 redisTemplate
-    public RedisTemplate<String, Object> redisTemplate() {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(ChatMessage.class));
         return redisTemplate;
     }
 
     @Bean//알림을 위한 redisTemplate
-    public RedisTemplate<String, Object> notificationRedisTemplate() {
+    public RedisTemplate<String, Object> notificationRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> notificationRedisTemplate = new RedisTemplate<>();
-        notificationRedisTemplate.setConnectionFactory(redisConnectionFactory());
+        notificationRedisTemplate.setConnectionFactory(redisConnectionFactory);
         notificationRedisTemplate.setKeySerializer(new StringRedisSerializer());
         notificationRedisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
         return notificationRedisTemplate;

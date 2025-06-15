@@ -2,6 +2,7 @@ package com.example.PetApp.config.redis;
 
 import com.example.PetApp.domain.*;
 import com.example.PetApp.dto.groupchat.UpdateChatRoomList;
+import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -46,7 +47,7 @@ public class RedisSubscriber {
 
     private void handleGroupChatMessage(ChatMessage chatMessage) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatMessage.getChatRoomId())
-                .orElseThrow(() -> new RuntimeException("Group ChatRoom not found"));
+                .orElseThrow(() -> new NotFoundException("해당 채팅방이 없습니다."));
 
         simpMessagingTemplate.convertAndSend("/sub/chat/" + chatMessage.getChatRoomId(), chatMessage);
         saveLastMessageToRedis("chat:lastMessage", "chat:lastMessageTime", chatMessage);
@@ -61,7 +62,7 @@ public class RedisSubscriber {
 
     private void handleOneToOneChatMessage(ChatMessage chatMessage) {
         MemberChatRoom chatRoom = memberChatRoomRepository.findById(chatMessage.getChatRoomId())
-                .orElseThrow(() -> new RuntimeException("MemberChatRoom not found"));
+                .orElseThrow(() -> new NotFoundException("해당 채팅방이 없습니다."));
 
         simpMessagingTemplate.convertAndSend("/sub/member/chat/" + chatMessage.getChatRoomId(), chatMessage);
         saveLastMessageToRedis("memberChat:lastMessage", "memberChat:lastMessageTime", chatMessage);
