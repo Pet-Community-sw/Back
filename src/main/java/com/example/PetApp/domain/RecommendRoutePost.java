@@ -31,8 +31,8 @@ public class RecommendRoutePost {
     @CreationTimestamp
     private LocalDateTime recommendRouteTime;
 
-    @OneToOne(mappedBy = "recommendRoutePost",cascade = CascadeType.ALL, orphanRemoval = true)
-    private WalkingTogetherPost walkingTogetherPost;
+    @OneToMany(mappedBy = "recommendRoutePost",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WalkingTogetherPost> walkingTogetherPost;
 
     @OneToMany(mappedBy = "recommendRoutePost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeT> likeTs;

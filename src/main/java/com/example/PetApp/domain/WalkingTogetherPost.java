@@ -24,7 +24,7 @@ public class WalkingTogetherPost {
 
     private int limitCount;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "recommend_route_post_id")
     private RecommendRoutePost recommendRoutePost;
 
