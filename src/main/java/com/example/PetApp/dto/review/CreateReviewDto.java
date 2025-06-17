@@ -13,10 +13,6 @@ public class CreateReviewDto {
 
     private Long walkRecordId;
 
-    private Long memberId;
-
-    private Long profileId;
-
     private String title;
 
     private String content;

@@ -39,16 +39,12 @@ public class ReviewServiceImp implements ReviewService{
         WalkRecord walkRecord = walkRecordRepository.findById(createReviewDto.getWalkRecordId())
                 .orElseThrow(() -> new NotFoundException("해당 산책기록은 없습니다."));
         Member member = memberRepository.findByEmail(email).get();
-        Profile profile = profileRepository.findById(createReviewDto.getProfileId()).get();
         if (walkRecord.getWalkStatus() != WalkRecord.WalkStatus.FINISH) {
             throw new ConflictException("산책을 다해야 후기를 작성할 수 있습니다.");
-        } else if (!(walkRecord.getDelegateWalkPost().getProfile().getProfileId().equals(createReviewDto.getProfileId())
-                && walkRecord.getMember().getMemberId().equals(createReviewDto.getMemberId()))) {
-            throw new ForbiddenException("권한 없음.");
-        } else if (!(profile.getMember().equals(member) || walkRecord.getMember().equals(member))) {
+        } else if (!(walkRecord.getMember().equals(member))) {
             throw new ForbiddenException("권한 없음.");
         }
-        Review review = ReviewMapper.toEntity(walkRecord, profile, createReviewDto);
+        Review review = ReviewMapper.toEntity(walkRecord, createReviewDto);
         reviewRepository.save(review);
         return new CreateReviewResponseDto(review.getReviewId());
     }

@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 
 
 public class ReviewMapper {
-    public static Review toEntity(WalkRecord walkRecord, Profile profile, CreateReviewDto createReviewDto) {
+    public static Review toEntity(WalkRecord walkRecord, CreateReviewDto createReviewDto) {
         return Review.builder()
                 .member(walkRecord.getMember())
-                .profile(profile)
+                .profile(walkRecord.getDelegateWalkPost().getProfile())
                 .walkRecord(walkRecord)
                 .title(createReviewDto.getTitle())
                 .content(createReviewDto.getContent())

@@ -6,7 +6,6 @@ import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostDto;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostResponseDto;
 import com.example.PetApp.dto.walkingtogetherpost.GetWalkingTogetherPostResponseDto;
 import com.example.PetApp.dto.walkingtogetherpost.UpdateWalkingTogetherPostDto;
-import com.example.PetApp.security.jwt.token.JwtAuthenticationToken;
 import com.example.PetApp.service.walkingtogetherpost.WalkingTogetherPostService;
 import com.example.PetApp.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
