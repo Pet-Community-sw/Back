@@ -118,6 +118,7 @@ public class ReviewServiceTest {
                 .hasMessage("산책을 다해야 후기를 작성할 수 있습니다.");
     }
 
+
     @Test
     @DisplayName("createReview_권한이 없는 경우_실패")
     void test5() {
