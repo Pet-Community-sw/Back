@@ -5,6 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ public class Profile {
     @NotEmpty
     private String petName;
 
+    @NotNull
     private String extraInfo;
 
     @Builder.Default

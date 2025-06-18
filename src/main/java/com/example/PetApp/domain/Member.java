@@ -1,9 +1,11 @@
 package com.example.PetApp.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,21 +28,20 @@ public class Member {//수정 필요
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
-    @Column(nullable = false)
+    @NotEmpty
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @NotEmpty
     private String name;
 
-    @Column(nullable = false)
+    @NotEmpty
     private String email;
 
-    @Setter
-    @Column(nullable = false)
+    @JsonIgnore//중요한 정보 숨김.
+    @NotEmpty
     private String password;
 
-    @Setter
-    @Column(nullable = false)
+    @NotEmpty
     private String memberImageUrl;
 
     @CreationTimestamp
@@ -61,7 +62,7 @@ public class Member {//수정 필요
     private List<RecommendRoutePost> recommendRoutePosts=new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Profile> profiles = new ArrayList<>();
 
     @Builder.Default

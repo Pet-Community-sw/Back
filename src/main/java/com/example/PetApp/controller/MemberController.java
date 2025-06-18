@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.stream.Collectors;
 
@@ -33,8 +34,8 @@ public class MemberController {
 
 
     @PostMapping("/login")
-    public LoginResponseDto login(@RequestBody LoginDto loginDto) {
-        return memberService.login(loginDto);
+    public LoginResponseDto login(@RequestBody LoginDto loginDto, HttpServletResponse response) {
+        return memberService.login(loginDto, response);
     }
 
     @GetMapping("/{memberId}")

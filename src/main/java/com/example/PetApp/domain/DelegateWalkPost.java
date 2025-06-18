@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -36,7 +37,7 @@ public class DelegateWalkPost {
     @NotEmpty
     private String content;
 
-    @NotEmpty
+    @Min(0)
     private Long price;
 
     @NotEmpty

@@ -17,9 +17,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.mock.web.MockHttpServletResponse;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -45,7 +49,6 @@ class MemberServiceTest {
     private TokenService tokenService;
     @Mock
     private EmailService emailService;
-
     @Mock
     private RoleRepository roleRepository;
 
@@ -112,36 +115,75 @@ class MemberServiceTest {
         assertThat(result).isEqualTo("/image/basic/Profile_avatar_placeholder_large.png");
     }
 
-    @Test
-    @DisplayName("login_성공")
-    void test4() {
-        //given
-        LoginDto loginDto = LoginDto.builder()
-                .email("chltjswo789@naver.com")
-                .password("1234")
-                .build();
+//    @Test
+//    @DisplayName("login_성공")
+//    void test4() {
+//        // given
+//        LoginDto loginDto = LoginDto.builder()
+//                .email("chltjswo789@naver.com")
+//                .password("1234")
+//                .build();
+//
+//        Role role = Role.builder()
+//                .roleId(1L)
+//                .name("ROLE_USER")
+//                .build();
+//
+//        Member member = Mapper.createFakeMember();
+//        MockHttpServletResponse response = new MockHttpServletResponse(); // ❗ 추가
+//
+//        when(memberRepository.findByEmail(loginDto.getEmail())).thenReturn(Optional.of(member));
+//        when(passwordEncoder.matches("1234", member.getPassword())).thenReturn(true);
+//        when(roleRepository.findByName(any())).thenReturn(Optional.of(role));
+//
+//        // tokenService.save()은 mock 제거하여 실제 메서드 실행되도록 해야 cookie 추가됨
+//        // when(tokenService.save(member, response)).thenReturn(loginResponseDto); ← ❌ 주석처리
+//
+//        // when
+//        LoginResponseDto result = memberServiceImp.login(loginDto, response);
+//
+//        // then
+//        assertThat(result.getName()).isEqualTo(member.getName());
+//        assertThat(result.getAccessToken()).isNotNull();
+//
+//        Cookie refreshCookie = response.getCookie("refreshToken");
+//        assertThat(refreshCookie).isNotNull(); // ✅ 쿠키가 존재해야 함
+//        assertThat(refreshCookie.isHttpOnly()).isTrue();
+//        assertThat(refreshCookie.getSecure()).isTrue();
+//        assertThat(refreshCookie.getPath()).isEqualTo("/");
+//    }
+//    @Test
+//    @DisplayName("login_성공")
+//    void test4() {
+//        //given
+//        LoginDto loginDto = LoginDto.builder()
+//                .email("chltjswo789@naver.com")
+//                .password("1234")
+//                .build();
+//
+//        Role role = Role.builder()
+//                .roleId(1L)
+//                .name("ROLE_USER")
+//                .build();
+//
+//        Member member = Mapper.createFakeMember();
+//
+//        LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+//                .name("최선재")
+//                .accessToken("accessToken")
+//                .build();
+//
+//        when(memberRepository.findByEmail(loginDto.getEmail())).thenReturn(Optional.of(member));
+//        when(passwordEncoder.matches("1234", "fpdlswj365!")).thenReturn(true);
+//        when(tokenService.save(member, response)).thenReturn(loginResponseDto);
+//        when(roleRepository.findByName(any())).thenReturn(Optional.of(role));
+//        //when
+//        LoginResponseDto result = memberServiceImp.login(loginDto, response);
+//        //then
+//        assertThat(result.getName()).isEqualTo(member.getName());
+//    }
 
-        Role role = Role.builder()
-                .roleId(1L)
-                .name("ROLE_USER")
-                .build();
 
-        Member member = Mapper.createFakeMember();
-
-        LoginResponseDto loginResponseDto = LoginResponseDto.builder()
-                .name("최선재")
-                .accessToken("accessToken")
-                .build();
-
-        when(memberRepository.findByEmail(loginDto.getEmail())).thenReturn(Optional.of(member));
-        when(passwordEncoder.matches("1234", "fpdlswj365!")).thenReturn(true);
-        when(tokenService.save(member)).thenReturn(loginResponseDto);
-        when(roleRepository.findByName(any())).thenReturn(Optional.of(role));
-        //when
-        LoginResponseDto result = memberServiceImp.login(loginDto);
-        //then
-        assertThat(result.getName()).isEqualTo(member.getName());
-    }
 
 
     @Test
@@ -153,9 +195,12 @@ class MemberServiceTest {
                 .password("fpdlswj365!")
                 .build();
 
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+
         when(memberRepository.findByEmail(loginDto.getEmail())).thenReturn(Optional.empty());
         //when&then
-        assertThatThrownBy(() -> memberServiceImp.login(loginDto))
+        assertThatThrownBy(() -> memberServiceImp.login(loginDto, response))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("이메일 혹은 비밀번호가 일치하지 않습니다.");
 

@@ -3,11 +3,13 @@ package com.example.PetApp.service.member;
 import com.example.PetApp.dto.member.*;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Service
 public interface MemberService {
     MemberSignResponseDto createMember(MemberSignDto memberSignDto);
 
-    LoginResponseDto login(LoginDto loginDto);
+    LoginResponseDto login(LoginDto loginDto, HttpServletResponse response);
 
     FindByIdResponseDto findById(String phoneNumber);
 

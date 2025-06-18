@@ -5,6 +5,7 @@ import com.example.PetApp.domain.RefreshToken;
 import com.example.PetApp.domain.Role;
 import com.example.PetApp.dto.member.AccessTokenResponseDto;
 import com.example.PetApp.dto.member.LoginResponseDto;
+import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.exception.UnAuthorizedException;
 import com.example.PetApp.mapper.MemberMapper;
@@ -20,10 +21,11 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +40,7 @@ public class TokenServiceImp implements TokenService {//리펙토링 필요.
 
     @Transactional
     @Override
-    public LoginResponseDto save(Member member) {
+    public LoginResponseDto save(Member member, HttpServletResponse response) {
         Optional<RefreshToken> byMember = refreshRepository.findByMember(member);
         List<String> roles = member.getRoles().stream().map(Role::getName).collect(Collectors.toList());
 
@@ -46,6 +48,12 @@ public class TokenServiceImp implements TokenService {//리펙토링 필요.
         String accessToken = jwtTokenizer.createAccessToken(member.getMemberId(), null, member.getEmail(),roles);
         String refreshToken = jwtTokenizer.createRefreshToken(member.getMemberId(), member.getEmail(), roles);
 
+        saveAndSendRefreshToken(member, response, byMember, refreshToken);
+        log.info("로그인 요청 성공");
+        return MemberMapper.toLoginResponseDto(member, accessToken);
+    }
+
+    private void saveAndSendRefreshToken(Member member, HttpServletResponse response, Optional<RefreshToken> byMember, String refreshToken) {
         if (byMember.isEmpty()) {
             RefreshToken refreshToken1 = RefreshToken.builder()
                     .member(member)
@@ -55,29 +63,46 @@ public class TokenServiceImp implements TokenService {//리펙토링 필요.
         } else {
             byMember.get().setRefreshToken(refreshToken);
         }
-        log.info("로그인 요청 성공");
-        return MemberMapper.toLoginResponseDto(member, accessToken);
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true); // 자바스크립트 접근 불가
+        cookie.setSecure(true);   // HTTPS에서만 전송
+        cookie.setPath("/");      // 모든 경로에서 유효
+        cookie.setMaxAge(7 * 24 * 60 * 60); // 7일
+        response.addCookie(cookie);
     }
 
 
     @Transactional
     @Override
-    public AccessTokenResponseDto accessToken(String accessToken) {
+    public AccessTokenResponseDto reissueAccessToken(String accessToken, String refreshToken) {
         log.info("에세스 토큰 재요청.");
         String token = accessToken.split(" ")[1];
         Claims claims = getClaimsFromToken(token,TokenType.ACCESS);
         Long memberId = Long.valueOf((Integer) claims.get("memberId"));
-        RefreshToken refreshToken = refreshRepository.findByMemberMemberId(memberId)
-               .orElseThrow(()->new NotFoundException("refreshToken이 없음 다시로그인."));
-        return reissueAccessToken(accessToken, claims, memberId, refreshToken);
+        RefreshToken savedRefreshToken = refreshRepository.findByMemberMemberId(memberId)
+                .orElseThrow(() -> new NotFoundException("refreshToken이 없음. 다시 로그인."));
+
+        if (!savedRefreshToken.getRefreshToken().equals(refreshToken)) {
+            throw new ForbiddenException("RefreshToken이 유효하지 않습니다.");
+        }
+
+        return createAccessToken(accessToken, claims, memberId, savedRefreshToken);
     }
 
     @Override
     public AccessTokenResponseDto createResetPasswordJwt(String email) {
         List<Role> roles = new ArrayList<>();
-        roles.add(new Role(1L, "ROLE_USER"));
+        Role role = roleRepository.findByName("ROLE_USER").get();
+        roles.add(role);
         String resetPasswordToken = jwtTokenizer.createResetPasswordToken(email, roles.stream().map(Role::getName).collect(Collectors.toList()));
         return new AccessTokenResponseDto(resetPasswordToken);
+    }
+
+    @Override
+    public String newAccessTokenByProfile(String accessToken, String refreshToken, Member member, Long profileId) {
+        blacklistAccessToken(accessToken);
+        List<String> roles = getRoles(member);
+        return jwtTokenizer.createAccessToken(member.getMemberId(), profileId, member.getEmail(), roles);
     }
 
 
@@ -93,7 +118,7 @@ public class TokenServiceImp implements TokenService {//리펙토링 필요.
     }
 
     @NotNull
-    private AccessTokenResponseDto reissueAccessToken(String accessToken, Claims claims, Long memberId, RefreshToken refreshToken) {
+    private AccessTokenResponseDto createAccessToken(String accessToken, Claims claims, Long memberId, RefreshToken refreshToken) {
         if (jwtTokenizer.isTokenExpired("refresh", refreshToken.getRefreshToken())) {
             throw new UnAuthorizedException("로그인 다시 해야됨.");
         } else {
@@ -130,6 +155,15 @@ public class TokenServiceImp implements TokenService {//리펙토링 필요.
             }
         }else
             throw new IllegalArgumentException("잘못된 tokenType");
+    }
+
+    @NotNull
+    private static List<String> getRoles(Member member) {
+        return member
+                .getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(Collectors.toList());
     }
 
 }

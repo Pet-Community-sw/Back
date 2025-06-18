@@ -21,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
+
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +54,7 @@ public class MemberServiceImp implements MemberService{
 
     @Transactional
     @Override
-    public LoginResponseDto login(LoginDto loginDto) {
+    public LoginResponseDto login(LoginDto loginDto, HttpServletResponse response) {
         log.info("login 요청 : {}", loginDto.toString());
         Member member = memberRepository.findByEmail(loginDto.getEmail())
                 .orElseThrow(() -> new NotFoundException("이메일 혹은 비밀번호가 일치하지 않습니다."));
@@ -60,7 +62,7 @@ public class MemberServiceImp implements MemberService{
             throw new UnAuthorizedException("이메일 혹은 비밀번호가 일치하지 않습니다.");
         }
         setRole(member);
-        return tokenService.save(member);
+        return tokenService.save(member, response);
     }
 
     @Override

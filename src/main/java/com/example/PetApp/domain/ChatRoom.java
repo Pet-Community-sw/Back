@@ -12,7 +12,7 @@ import java.util.List;
 @Table(name = "chatRoom")
 @Getter
 @Setter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
 public class ChatRoom {
@@ -20,6 +20,7 @@ public class ChatRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatRoomId;
+
 
     private String name;
 

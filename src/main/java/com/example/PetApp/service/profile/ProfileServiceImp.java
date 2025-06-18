@@ -10,6 +10,7 @@ import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import com.example.PetApp.service.dogbreed.PetBreedService;
+import com.example.PetApp.service.token.TokenService;
 import com.example.PetApp.util.RedisUtil;
 import com.example.PetApp.util.imagefile.FileImageKind;
 import com.example.PetApp.util.imagefile.FileUploadUtil;
@@ -36,8 +37,7 @@ public class ProfileServiceImp implements ProfileService {
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
     private final PetBreedService petBreedService;
-    private final JwtTokenizer jwtTokenizer;
-    private final RedisUtil redisUtil;
+    private final TokenService tokenService;
 
     @Transactional//accesstoken 수정 필요 이름이 같은지 확인해야됨.
     @Override
@@ -115,7 +115,7 @@ public class ProfileServiceImp implements ProfileService {
 
     @Transactional
     @Override
-    public AccessTokenByProfileIdResponseDto accessTokenByProfile(String accessToken, Long profileId, String email) {//요청했을 당시 토큰을 redis에 저장시켜서 이전 토큰으로 요청 시 인증이 안되게 끔 해야됨.
+    public AccessTokenByProfileIdResponseDto accessTokenByProfile(String accessToken, String refreshToken, Long profileId, String email) {//요청했을 당시 토큰을 redis에 저장시켜서 이전 토큰으로 요청 시 인증이 안되게 끔 해야됨.
         log.info("accessTokenByProfile 요청 email : {}, profileId : {}", email, profileId);
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new NotFoundException("해당 프로필은 없습니다."));
@@ -123,21 +123,11 @@ public class ProfileServiceImp implements ProfileService {
         if (!(profile.getMember().equals(member))) {
             throw new ForbiddenException("권한이 없습니다.");
         }
-        redisUtil.createData(accessToken, "blacklist", 30 * 60L);//에세스토큰 유효시간
-        List<String> roles = getRoles(member);
+        String newAccessToken = tokenService.newAccessTokenByProfile(accessToken, refreshToken, member, profileId);
 
-        String newAccessToken = jwtTokenizer.createAccessToken(member.getMemberId(), profileId, member.getEmail(), roles);
         return ProfileMapper.toAccessTokenToProfileIdResponseDto(profileId, newAccessToken);
     }
 
-    @NotNull
-    private static List<String> getRoles(Member member) {
-        return member
-                .getRoles()
-                .stream()
-                .map(Role::getName)
-                .collect(Collectors.toList());
-    }
 
 
     private void validateBreed(ProfileDto profileDto, Profile profile) {

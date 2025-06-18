@@ -46,8 +46,8 @@ public class ProfileController {
     }
 
     @PostMapping("/token/{profileId}")//리팩토링 시에 authentication 말고 accesstoken을 받아서 이전 토큰 무효화 처리해야됨.
-    public AccessTokenByProfileIdResponseDto accessTokenByProfileId(@RequestHeader("Authorization") String accessToken, @PathVariable Long profileId, Authentication authentication) {
-        return profileService.accessTokenByProfile(accessToken, profileId, AuthUtil.getEmail(authentication));
+    public AccessTokenByProfileIdResponseDto accessTokenByProfileId(@RequestHeader("Authorization") String accessToken, @CookieValue("refreshToken") String refreshToken, @PathVariable Long profileId, Authentication authentication) {
+        return profileService.accessTokenByProfile(accessToken,refreshToken, profileId, AuthUtil.getEmail(authentication));
     }
 
 }

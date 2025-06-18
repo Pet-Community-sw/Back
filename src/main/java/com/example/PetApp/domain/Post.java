@@ -15,7 +15,7 @@ import java.util.List;
 @Table(name = "post")
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 @DynamicInsert
@@ -31,6 +31,7 @@ public class Post {
     @NotEmpty
     private String content;
 
+    @NotEmpty
     private String postImageUrl;
 
     @ManyToOne
