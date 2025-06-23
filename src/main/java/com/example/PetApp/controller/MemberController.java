@@ -32,7 +32,6 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(memberService.createMember(memberSignDto));
     }
 
-
     @PostMapping("/login")
     public LoginResponseDto login(@RequestBody LoginDto loginDto, HttpServletResponse response) {
         return memberService.login(loginDto, response);

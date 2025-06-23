@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -32,4 +33,6 @@ public interface DelegateWalkPostRepository extends JpaRepository<DelegateWalkPo
             @Param("maxLongitude") Double maxLongitude,
             @Param("maxLatitude") Double maxLatitude
     );
+
+    List<DelegateWalkPost> findAllBySelectedApplicantMemberIdAndScheduledTimeBetween(Long selectedApplicantMemberId, LocalDateTime startDateTime, LocalDateTime endDateTime);
 }

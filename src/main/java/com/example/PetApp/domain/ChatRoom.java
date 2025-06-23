@@ -21,7 +21,6 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatRoomId;
 
-
     private String name;
 
     private int limitCount;

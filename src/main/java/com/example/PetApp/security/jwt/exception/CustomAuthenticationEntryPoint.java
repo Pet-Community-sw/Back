@@ -22,7 +22,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         String exception = (String) request.getAttribute("exception");
         log.error("Commence Get Exception : {}", exception);
 
-        if(exception == null||exception.equals(JwtExceptionCode.NOT_FOUND_TOKEN.getCode())) {
+        if(exception.equals(JwtExceptionCode.NOT_FOUND_TOKEN.getCode())) {
             log.error("entry point >> not found null");
             setResponse(response, JwtExceptionCode.NOT_FOUND_TOKEN);
         }

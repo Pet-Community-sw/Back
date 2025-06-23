@@ -21,4 +21,5 @@ public class TimeAgoUtil {
             return days + "일 전";
         }
     }
+
 }
