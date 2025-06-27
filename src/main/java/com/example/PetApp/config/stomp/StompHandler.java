@@ -44,13 +44,22 @@ public class StompHandler implements ChannelInterceptor {
         log.info(" interceptor 진입 - accessor: {}", accessor);
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {//connect로 들어온 요청은 jwt토큰 인증을 해야됨. setuser을 해도 sub까지 유지가 안됨.
             //토큰 값이 유효 한지만 확인.
-            String token = accessor.getFirstNativeHeader("Authorization");
+            log.info("stomp connect");
+//            String token = accessor.getFirstNativeHeader("Authorization");
+//            if (token == null) {
+//                log.error("websocket 인증 에러 : null");
+//                throw new NullPointerException("비어있는 토큰");
+//            }
+//            String[] arr = token.split(" ");
+//            String accessToken = arr[1];
+            String token = (String) accessor.getSessionAttributes().get("token");
             if (token == null) {
-                log.error("websocket 인증 에러 : null");
+                log.error("WebSocket 인증 에러: 토큰 없음");
                 throw new NullPointerException("비어있는 토큰");
             }
-            String[] arr = token.split(" ");
-            String accessToken = arr[1];
+
+            String accessToken = token.startsWith("Bearer ") ? token.split(" ")[1] : token;
+
             if (jwtTokenizer.isTokenExpired("access", accessToken)) {
                 log.error("websocket 인증 에러 : expired");
                 throw new IllegalArgumentException("만료된 토큰");
