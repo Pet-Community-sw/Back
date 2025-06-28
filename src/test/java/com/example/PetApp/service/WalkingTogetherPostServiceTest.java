@@ -241,10 +241,11 @@ public class WalkingTogetherPostServiceTest {
 
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
-        when(walkingTogetherPostRepository.save(any(WalkingTogetherPost.class))).thenAnswer(invocation -> {
-            WalkingTogetherPost walkingTogetherPost = invocation.getArgument(0);
-            return walkingTogetherPost.toBuilder().walkingTogetherPostId(100L).build();
-        });
+        when(walkingTogetherPostRepository.save(any(WalkingTogetherPost.class))).thenReturn(WalkingTogetherPost.builder().walkingTogetherPostId(100L).build());
+//        when(walkingTogetherPostRepository.save(any(WalkingTogetherPost.class))).thenAnswer(invocation -> {
+//            WalkingTogetherPost walkingTogetherPost = invocation.getArgument(0);
+//            return walkingTogetherPost.toBuilder().walkingTogetherPostId(100L).build();
+//        });
 
         // when
         CreateWalkingTogetherPostResponseDto result =
@@ -252,7 +253,7 @@ public class WalkingTogetherPostServiceTest {
 
         // then
         assertThat(result).isNotNull();
-//        assertThat(result.getWalkingTogetherPostId()).isEqualTo(100L);
+        assertThat(result.getWalkingTogetherPostId()).isEqualTo(100L);
 
         verify(recommendRoutePostRepository).findById(recommendRoutePostId);
         verify(profileRepository).findById(profileId);

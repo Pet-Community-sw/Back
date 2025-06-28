@@ -38,8 +38,8 @@ public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
         log.info("createRecommendRoutePost 요청 email : {}", email);
         Member member = memberRepository.findByEmail(email).get();
         RecommendRoutePost recommendRoutePost = RecommendRoutePostMapper.toEntity(createRecommendRoutePostDto, member);
-        recommendRoutePostRepository.save(recommendRoutePost);
-        return new CreateRecommendRoutePostResponseDto(recommendRoutePost.getRecommendRouteId());
+        RecommendRoutePost savedRecommendRoutePost = recommendRoutePostRepository.save(recommendRoutePost);
+        return new CreateRecommendRoutePostResponseDto(savedRecommendRoutePost.getRecommendRouteId());
     }
 
     @Transactional(readOnly = true)//페이징 처리를 해야됨. 40개 정도 내보내면 프론트가 페이지 처리할 수 있으려나?

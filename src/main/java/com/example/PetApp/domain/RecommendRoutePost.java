@@ -16,7 +16,7 @@ import java.util.List;
 @Table
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder(toBuilder = true)
+@Builder
 public class RecommendRoutePost {
 
     @Id

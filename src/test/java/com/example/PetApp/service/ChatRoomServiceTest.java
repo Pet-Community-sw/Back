@@ -125,17 +125,14 @@ class ChatRoomServiceTest {
 
 
         when(chatRoomRepository.findByWalkingTogetherPost(post)).thenReturn(Optional.empty());
-        when(chatRoomRepository.save(any(ChatRoom.class))).thenAnswer(invocation -> {
-            ChatRoom saved = invocation.getArgument(0);
-            return saved.toBuilder().chatRoomId(99L).build();//실제 db에 저장하고 나온 id를 넣는것이기 때문에 test mocking에서는 안됨.
-        });
+        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(ChatRoom.builder().chatRoomId(99L).build());
 
         // when
         CreateChatRoomResponseDto result = chatRoomServiceImp.createChatRoom(post, profile);
 
         // then
         assertThat(result).isNotNull();
-//        assertThat(result.getChatRoomId()).isEqualTo(99L);
+        assertThat(result.getChatRoomId()).isEqualTo(99L);
         assertThat(result.isCreated()).isTrue();
 
         verify(chatRoomRepository).save(any(ChatRoom.class));

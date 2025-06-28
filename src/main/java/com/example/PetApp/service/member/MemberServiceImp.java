@@ -48,8 +48,8 @@ public class MemberServiceImp implements MemberService{
         }
         String imageFileName = FileUploadUtil.fileUpload(memberSignDto.getMemberImageUrl(), memberUploadDir, FileImageKind.MEMBER);
         Member member = MemberMapper.toEntity(memberSignDto, passwordEncoder.encode(memberSignDto.getPassword()), imageFileName);
-        memberRepository.save(member);
-        return new MemberSignResponseDto(member.getMemberId());
+        Member savedMember = memberRepository.save(member);
+        return new MemberSignResponseDto(savedMember.getMemberId());
     }
 
     @Transactional

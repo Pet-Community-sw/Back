@@ -74,6 +74,7 @@ public class ReviewServiceTest {
 
         try(MockedStatic<ReviewMapper> mockedStatic = mockStatic(ReviewMapper.class)) {
             mockedStatic.when(() -> ReviewMapper.toEntity(walkRecord, createReviewDto)).thenReturn(Review.builder().reviewId(1L).build());
+            when(reviewRepository.save(any(Review.class))).thenReturn(Review.builder().reviewId(1L).build());
 
             //when
             CreateReviewResponseDto result = reviewServiceImp.createReview(createReviewDto, email);

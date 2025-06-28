@@ -67,17 +67,18 @@ class MemberServiceTest {
                 .build();
 
         when(memberRepository.existsByEmail(memberSignDto.getEmail())).thenReturn(false);
-        when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> {
-            Member fakeMember = invocation.getArgument(0);
-            return fakeMember.toBuilder().memberId(100L).build();
-        });
+        when(memberRepository.save(any(Member.class))).thenReturn(Member.builder().memberId(100L).build());
+//        when(memberRepository.save(any(Member.class))).thenAnswer(invocation -> {
+//            Member fakeMember = invocation.getArgument(0);
+//            return fakeMember.toBuilder().memberId(100L).build();
+//        });
 
         //when
         MemberSignResponseDto member = memberServiceImp.createMember(memberSignDto);
 
         //then
         assertThat(member).isNotNull();
-//        assertThat(member.getMemberId()).isEqualTo(100L);
+        assertThat(member.getMemberId()).isEqualTo(100L);
     }
 
     @Test

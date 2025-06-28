@@ -17,7 +17,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor(access=AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder(toBuilder = true)
+@Builder
 public class DelegateWalkPost {
     public enum DelegateWalkStatus {
         RECRUITING,   // 모집중

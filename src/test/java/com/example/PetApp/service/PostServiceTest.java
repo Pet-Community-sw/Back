@@ -53,16 +53,17 @@ public class PostServiceTest {
 
 
         when(memberRepository.findByEmail("chltjswo789@naver.com")).thenReturn(Optional.of(member));
-        when(postRepository.save(any(Post.class))).thenAnswer(invocation -> {
-            Post fakePost = invocation.getArgument(0);
-            return fakePost.toBuilder().postId(100L).build();
-        });
+        when(postRepository.save(any(Post.class))).thenReturn(Post.builder().postId(100L).build());
+//        when(postRepository.save(any(Post.class))).thenAnswer(invocation -> {
+//            Post fakePost = invocation.getArgument(0);
+//            return fakePost.toBuilder().postId(100L).build();
+//        });
         //when
         CreatePostResponseDto result = postServiceImp.createPost(postDto, email);
 
         //then
         assertThat(result).isNotNull();
-//        assertThat(result.getPostId()).isEqualTo(100L);
+        assertThat(result.getPostId()).isEqualTo(100L);
     }
 
     @Test

@@ -16,7 +16,7 @@ import java.util.Set;
 @Table(name = "walking_together_post")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-@Builder(toBuilder = true)
+@Builder
 public class WalkingTogetherPost {
 
     @Id

@@ -74,17 +74,18 @@ public class DelegateWalkPostServiceTest {
                 .build();
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
-        when(delegateWalkPostRepository.save(any(DelegateWalkPost.class))).thenAnswer(invocation -> {
-            DelegateWalkPost delegateWalkPost = invocation.getArgument(0);
-            return delegateWalkPost.toBuilder().delegateWalkPostId(1L).build();
-        });
+        when(delegateWalkPostRepository.save(any(DelegateWalkPost.class))).thenReturn(DelegateWalkPost.builder().delegateWalkPostId(1L).build());
+//        when(delegateWalkPostRepository.save(any(DelegateWalkPost.class))).thenAnswer(invocation -> {
+//            DelegateWalkPost delegateWalkPost = invocation.getArgument(0);
+//            return delegateWalkPost.toBuilder().delegateWalkPostId(1L).build();
+//        });
 
         //when
         CreateDelegateWalkPostResponseDto result = delegateWalkPostServiceImp.createDelegateWalkPost(createDelegateWalkPostDto, profileId);
 
         //then
         assertThat(result).isNotNull();
-//        assertThat(result.getDelegateWalkPostId()).isEqualTo(1L);
+        assertThat(result.getDelegateWalkPostId()).isEqualTo(1L);
     }
 
     @Test

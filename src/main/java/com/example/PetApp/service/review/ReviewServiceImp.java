@@ -45,8 +45,8 @@ public class ReviewServiceImp implements ReviewService{
             throw new ForbiddenException("권한 없음.");
         }
         Review review = ReviewMapper.toEntity(walkRecord, createReviewDto);
-        reviewRepository.save(review);
-        return new CreateReviewResponseDto(review.getReviewId());
+        Review savedReview = reviewRepository.save(review);
+        return new CreateReviewResponseDto(savedReview.getReviewId());
     }
 
     @Transactional(readOnly = true)

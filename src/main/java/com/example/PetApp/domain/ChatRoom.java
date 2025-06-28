@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-@Builder(toBuilder = true)
+@Builder
 public class ChatRoom {
 
     @Id

@@ -53,8 +53,8 @@ public class ChatRoomServiceImp implements ChatRoomService {
         Optional<ChatRoom> chatRoom1 = chatRoomRepository.findByWalkingTogetherPost(walkingTogetherPost);
         if (chatRoom1.isEmpty()) {//채팅방이 없으면 새로운생성 있으면 profiles에 신청자 Profile 추가
             ChatRoom chatRoom = ChatRoomMapper.toEntity(walkingTogetherPost, profile);
-            chatRoomRepository.save(chatRoom);
-            return new CreateChatRoomResponseDto(chatRoom.getChatRoomId(), true);
+            ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
+            return new CreateChatRoomResponseDto(savedChatRoom.getChatRoomId(), true);
         } else {
             if (walkingTogetherPost.getLimitCount() <= chatRoom1.get().getProfiles().size()) {
                 throw new ConflictException("인원초과");//채팅방 limitCount설정.

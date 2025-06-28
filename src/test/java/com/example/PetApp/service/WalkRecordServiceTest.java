@@ -75,11 +75,13 @@ public class WalkRecordServiceTest {
         when(memberRepository.findById(delegateWalkPost.getSelectedApplicantMemberId())).thenReturn(Optional.of(Member.builder().memberId(1L).build()));
         try(MockedStatic<WalkRecordMapper> mockedStatic = mockStatic(WalkRecordMapper.class)) {
             mockedStatic.when(() -> WalkRecordMapper.toEntity(delegateWalkPost, member)).thenReturn(walkRecord);
+            when(walkRecordRepository.save(any(WalkRecord.class))).thenReturn(WalkRecord.builder().walkRecordId(100L).build());
 
             //when
             CreateWalkRecordResponseDto result = walkRecordServiceImp.createWalkRecord(delegateWalkPost);
 
             //then
+            assertThat(result).isNotNull();
             assertThat(result.getWalkRecordId()).isEqualTo(walkRecordId);
         }
     }

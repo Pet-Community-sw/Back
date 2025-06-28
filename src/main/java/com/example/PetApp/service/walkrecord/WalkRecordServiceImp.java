@@ -39,8 +39,9 @@ public class WalkRecordServiceImp implements WalkRecordService{
         Member member = memberRepository.findById(delegateWalkPost.getSelectedApplicantMemberId())
                 .orElseThrow(()->new NotFoundException("해당 대리산책자 유저가 없습니다."));
         WalkRecord walkRecord = WalkRecordMapper.toEntity(delegateWalkPost, member);
+        WalkRecord savedWalkRecord = walkRecordRepository.save(walkRecord);
         sendNotificationUtil.sendNotification(member, "산책 권한이 부여 되었습니다.");
-        return new CreateWalkRecordResponseDto(walkRecord.getWalkRecordId());
+        return new CreateWalkRecordResponseDto(savedWalkRecord.getWalkRecordId());
     }
 
     @Transactional(readOnly = true)

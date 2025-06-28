@@ -58,8 +58,8 @@ public class PostServiceImp implements PostService {
         Member member = memberRepository.findByEmail(email).get();
         String imageFileName = FileUploadUtil.fileUpload(createPostDto.getPostImageFile(), postUploadDir, FileImageKind.POST);
         Post post = PostMapper.toEntity(createPostDto, imageFileName, member);
-        postRepository.save(post);
-        return new CreatePostResponseDto(post.getPostId());
+        Post savedPost = postRepository.save(post);
+        return new CreatePostResponseDto(savedPost.getPostId());
     }
 
     @Transactional

@@ -76,8 +76,8 @@ public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService
         WalkingTogetherPost walkingTogetherPost = WalkingTogetherPostMapper.toEntity(profile, recommendRoutePost, createWalkingTogetherPostDto);
         walkingTogetherPost.addMatchPostProfiles(profileId);
         walkingTogetherPost.addAvoidBreeds(profile);
-        walkingTogetherPostRepository.save(walkingTogetherPost);
-        return new CreateWalkingTogetherPostResponseDto(walkingTogetherPost.getWalkingTogetherPostId());
+        WalkingTogetherPost savedWalkingTogetherPost = walkingTogetherPostRepository.save(walkingTogetherPost);
+        return new CreateWalkingTogetherPostResponseDto(savedWalkingTogetherPost.getWalkingTogetherPostId());
     }
 
     @Transactional

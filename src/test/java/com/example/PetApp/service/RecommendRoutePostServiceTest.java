@@ -62,17 +62,18 @@ public class RecommendRoutePostServiceTest {
                 .build();
 
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
-        when(recommendRoutePostRepository.save(any(RecommendRoutePost.class))).thenAnswer(invocation -> {
-            RecommendRoutePost post = invocation.getArgument(0);
-            return post.toBuilder().recommendRouteId(10L).build();
-        });
+        when(recommendRoutePostRepository.save(any(RecommendRoutePost.class))).thenReturn(RecommendRoutePost.builder().recommendRouteId(10L).build());
+//        when(recommendRoutePostRepository.save(any(RecommendRoutePost.class))).thenAnswer(invocation -> {
+//            RecommendRoutePost post = invocation.getArgument(0);
+//            return post.toBuilder().recommendRouteId(10L).build();
+//        });
 
         //when
         CreateRecommendRoutePostResponseDto result = recommendRoutePostServiceImp.createRecommendRoutePost(createRecommendRoutePostDto, email);
 
         //then
         assertThat(result).isNotNull();
-//        assertThat(result.getRecommendRoutePostId()).isEqualTo(10L);
+        assertThat(result.getRecommendRoutePostId()).isEqualTo(10L);
 
     }
 

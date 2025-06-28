@@ -20,7 +20,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder(toBuilder = true)
+@Builder
 @DynamicInsert//inster문 생성할 때 null인 건 제외하고 query를 생성.
 public class Post {
 
