@@ -16,7 +16,7 @@ import java.util.Set;
 @Table(name = "walking_together_post")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class WalkingTogetherPost {
 
     @Id
@@ -36,6 +36,7 @@ public class WalkingTogetherPost {
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
+    @Setter
     @NotNull
     @Column(nullable = false)
     private LocalDateTime scheduledTime;

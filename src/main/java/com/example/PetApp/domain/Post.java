@@ -20,8 +20,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-@DynamicInsert
+@Builder(toBuilder = true)
+@DynamicInsert//inster문 생성할 때 null인 건 제외하고 query를 생성.
 public class Post {
 
     @Id
@@ -38,10 +38,12 @@ public class Post {
     @Column(nullable = false)
     private String content;
 
+    @Setter
     @NotBlank
     @Column(nullable = false)
     private String postImageUrl;
 
+    @Setter
     @Min(0)
     @NotNull
     @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")

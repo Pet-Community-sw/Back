@@ -55,6 +55,7 @@ public class Profile {
     @Column(nullable = false)
     private String extraInfo;
 
+    @Setter
     @Builder.Default
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "profile_breed",

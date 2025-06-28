@@ -17,7 +17,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor(access=AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class DelegateWalkPost {
     public enum DelegateWalkStatus {
         RECRUITING,   // 모집중
@@ -86,6 +86,7 @@ public class DelegateWalkPost {
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
+    @Setter
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

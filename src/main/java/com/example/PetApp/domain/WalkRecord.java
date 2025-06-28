@@ -25,21 +25,22 @@ public class WalkRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long walkRecordId;
 
+    @Setter
     @NotNull
     @Column(nullable = false)
-
     private LocalDateTime startTime;
 
+    @Setter
     @NotNull
     @Column(nullable = false)
-
     private LocalDateTime finishTime;
 
+    @Setter
     @NotNull
     @Column(nullable = false)
-
     private Double walkDistance;
 
+    @Setter
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -53,6 +54,7 @@ public class WalkRecord {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Setter
     @Builder.Default
     @ElementCollection
     @CollectionTable(name = "walk_path_points", joinColumns = @JoinColumn(name = "walk_record_id"))

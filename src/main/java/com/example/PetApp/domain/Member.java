@@ -19,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)//JPA 내부에서는 접근 가능하고, 외부에서는 new로 빈 객체 생성 못 하게
 //기본 생성자를 protected로 두는 게 안전하고 객체지향적이다
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @EqualsAndHashCode(of = "memberId") //엔티티의 동등/중복 판단은 memberId(유일한값)으로 판단하기 위함.
 public class Member {//수정 필요
 

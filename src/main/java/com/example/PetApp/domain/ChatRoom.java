@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class ChatRoom {
 
     @Id
@@ -41,6 +41,7 @@ public class ChatRoom {
     @JoinColumn(name = "walking_together_post_id")
     private WalkingTogetherPost walkingTogetherPost;
 
+    @Setter
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(joinColumns = @JoinColumn(name = "chat_room_id"),
             inverseJoinColumns = @JoinColumn(name = "profile_id"))

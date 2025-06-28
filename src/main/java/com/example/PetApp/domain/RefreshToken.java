@@ -22,6 +22,7 @@ public class RefreshToken {
     @JoinColumn(name = "member_id", unique = true)
     private Member member;
 
+    @Setter
     @NotBlank
     @Column(nullable = false)
     private String refreshToken;

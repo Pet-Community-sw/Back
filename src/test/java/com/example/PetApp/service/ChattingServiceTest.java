@@ -63,11 +63,12 @@ class ChattingServiceTest {
         Long senderId = 1L;
         Long chatRoomId = 99L;
 
-        ChatMessage message = new ChatMessage();
-        message.setSenderId(senderId);
-        message.setChatRoomId(chatRoomId);
-        message.setChatRoomType(ChatMessage.ChatRoomType.MANY);
-        message.setMessageType(ChatMessage.MessageType.TALK);
+        ChatMessage message = ChatMessage.builder()
+                .senderId(senderId)
+                .chatRoomId(chatRoomId)
+                .chatRoomType(ChatMessage.ChatRoomType.MANY)
+                .messageType(ChatMessage.MessageType.TALK)
+                .build();
 
         Profile profile = Profile.builder()
                 .profileId(senderId)
@@ -107,11 +108,12 @@ class ChattingServiceTest {
         Long senderId = 1L;
         Long chatRoomId = 101L;
 
-        ChatMessage message = new ChatMessage();
-        message.setSenderId(senderId);
-        message.setChatRoomId(chatRoomId);
-        message.setChatRoomType(ChatMessage.ChatRoomType.MANY);
-        message.setMessageType(ChatMessage.MessageType.ENTER);
+        ChatMessage message = ChatMessage.builder()
+                .senderId(senderId)
+                .chatRoomId(chatRoomId)
+                .chatRoomType(ChatMessage.ChatRoomType.MANY)
+                .messageType(ChatMessage.MessageType.ENTER)
+                .build();
 
         Member member = Member.builder().memberId(10L).build();
         Profile senderProfile = Profile.builder()
