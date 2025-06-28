@@ -1,18 +1,21 @@
 package com.example.PetApp.domain;
 
 import lombok.*;
+import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Setter
 @Entity
 @Table
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class RecommendRoutePost {
 
@@ -20,15 +23,28 @@ public class RecommendRoutePost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recommendRouteId;
 
+    @Setter
+    @NotBlank
+    @Column(nullable = false)
     private String title;
 
+    @Setter
+    @NotBlank
+    @Column(nullable = false)
     private String content;
 
+    @Setter
+    @NotNull
+    @Column(nullable = false)
     private Double locationLongitude;
 
+    @Setter
+    @NotNull
+    @Column(nullable = false)
     private Double locationLatitude;
 
     @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime recommendRouteTime;
 
     @OneToMany(mappedBy = "recommendRoutePost",cascade = CascadeType.ALL, orphanRemoval = true)

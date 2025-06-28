@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -13,9 +14,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "profile")
-@Setter
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Profile {
@@ -24,26 +24,39 @@ public class Profile {
     @Column(name = "profile_id")
     private Long profileId;
 
-    @NotEmpty
+    @Setter
+    @NotBlank
+    @Column(nullable = false)
     private String petImageUrl;
 
+    @Setter
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @NotNull
+    @Column(nullable = false)
     private LocalDate petBirthDate;
 
-    @NotEmpty
+    @Setter
+    @NotBlank
+    @Column(nullable = false)
     private String petAge;
 
-    @NotEmpty//이것도 바꿔야할듯.
+    @Setter
+    @NotBlank//이것도 바꿔야할듯.
+    @Column(nullable = false)
     private String petBreed;
 
-    @NotEmpty
+    @Setter
+    @NotBlank
+    @Column(nullable = false)
     private String petName;
 
-    @NotNull
+    @Setter
+    @NotBlank
+    @Column(nullable = false)
     private String extraInfo;
 
     @Builder.Default
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "profile_breed",
             joinColumns = @JoinColumn(name = "profile_id"),
             inverseJoinColumns = @JoinColumn(name = "pet_breed_id"))
@@ -56,7 +69,7 @@ public class Profile {
     @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WalkingTogetherPost> walkingTogetherPost;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<ChatRoom> chatRooms;
 
     public void addAvoidBreeds(PetBreed dogBreed) {

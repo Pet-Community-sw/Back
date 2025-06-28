@@ -5,14 +5,14 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @Getter
-@Setter
 @Entity
 @Table
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class MemberChatRoom {
@@ -21,9 +21,12 @@ public class MemberChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberChatRoomId;
 
-    @OneToMany
-    private List<Member> members;
+    @Builder.Default//이미 초기화가 되어있기때문에 notnull이 필요 없음.
+    @Setter
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Member> members = new ArrayList<>();
 
     @CreationTimestamp
+    @Column(nullable = false)
     private LocalDateTime memberChatRoomTime;
 }

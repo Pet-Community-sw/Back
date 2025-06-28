@@ -1,20 +1,21 @@
 package com.example.PetApp.domain;
 
 import lombok.*;
-import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
-@Setter
 @Table
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access=AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class DelegateWalkPost {
@@ -27,47 +28,72 @@ public class DelegateWalkPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long delegateWalkPostId;
 
-    @ManyToOne
-    @JoinColumn(name = "profile_id")
-    private Profile profile;
-
-    @NotEmpty
+    @Setter
+    @NotBlank
+    @Column(nullable = false)
     private String title;
 
-    @NotEmpty
+    @Setter
+    @NotBlank    @Column(nullable = false)
     private String content;
 
+    @Setter
     @Min(0)
+    @NotNull
+    @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private Long price;
 
-    @NotEmpty
+    @Setter
+    @NotNull
+    @Column(nullable = false)
     private Double locationLongitude;
 
-    @NotEmpty
+    @Setter
+    @NotNull
+    @Column(nullable = false)
     private Double locationLatitude;
 
-    @NotEmpty
+    @Setter
+    @NotNull
+    @Column(nullable = false)
     private Integer allowedRadiusMeters;
 
-    private boolean requireProfile;//profile여부 true or false
-
-    private LocalDateTime scheduledTime;
-
-    private LocalDateTime delegateWalkPostTime;
-
+    @Setter
+    @NotEmpty
+    @Column(nullable = false)
     private Long selectedApplicantMemberId;
 
+    @Setter
+    @NotNull
+    @Column(nullable = false)
+    private boolean requireProfile;//profile여부 true or false
+
+    @Setter
+    @NotNull
+    @Column(nullable = false)
     private boolean startAuthorized;// start권한 부여
+
+    @Setter
+    @NotEmpty
+    @Column(nullable = false)
+    private LocalDateTime scheduledTime;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime delegateWalkPostTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DelegateWalkStatus status = DelegateWalkStatus.RECRUITING;//기본값을 모집중으로 선언.
 
+    @Builder.Default
     @ElementCollection
     @CollectionTable(name = "walker_post_applicants")
-    @Cascade(org.hibernate.annotations.CascadeType.DELETE)
-    @Builder.Default
     private Set<Applicant> applicants = new HashSet<>();
 
 }

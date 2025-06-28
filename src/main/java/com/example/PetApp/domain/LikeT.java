@@ -7,9 +7,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "likeT")
 @Getter
-@Setter
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class LikeT {
 
@@ -17,11 +16,11 @@ public class LikeT {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long likeId;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recommend_route_post_id")
     private RecommendRoutePost recommendRoutePost;
 

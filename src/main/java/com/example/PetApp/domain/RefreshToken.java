@@ -4,12 +4,12 @@ package com.example.PetApp.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "refresh_token")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class RefreshToken {
@@ -22,6 +22,8 @@ public class RefreshToken {
     @JoinColumn(name = "member_id", unique = true)
     private Member member;
 
+    @NotBlank
+    @Column(nullable = false)
     private String refreshToken;
 
 }

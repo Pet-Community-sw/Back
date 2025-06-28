@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import java.util.Set;
 @Entity
 @Table(name = "member")
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)//JPA 내부에서는 접근 가능하고, 외부에서는 new로 빈 객체 생성 못 하게
 //기본 생성자를 protected로 두는 게 안전하고 객체지향적이다
 @AllArgsConstructor
@@ -28,23 +28,33 @@ public class Member {//수정 필요
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
-    @NotEmpty
+    @Setter
+    @NotBlank
+    @Column(nullable = false)
     private String phoneNumber;
 
-    @NotEmpty
+    @Setter
+    @NotBlank
+    @Column(nullable = false)
     private String name;
 
-    @NotEmpty
+    @Setter
+    @NotBlank
+    @Column(nullable = false)
     private String email;
 
-    @JsonIgnore//중요한 정보 숨김.
-    @NotEmpty
+    @Setter
+    @JsonIgnore//중요한 정보 숨김. 반환 값에 넣어도 반환이 안됨.
+    @NotBlank
+    @Column(nullable = false)
     private String password;
 
-    @NotEmpty
+    @Setter
+    @Column(nullable = false)
     private String memberImageUrl;
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime memberTime;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -66,7 +76,7 @@ public class Member {//수정 필요
     private List<Profile> profiles = new ArrayList<>();
 
     @Builder.Default
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "member_role",
             joinColumns = @JoinColumn(name = "member_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")

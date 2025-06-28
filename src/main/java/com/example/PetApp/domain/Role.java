@@ -4,12 +4,12 @@ package com.example.PetApp.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "role")
-@Setter
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class Role {
@@ -19,6 +19,8 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roleId;
 
+    @NotBlank
+    @Column(nullable = false)
     private String name;
 
     @Override

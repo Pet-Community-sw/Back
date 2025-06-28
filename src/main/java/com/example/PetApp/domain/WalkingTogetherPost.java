@@ -5,15 +5,16 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "walking_together_post")
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
 public class WalkingTogetherPost {
@@ -22,19 +23,25 @@ public class WalkingTogetherPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long walkingTogetherPostId;
 
+    @Setter
+    @NotNull
+    @Column(nullable = false)
     private int limitCount;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recommend_route_post_id")
     private RecommendRoutePost recommendRoutePost;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
+    @NotNull
+    @Column(nullable = false)
     private LocalDateTime scheduledTime;
 
     @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime walkingTogetherPostTime;
 
     @ElementCollection

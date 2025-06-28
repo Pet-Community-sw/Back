@@ -3,16 +3,17 @@ package com.example.PetApp.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @Entity
 @Table
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 public class WalkRecord {
 
@@ -24,14 +25,25 @@ public class WalkRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long walkRecordId;
 
+    @NotNull
+    @Column(nullable = false)
+
     private LocalDateTime startTime;
+
+    @NotNull
+    @Column(nullable = false)
 
     private LocalDateTime finishTime;
 
+    @NotNull
+    @Column(nullable = false)
+
     private Double walkDistance;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private WalkStatus walkStatus;
+    @Column(nullable = false)
+    private WalkStatus walkStatus=WalkStatus.READY;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delegate_walk_post")

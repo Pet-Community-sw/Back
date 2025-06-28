@@ -3,10 +3,11 @@ package com.example.PetApp.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
 @Table(name = "pet_breed")
@@ -17,6 +18,8 @@ public class PetBreed {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long petBreedId;
 
+    @NotBlank
+    @Column(nullable = false, updatable = false)
     private String name;
 
 }

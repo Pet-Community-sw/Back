@@ -4,6 +4,9 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +14,6 @@ import java.util.List;
 @Entity
 @Table(name = "chatRoom")
 @Getter
-@Setter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
@@ -21,18 +23,25 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chatRoomId;
 
+    @Setter
+    @NotBlank
+    @Column(nullable = false)
     private String name;
 
+    @Setter
+    @NotNull
+    @Column(nullable = false)
     private int limitCount;
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime chatRoomTime;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "walking_together_post_id")
     private WalkingTogetherPost walkingTogetherPost;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(joinColumns = @JoinColumn(name = "chat_room_id"),
             inverseJoinColumns = @JoinColumn(name = "profile_id"))
     @Builder.Default
