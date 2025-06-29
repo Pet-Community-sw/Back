@@ -9,17 +9,18 @@ import com.example.PetApp.dto.groupchat.UpdateChatRoomDto;
 import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
+import com.example.PetApp.mapper.ChatRoomMapper;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
 import com.example.PetApp.service.chat.ChatRoomServiceImp;
 import com.example.PetApp.service.chat.ChattingReader;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -31,8 +32,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ChatRoomServiceTest {
@@ -109,7 +109,7 @@ class ChatRoomServiceTest {
     }
 
     @Test
-    @DisplayName("createChatRoom_채팅방 새로 생성_성공")
+    @DisplayName("createChatRoom_채팅방 새로 성공_성공")
     void test3() {
         // given
         Profile profile = Profile.builder()
@@ -123,16 +123,22 @@ class ChatRoomServiceTest {
                 .profile(profile)
                 .build();
 
+        ChatRoom chatRoom = ChatRoom.builder()
+                .chatRoomId(2L)
+                .build();
 
         when(chatRoomRepository.findByWalkingTogetherPost(post)).thenReturn(Optional.empty());
-        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(ChatRoom.builder().chatRoomId(99L).build());
+        try(MockedStatic<ChatRoomMapper> mockedStatic = mockStatic(ChatRoomMapper.class)) {
+            mockedStatic.when(()->ChatRoomMapper.toEntity(post, profile)).thenReturn(chatRoom);
+        }
+        when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(chatRoom);
 
         // when
         CreateChatRoomResponseDto result = chatRoomServiceImp.createChatRoom(post, profile);
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.getChatRoomId()).isEqualTo(99L);
+        assertThat(result.getChatRoomId()).isEqualTo(2L);
         assertThat(result.isCreated()).isTrue();
 
         verify(chatRoomRepository).save(any(ChatRoom.class));

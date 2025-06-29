@@ -14,7 +14,6 @@ import com.example.PetApp.repository.jpa.PostRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
 import com.example.PetApp.service.comment.PostType;
 import com.example.PetApp.util.SendNotificationUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -79,13 +79,14 @@ class RedisSubscriberTest {
                 .profiles(List.of(senderProfile))
                 .build();
 
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setSenderId(senderId);
-        chatMessage.setChatRoomId(chatRoomId);
-        chatMessage.setChatRoomType(ChatMessage.ChatRoomType.MANY);
-        chatMessage.setMessageType(ChatMessage.MessageType.TALK);
-        chatMessage.setMessage("안녕하세요!");
-        chatMessage.setMessageTime(LocalDateTime.now());
+        ChatMessage chatMessage = ChatMessage.builder()
+                .senderId(senderId)
+                .chatRoomId(chatRoomId)
+                .chatRoomType(ChatMessage.ChatRoomType.MANY)
+                .messageType(ChatMessage.MessageType.TALK)
+                .message("안녕하세요!")
+                .messageTime(LocalDateTime.now())
+                .build();
 
         String json = objectMapper.writeValueAsString(chatMessage);
 

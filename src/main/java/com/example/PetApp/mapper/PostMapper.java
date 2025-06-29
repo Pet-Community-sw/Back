@@ -27,20 +27,21 @@ public class PostMapper {
     public static List<PostResponseDto> toPostListResponseDto(List<Post> posts,
                                                               Map<Long, Long> likeCountMap,
                                                               Set<Long> likedPostIds) {
-        return posts.stream().map(post ->
-                new PostResponseDto(
-                        post.getPostId(),
-                        post.getPostImageUrl(),
-                        post.getMember().getMemberId(),
-                        post.getMember().getName(),
-                        post.getMember().getMemberImageUrl(),
-                        TimeAgoUtil.getTimeAgo(post.getPostTime()),
-                        post.getViewCount(),
-                        likeCountMap.get(post.getPostId()),
-                        post.getTitle(),
-                        likedPostIds.contains(post.getPostId())
+        return posts.stream()
+                .map(post -> PostResponseDto.builder()
+                        .postId(post.getPostId())
+                        .postImageUrl(post.getPostImageUrl())
+                        .memberId(post.getMember().getMemberId())
+                        .memberName(post.getMember().getName())
+                        .memberImageUrl(post.getMember().getMemberImageUrl())
+                        .createdAt(TimeAgoUtil.getTimeAgo(post.getPostTime()))
+                        .viewCount(post.getViewCount())
+                        .likeCount(likeCountMap.get(post.getPostId()))
+                        .title(post.getTitle())
+                        .like(likedPostIds.contains(post.getPostId()))
+                        .build()
                 )
-        ).collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     public static GetPostResponseDto toGetPostResponseDto(Post post,

@@ -51,15 +51,17 @@ public class ChatRoomMapper {
 
     public static List<ChatMessageDto> toChatMessageDtos(List<ChatMessage> chatMessages) {
         return chatMessages.stream()
-                .map(chatMessage -> new ChatMessageDto(
-                        chatMessage.getSenderId(),
-                        chatMessage.getSenderName(),
-                        chatMessage.getSenderImageUrl(),
-                        chatMessage.getMessage(),
-                        chatMessage.getChatUnReadCount(),
-                        chatMessage.getMessageTime()
-                ))
+                .map(chatMessage -> ChatMessageDto.builder()
+                        .senderId(chatMessage.getSenderId())
+                        .senderName(chatMessage.getSenderName())
+                        .senderImageUrl(chatMessage.getSenderImageUrl())
+                        .message(chatMessage.getMessage())
+                        .unReadCount(chatMessage.getChatUnReadCount())
+                        .messageTime(chatMessage.getMessageTime())
+                        .build()
+                )
                 .collect(Collectors.toList());
+
     }
 
     public static UpdateChatUnReadCountDto toUpdateChatUnReadCountDto(ChatMessage chatMessage) {

@@ -1,15 +1,13 @@
 package com.example.PetApp.dto.post;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class PostDto {
 

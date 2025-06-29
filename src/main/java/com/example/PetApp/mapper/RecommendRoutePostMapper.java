@@ -28,19 +28,22 @@ public class RecommendRoutePostMapper {
                                                                                     List<Long> likedRecommendPostIds,
                                                                                     Member member) {
         return recommendRoutePosts.stream()
-                .map(recommendRoutePost -> new GetRecommendRoutePostsResponseDto(
-                        recommendRoutePost.getRecommendRouteId(),
-                        recommendRoutePost.getTitle(),
-                        recommendRoutePost.getMember().getMemberId(),
-                        recommendRoutePost.getMember().getName(),
-                        recommendRoutePost.getMember().getMemberImageUrl(),
-                        likeCountMap.getOrDefault(recommendRoutePost.getRecommendRouteId(), 0L),
-                        recommendRoutePost.getLocationLongitude(),
-                        recommendRoutePost.getLocationLatitude(),
-                        TimeAgoUtil.getTimeAgo(recommendRoutePost.getRecommendRouteTime()),
-                        member.getMemberId().equals(recommendRoutePost.getMember().getMemberId()),
-                        likedRecommendPostIds.contains(recommendRoutePost.getRecommendRouteId())
-                )).collect(Collectors.toList());
+                .map(recommendRoutePost -> GetRecommendRoutePostsResponseDto.builder()
+                        .recommendRoutePostId(recommendRoutePost.getRecommendRouteId())
+                        .title(recommendRoutePost.getTitle())
+                        .memberId(recommendRoutePost.getMember().getMemberId())
+                        .memberName(recommendRoutePost.getMember().getName())
+                        .memberImageUrl(recommendRoutePost.getMember().getMemberImageUrl())
+                        .likeCount(likeCountMap.getOrDefault(recommendRoutePost.getRecommendRouteId(), 0L))
+                        .locationLongitude(recommendRoutePost.getLocationLongitude())
+                        .locationLatitude(recommendRoutePost.getLocationLatitude())
+                        .createdAt(TimeAgoUtil.getTimeAgo(recommendRoutePost.getRecommendRouteTime()))
+                        .isOwner(member.getMemberId().equals(recommendRoutePost.getMember().getMemberId()))
+                        .isLike(likedRecommendPostIds.contains(recommendRoutePost.getRecommendRouteId()))
+                        .build()
+                )
+                .collect(Collectors.toList());
+
     }
 
     public static GetRecommendPostResponseDto toGetRecommendPostResponseDto(Member member, RecommendRoutePost post, Long likeCount, boolean isLike) {

@@ -6,10 +6,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.Set;
 
-@Setter
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class GetProfileResponseDto {
     private Long profileId;

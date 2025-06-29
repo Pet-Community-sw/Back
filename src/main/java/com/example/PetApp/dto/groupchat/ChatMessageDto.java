@@ -8,9 +8,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @Builder
-@AllArgsConstructor
 public class ChatMessageDto {
 
     private Long senderId;

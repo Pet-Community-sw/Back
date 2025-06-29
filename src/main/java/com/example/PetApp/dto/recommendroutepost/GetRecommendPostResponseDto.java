@@ -7,9 +7,7 @@ import lombok.Setter;
 
 
 @Getter
-@Setter
 @Builder
-@AllArgsConstructor//코드 중복임 리팩토링 시 수정해야됨.
 public class GetRecommendPostResponseDto {
     private Long recommendRoutePostId;
 

@@ -7,16 +7,18 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @Builder
 public class GetReviewResponseDto {
 
     private Long reviewId;
 
+    @Setter
     private Long userId;
 
+    @Setter
     private String userName;
 
+    @Setter
     private String userImageUrl;
 
     private String title;
@@ -27,6 +29,7 @@ public class GetReviewResponseDto {
 
     private LocalDateTime reviewTime;
 
+    @Setter
     private boolean isOwner;
 
 }

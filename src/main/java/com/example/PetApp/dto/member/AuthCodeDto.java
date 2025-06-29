@@ -5,12 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@NotBlank
 public class AuthCodeDto {
+
     private String email;
+
     private String code;
 
 }

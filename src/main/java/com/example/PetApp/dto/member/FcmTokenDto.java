@@ -1,12 +1,17 @@
 package com.example.PetApp.dto.member;
 
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import javax.validation.constraints.NotBlank;
 
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@NotBlank
 public class FcmTokenDto {
+
     private Long memberId;
+
     private String fcmToken;
 }

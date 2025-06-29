@@ -1,14 +1,16 @@
 package com.example.PetApp.dto.review;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import javax.validation.constraints.NotBlank;
 
 import static com.example.PetApp.domain.Review.*;
 
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
+@NotBlank
 public class CreateReviewDto {
 
     private Long walkRecordId;

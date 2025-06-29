@@ -1,30 +1,23 @@
 package com.example.PetApp.dto.recommendroutepost;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 @Getter
-@Setter
-@Builder
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@NotBlank
 public class CreateRecommendRoutePostDto {
-    @NotEmpty
     private String title;
 
-    @NotEmpty
     private String content;
 
-    @NotEmpty
     private String locationName;
 
-    @NotEmpty
     private Double locationLongitude;
 
-    @NotEmpty
     private Double locationLatitude;
 
 }

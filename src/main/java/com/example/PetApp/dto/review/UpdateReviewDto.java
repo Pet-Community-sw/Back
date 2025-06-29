@@ -1,12 +1,14 @@
 package com.example.PetApp.dto.review;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import javax.validation.constraints.NotBlank;
 
 @Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
+@NotBlank
 public class UpdateReviewDto {
 
     private String title;

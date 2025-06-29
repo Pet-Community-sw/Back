@@ -6,7 +6,6 @@ import lombok.*;
 import static com.example.PetApp.dto.commment.CommentDto.*;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

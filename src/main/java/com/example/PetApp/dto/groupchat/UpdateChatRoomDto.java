@@ -2,11 +2,13 @@ package com.example.PetApp.dto.groupchat;
 
 import lombok.*;
 
+import javax.validation.constraints.NotBlank;
+
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@NotBlank
 public class UpdateChatRoomDto {
 
     private String chatRoomName;
