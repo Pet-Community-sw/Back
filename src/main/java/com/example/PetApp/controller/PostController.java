@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -27,7 +28,7 @@ public class PostController {
     }
 
     @PostMapping()
-    public CreatePostResponseDto createPost(@ModelAttribute PostDto createPostDto, Authentication authentication) {
+    public CreatePostResponseDto createPost(@ModelAttribute @Valid PostDto createPostDto, Authentication authentication) {
         return postService.createPost(createPostDto, AuthUtil.getEmail(authentication));
     }
 
@@ -43,7 +44,7 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<MessageResponse> updatePost(@PathVariable Long postId, @ModelAttribute PostDto postDto, Authentication authentication) {
+    public ResponseEntity<MessageResponse> updatePost(@PathVariable Long postId, @ModelAttribute @Valid PostDto postDto, Authentication authentication) {
         postService.updatePost(postId, postDto, AuthUtil.getEmail(authentication));
         return ResponseEntity.ok(new MessageResponse("수정 되었습니다."));
     }

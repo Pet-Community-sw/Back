@@ -75,9 +75,9 @@ public class RedisSubscriber {
         sendChatRoomUpdate("/sub/member/chat/update", chatRoom.getMemberChatRoomId(), chatMessage, unReadMap);
     }
 
-    private void saveLastMessageToRedis(String messageKeyPrefix, String timeKeyPrefix, ChatMessage message) {
-        redisTemplate.opsForValue().set(messageKeyPrefix + message.getChatRoomId(), message.getMessage());
-        redisTemplate.opsForValue().set(timeKeyPrefix + message.getChatRoomId(), String.valueOf(message.getMessageTime()));
+    private void saveLastMessageToRedis(String lastMessage, String lastTime, ChatMessage message) {
+        redisTemplate.opsForValue().set(lastMessage + message.getChatRoomId(), message.getMessage());
+        redisTemplate.opsForValue().set(lastTime + message.getChatRoomId(), String.valueOf(message.getMessageTime()));
     }
 
     private Map<Long, Long> countUnreadForGroup(ChatRoom chatRoom, ChatMessage message, Set<String> onlineProfiles) {

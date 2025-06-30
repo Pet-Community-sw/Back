@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -29,12 +30,12 @@ public class ProfileController {
     }
 
     @PostMapping
-    public CreateProfileResponseDto createProfile(@ModelAttribute ProfileDto profileDto, Authentication authentication) {
+    public CreateProfileResponseDto createProfile(@ModelAttribute @Valid ProfileDto profileDto, Authentication authentication) {
         return profileService.createProfile(profileDto, AuthUtil.getEmail(authentication));
     }
 
     @PutMapping("/{profileId}")
-    public ResponseEntity<MessageResponse> updateProfile(@PathVariable Long profileId, @ModelAttribute ProfileDto addProfileDto, Authentication authentication) {
+    public ResponseEntity<MessageResponse> updateProfile(@PathVariable Long profileId, @ModelAttribute @Valid ProfileDto addProfileDto, Authentication authentication) {
         profileService.updateProfile(profileId, addProfileDto, AuthUtil.getEmail(authentication));
         return ResponseEntity.ok(new MessageResponse("수정 되었습니다."));
     }

@@ -19,7 +19,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
 
     @GetMapping()
-    public List<GetSchedulesResponseDto> getSchedules(@RequestParam() String start, @RequestParam() String end, Authentication authentication) {
+    public List<GetSchedulesResponseDto> getSchedules(@RequestParam String start, @RequestParam String end, Authentication authentication) {
         return scheduleService.getSchedules(start, end, AuthUtil.getProfileId(authentication));
     }
 

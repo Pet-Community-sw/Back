@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/likes")
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class LikeController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createAndDeleteLike(@RequestBody LikeDto likeDto, Authentication authentication) {
+    public ResponseEntity<?> createAndDeleteLike(@RequestBody @Valid LikeDto likeDto, Authentication authentication) {
         return likeService.createAndDeleteLike(likeDto, AuthUtil.getEmail(authentication));
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -36,7 +37,7 @@ public class ChatRoomController {
     }
 
     @PutMapping("/{chatRoomId}")
-    private ResponseEntity<MessageResponse> updateChatRoom(@PathVariable Long chatRoomId, @RequestBody UpdateChatRoomDto updateChatRoomDto, Authentication authentication) {
+    private ResponseEntity<MessageResponse> updateChatRoom(@PathVariable Long chatRoomId, @RequestBody @Valid UpdateChatRoomDto updateChatRoomDto, Authentication authentication) {
         chatRoomService.updateChatRoom(chatRoomId, updateChatRoomDto, AuthUtil.getProfileId(authentication));
         return ResponseEntity.ok(new MessageResponse("수정 되었습니다."));
     }

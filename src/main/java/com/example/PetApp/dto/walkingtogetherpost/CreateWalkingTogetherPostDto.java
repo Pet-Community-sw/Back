@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @Builder
 public class CreateWalkingTogetherPostDto {
 
-    @NotBlank
+    @NotNull(message = "산책길추천id는 필수입니다.")
     private Long recommendRoutePostId;
 
-    @NotNull
+    @NotNull(message = "함께 산책해요 시간은 필수입니다.")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime scheduledTime;
 
-    @NotNull
+    @NotNull(message = "제한인원은 필수입니다.")
     private int limitCount;
 }

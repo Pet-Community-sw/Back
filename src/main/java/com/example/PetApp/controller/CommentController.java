@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -29,7 +30,7 @@ public class CommentController {
     }
 
     @PostMapping()
-    public CreateCommentResponseDto createComment(@RequestBody CommentDto commentDto, Authentication authentication) {
+    public CreateCommentResponseDto createComment(@RequestBody @Valid CommentDto commentDto, Authentication authentication) {
         return commentService.createComment(commentDto, AuthUtil.getEmail(authentication));
     }
 
@@ -40,7 +41,7 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")//좋아요 개수는 따로하는게 좋을 듯
-    public ResponseEntity<MessageResponse> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentDto updateCommentDto, Authentication authentication) {
+    public ResponseEntity<MessageResponse> updateComment(@PathVariable Long commentId, @RequestBody @Valid UpdateCommentDto updateCommentDto, Authentication authentication) {
         commentService.updateComment(commentId,updateCommentDto, AuthUtil.getEmail(authentication));
         return ResponseEntity.ok(new MessageResponse("수정 되었습니다."));
     }

@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
@@ -17,7 +19,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public CreateReviewResponseDto createReview(@RequestBody CreateReviewDto createReviewDto, Authentication authentication) {
+    public CreateReviewResponseDto createReview(@RequestBody @Valid CreateReviewDto createReviewDto, Authentication authentication) {
         return reviewService.createReview(createReviewDto, AuthUtil.getEmail(authentication));
     }
 
@@ -37,7 +39,7 @@ public class ReviewController {
     }
 
     @PutMapping("/{reviewId}")
-    public ResponseEntity<MessageResponse> updateReview(@PathVariable Long reviewId, @RequestBody UpdateReviewDto updateReviewDto, Authentication authentication) {
+    public ResponseEntity<MessageResponse> updateReview(@PathVariable Long reviewId, @RequestBody @Valid UpdateReviewDto updateReviewDto, Authentication authentication) {
         reviewService.updateReview(reviewId, updateReviewDto, AuthUtil.getEmail(authentication));
         return ResponseEntity.ok(new MessageResponse("수정 되었습니다."));
     }

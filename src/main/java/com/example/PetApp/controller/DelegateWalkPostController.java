@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class DelegateWalkPostController {
     }
 
     @PostMapping
-    public CreateDelegateWalkPostResponseDto createDelegateWalkPost(@RequestBody CreateDelegateWalkPostDto createDelegateWalkPostDto, Authentication authentication) {
+    public CreateDelegateWalkPostResponseDto createDelegateWalkPost(@RequestBody @Valid CreateDelegateWalkPostDto createDelegateWalkPostDto, Authentication authentication) {
         return delegateWalkPostService.createDelegateWalkPost(createDelegateWalkPostDto, AuthUtil.getProfileId(authentication));
     }
 

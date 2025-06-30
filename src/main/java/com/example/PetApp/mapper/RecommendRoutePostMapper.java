@@ -6,7 +6,6 @@ import com.example.PetApp.dto.recommendroutepost.CreateRecommendRoutePostDto;
 import com.example.PetApp.dto.recommendroutepost.GetRecommendPostResponseDto;
 import com.example.PetApp.dto.recommendroutepost.GetRecommendRoutePostsResponseDto;
 import com.example.PetApp.util.TimeAgoUtil;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;

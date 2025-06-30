@@ -5,6 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Getter
@@ -13,16 +14,16 @@ import java.time.LocalDate;
 @Builder
 public class ProfileDto {
 
-    @NotBlank
+    @NotNull(message = "반려견 이미지는 필수입니다.")
     private MultipartFile petImageUrl;
 
-    @NotBlank
+    @NotBlank(message = "반려견 종이름은 필수입니다.")
     private String petBreed;
 
-    @NotBlank
+    @NotBlank(message = "반려견 이름은 필수입니다.")
     private String petName;//이거 연결해야함.
 
-    @NotBlank
+    @NotNull(message = "반려견 생일은 필수입니다.")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate petBirthDate;
 

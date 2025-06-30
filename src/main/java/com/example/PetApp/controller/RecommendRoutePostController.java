@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -19,7 +20,7 @@ public class RecommendRoutePostController {
     private final RecommendRoutePostService recommendRoutePostService;
 
     @PostMapping
-    private CreateRecommendRoutePostResponseDto createRecommendRoutePost(@RequestBody CreateRecommendRoutePostDto createRecommendRoutePostDto,
+    private CreateRecommendRoutePostResponseDto createRecommendRoutePost(@RequestBody @Valid CreateRecommendRoutePostDto createRecommendRoutePostDto,
                                                                          Authentication authentication) {
         return recommendRoutePostService.createRecommendRoutePost(createRecommendRoutePostDto, AuthUtil.getEmail(authentication));
     }
@@ -49,7 +50,7 @@ public class RecommendRoutePostController {
 
     @PutMapping("/{recommendRoutePostId}")
     private ResponseEntity<MessageResponse> updateRecommendRoutePost(@PathVariable Long recommendRoutePostId,
-                                                       @RequestBody UpdateRecommendRoutePostDto updateRecommendRoutePostDto,
+                                                       @RequestBody @Valid UpdateRecommendRoutePostDto updateRecommendRoutePostDto,
                                                        Authentication authentication) {
         recommendRoutePostService.updateRecommendRoutePost(recommendRoutePostId, updateRecommendRoutePostDto, AuthUtil.getEmail(authentication));
         return ResponseEntity.ok(new MessageResponse("수정 되었습니다."));

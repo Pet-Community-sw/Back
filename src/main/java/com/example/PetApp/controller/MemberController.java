@@ -25,15 +25,12 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@ModelAttribute @Valid MemberSignDto memberSignDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return getBindingError(bindingResult);
-        }
+    public ResponseEntity<MemberSignResponseDto> signUp(@ModelAttribute @Valid MemberSignDto memberSignDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(memberService.createMember(memberSignDto));
     }
 
     @PostMapping("/login")
-    public LoginResponseDto login(@RequestBody LoginDto loginDto, HttpServletResponse response) {
+    public LoginResponseDto login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
         return memberService.login(loginDto, response);
     }
 
@@ -54,25 +51,18 @@ public class MemberController {
     }
 
     @PostMapping("/send-email")
-    public ResponseEntity<MessageResponse> sendEmail(@RequestBody SendEmailDto sendEmailDto) {
+    public ResponseEntity<MessageResponse> sendEmail(@RequestBody @Valid SendEmailDto sendEmailDto) {
         memberService.sendEmail(sendEmailDto);
         return ResponseEntity.ok(new MessageResponse("인증번호가 이메일로 전송되었습니다."));
     }
 
     @PostMapping("/verify-code")
-    public AccessTokenResponseDto verifyCode(@RequestBody AuthCodeDto authCodeDto) {
+    public AccessTokenResponseDto verifyCode(@RequestBody @Valid AuthCodeDto authCodeDto) {
         return memberService.verifyCode(authCodeDto.getEmail(), authCodeDto.getCode());
     }
 
-
     @PutMapping("/reset-password")//수정 필요 토큰 있을 때와 없을 때
-    public ResponseEntity<MessageResponse> resetPassword(@RequestBody @Valid ResetPasswordDto resetPasswordDto,
-                                                         BindingResult bindingResult,
-                                                         Authentication authentication) {
-
-        if (bindingResult.hasErrors()) {
-            return getBindingError(bindingResult);
-        }
+    public ResponseEntity<MessageResponse> resetPassword(@RequestBody @Valid ResetPasswordDto resetPasswordDto, Authentication authentication) {
         memberService.resetPassword(resetPasswordDto, AuthUtil.getEmail(authentication));
         return ResponseEntity.ok(new MessageResponse("비밀번호가 성공적으로 변경되었습나다."));
     }
@@ -84,15 +74,8 @@ public class MemberController {
     }
 
     @PostMapping("/fcm-token")
-    public ResponseEntity<MessageResponse> createFcmToken(@RequestBody FcmTokenDto fcmTokenDto) {
+    public ResponseEntity<MessageResponse> createFcmToken(@RequestBody @Valid FcmTokenDto fcmTokenDto) {
         memberService.createFcmToken(fcmTokenDto);
         return ResponseEntity.ok(new MessageResponse("fcm토큰 생성완료."));
-    }
-
-    @NotNull
-    private static ResponseEntity<MessageResponse> getBindingError(BindingResult bindingResult) {
-        return ResponseEntity.badRequest().body(new MessageResponse(bindingResult.getFieldErrors()
-                .stream().map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.joining(", "))));
     }
 }
