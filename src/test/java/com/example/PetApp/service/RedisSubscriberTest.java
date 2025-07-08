@@ -1,5 +1,7 @@
 package com.example.PetApp.service;
 
+import com.example.PetApp.config.redis.chathandler.GroupChatHandler;
+import com.example.PetApp.config.redis.chathandler.OneToOneChatHandler;
 import com.example.PetApp.config.redis.RedisSubscriber;
 import com.example.PetApp.domain.ChatMessage;
 import com.example.PetApp.domain.ChatRoom;
@@ -44,7 +46,10 @@ class RedisSubscriberTest {
     private ChatRoomRepository chatRoomRepository;
     @Mock
     private MemberChatRoomRepository memberChatRoomRepository;
-
+    @Mock
+    private GroupChatHandler groupChatHandler;
+    @Mock
+    private OneToOneChatHandler oneToOneChatHandler;
     @Mock
     private ValueOperations<String, String> valueOperations;
     @Mock
@@ -54,13 +59,7 @@ class RedisSubscriberTest {
 
     @BeforeEach
     void setup() {
-        redisSubscriber = new RedisSubscriber(
-                simpMessagingTemplate,
-                objectMapper,
-                redisTemplate,
-                chatRoomRepository,
-                memberChatRoomRepository
-        );
+        redisSubscriber = new RedisSubscriber(groupChatHandler, oneToOneChatHandler, objectMapper);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(redisTemplate.opsForSet()).thenReturn(setOperations);
     }
