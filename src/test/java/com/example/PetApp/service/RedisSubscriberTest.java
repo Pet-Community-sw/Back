@@ -100,5 +100,6 @@ class RedisSubscriberTest {
         verify(redisTemplate.opsForValue()).set(contains("chat:lastMessage"), eq("안녕하세요!"));
         verify(simpMessagingTemplate).convertAndSend(eq("/sub/chat/update"), any(UpdateChatRoomList.class));
     }
+
 }
 
