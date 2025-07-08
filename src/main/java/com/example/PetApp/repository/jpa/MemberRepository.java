@@ -6,9 +6,11 @@ import io.lettuce.core.dynamic.annotation.Param;
 import org.hibernate.annotations.Parameter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     boolean existsByEmail(String email);
