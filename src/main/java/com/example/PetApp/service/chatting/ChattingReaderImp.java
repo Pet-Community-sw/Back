@@ -33,8 +33,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ChattingReaderImp implements ChattingReader{
 
-    private final MemberRepository memberRepository;
-    private final MemberChatRoomRepository memberChatRoomRepository;
     private final ChatRedisCleaner chatRedisCleaner;
     private final MessageUpdate messageUpdate;
     private final ChatMessageRepository chatMessageRepository;
