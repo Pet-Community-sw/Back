@@ -12,7 +12,7 @@ import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.MemberChatRoomMapper;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
-import com.example.PetApp.service.chat.ChattingReader;
+import com.example.PetApp.service.chatting.ChattingReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;

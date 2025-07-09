@@ -4,7 +4,7 @@ import com.example.PetApp.dto.MessageResponse;
 import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
 import com.example.PetApp.dto.groupchat.ChatRoomsResponseDto;
 import com.example.PetApp.dto.groupchat.UpdateChatRoomDto;
-import com.example.PetApp.service.chat.ChatRoomService;
+import com.example.PetApp.service.chatroom.ChatRoomService;
 import com.example.PetApp.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

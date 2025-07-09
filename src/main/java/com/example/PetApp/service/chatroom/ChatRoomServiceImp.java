@@ -1,4 +1,4 @@
-package com.example.PetApp.service.chat;
+package com.example.PetApp.service.chatroom;
 
 import com.example.PetApp.domain.*;
 import com.example.PetApp.dto.chatroom.CreateChatRoomResponseDto;
@@ -10,6 +10,7 @@ import com.example.PetApp.mapper.ChatRoomMapper;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
+import com.example.PetApp.service.chatting.ChattingReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;

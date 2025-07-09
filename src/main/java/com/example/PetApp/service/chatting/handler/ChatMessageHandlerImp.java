@@ -1,4 +1,4 @@
-package com.example.PetApp.service.chat;
+package com.example.PetApp.service.chatting.handler;
 
 import com.example.PetApp.config.redis.RedisPublisher;
 import com.example.PetApp.domain.ChatMessage;
@@ -7,6 +7,8 @@ import com.example.PetApp.domain.MemberChatRoom;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
+import com.example.PetApp.service.chatting.ChatRedisCleaner;
+import com.example.PetApp.service.chatroom.ChatRoomService;
 import com.example.PetApp.util.SendNotificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

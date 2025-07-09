@@ -9,7 +9,7 @@ import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.repository.jpa.*;
-import com.example.PetApp.service.chat.ChatRoomService;
+import com.example.PetApp.service.chatroom.ChatRoomService;
 import com.example.PetApp.service.walkingtogetherpost.WalkingTogetherPostServiceImp;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

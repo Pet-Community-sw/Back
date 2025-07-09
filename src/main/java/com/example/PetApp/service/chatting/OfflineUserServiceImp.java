@@ -1,4 +1,4 @@
-package com.example.PetApp.service.chat;
+package com.example.PetApp.service.chatting;
 
 import com.example.PetApp.domain.*;
 import lombok.RequiredArgsConstructor;
@@ -13,10 +13,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class OfflineUserService {
+public class OfflineUserServiceImp implements OfflineUserService{
 
     private final StringRedisTemplate stringRedisTemplate;
 
+    @Override
     public void setOfflineProfilesAndUnreadCount(ChatMessage chatMessage, ChatRoom chatRoom) {
         List<Profile> profiles = chatRoom.getProfiles();
         Set<String> onlineProfiles = stringRedisTemplate.opsForSet()
@@ -32,6 +33,7 @@ public class OfflineUserService {
         log.info("오프라인 프로필 목록 설정 (MANY): {}", offlineProfiles);
     }
 
+    @Override
     public void setOfflineMembersAndUnreadCount(ChatMessage chatMessage, MemberChatRoom memberChatRoom) {
         List<Member> members = memberChatRoom.getMembers();
         Set<String> onlineMembers = stringRedisTemplate.opsForSet()

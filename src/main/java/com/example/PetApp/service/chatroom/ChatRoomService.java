@@ -1,4 +1,4 @@
-package com.example.PetApp.service.chat;
+package com.example.PetApp.service.chatroom;
 
 import com.example.PetApp.domain.WalkingTogetherPost;
 import com.example.PetApp.domain.Profile;

@@ -18,7 +18,7 @@ import com.example.PetApp.repository.jpa.WalkingTogetherPostRepository;
 import com.example.PetApp.repository.jpa.PetBreedRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
-import com.example.PetApp.service.chat.ChatRoomService;
+import com.example.PetApp.service.chatroom.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.example.PetApp.service.chat;
+package com.example.PetApp.service.chatting.handler;
 
 import com.example.PetApp.domain.ChatMessage;
 import org.springframework.stereotype.Service;
