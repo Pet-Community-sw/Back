@@ -26,4 +26,23 @@ public class ChatRedisCleaner {
         stringRedisTemplate.delete("unReadMemberChat:" + chatMessage.getChatRoomId() + ":" + id);
         log.info("Redis 정리 완료 (ONE): {}", chatMessage.getChatRoomId());
     }
+
+    public void redisDeleteUnreadKey(Long chatRoomId, Long userId, ChatMessage.ChatRoomType chatRoomType) {
+        String unreadKey = makeUnreadKey(chatRoomId, userId, chatRoomType);
+        stringRedisTemplate.delete(unreadKey);
+    }
+
+    public String makeUnreadKey(Long chatRoomId, Long userId, ChatMessage.ChatRoomType chatRoomType) {
+        switch (chatRoomType) {
+            case MANY -> {
+                return "unReadChatCount:" + chatRoomId + ":" + userId;
+            }
+            case ONE -> {
+                return "unReadMemberChatCount:" + chatRoomId + ":" + userId;
+            }
+            default -> {
+                throw new IllegalArgumentException("지원하지 않는 채팅방 타입입니다.");
+            }
+        }
+    }
 }

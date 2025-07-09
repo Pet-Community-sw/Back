@@ -19,9 +19,15 @@ public class ChattingServiceImp implements ChattingService {
 
     @Override
     public void sendToMessage(ChatMessage chatMessage, Long senderId) {
-        validateSender(chatMessage, senderId);
+        if (!chatMessage.getSenderId().equals(senderId)) {
+            throw new IllegalArgumentException("사용자가 동일하지 않습니다.");
+        }
         log.info("메시지 처리 시작 - chatRoomType: {}, messageType: {}", chatMessage.getChatRoomType(), chatMessage.getMessageType());
 
+        chatRoomAndMessageHandler(chatMessage, senderId);
+    }
+
+    private void chatRoomAndMessageHandler(ChatMessage chatMessage, Long senderId) {
         switch (chatMessage.getChatRoomType()) {
             case MANY -> chatRoomHandler.handleGroupChat(chatMessage, senderId);
             case ONE -> chatRoomHandler.handleOneToOneChat(chatMessage, senderId);
@@ -39,15 +45,6 @@ public class ChattingServiceImp implements ChattingService {
             default -> {
                 throw new IllegalArgumentException("지원하지 않는 chatMessageType입니다.");
             }
-
-        }
-
-        log.info("메시지 처리 완료");
-    }
-
-    private void validateSender(ChatMessage chatMessage, Long senderId) {
-        if (!chatMessage.getSenderId().equals(senderId)) {
-            throw new IllegalArgumentException("사용자가 동일하지 않습니다.");
         }
     }
 }
