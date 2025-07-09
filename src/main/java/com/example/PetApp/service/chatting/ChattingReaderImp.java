@@ -12,6 +12,8 @@ import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
+import com.example.PetApp.service.chatting.handler.ChatRoomHandler;
+import com.example.PetApp.service.chatting.handler.ChatRoomHandlerImp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,13 +33,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ChattingReaderImp implements ChattingReader{
 
-    private final ChatRoomRepository chatRoomRepository;
-    private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
     private final MemberChatRoomRepository memberChatRoomRepository;
     private final ChatRedisCleaner chatRedisCleaner;
     private final MessageUpdate messageUpdate;
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatRoomHandler chatRoomHandler;
 
 
     @Transactional
@@ -63,22 +64,10 @@ public class ChattingReaderImp implements ChattingReader{
 
         switch (chatRoomType) {
             case MANY -> {
-                ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                        .orElseThrow(() -> new NotFoundException("해당 채팅방이 없습니다."));
-                Profile profile = profileRepository.findById(userId)
-                        .orElseThrow(() -> new ForbiddenException("프로필 설정 해주세요."));
-                if (!chatRoom.getProfiles().contains(profile)) {
-                    throw new ForbiddenException("권한이 없습니다.");
-                }
+                chatRoomHandler.verifyChatRoomAccess(chatRoomId, userId);
             }
             case ONE -> {
-                MemberChatRoom memberChatRoom = memberChatRoomRepository.findById(chatRoomId)
-                        .orElseThrow(() -> new NotFoundException("해당 채팅방이 없습니다."));
-                Member member = memberRepository.findById(userId)
-                        .orElseThrow(() -> new NotFoundException("해당 회원이 없습니다."));
-                if (!memberChatRoom.getMembers().contains(member)) {
-                    throw new ForbiddenException("권한이 없습니다.");
-                }
+                chatRoomHandler.verifyMemberChatRoomAccess(chatRoomId, userId);
             }
             default -> {
                 throw new IllegalArgumentException("지원하지 않는 채팅방  타입입니다.");
