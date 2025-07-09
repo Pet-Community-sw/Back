@@ -29,7 +29,7 @@ public class OneToOneChatHandler {
 
         messagingTemplate.convertAndSend("/sub/member/chat/" + chatRoom.getMemberChatRoomId(), message);
 
-        saveLastMessageToRedis(message, "memberChat:lastMessage", "memberChat:lastMessageTime");
+        saveLastMessageToRedis(message);
 
         Set<String> onlineMembers = redisTemplate.opsForSet()
                 .members("memberChatRoomId:" + chatRoom.getMemberChatRoomId() + ":onlineMembers");
@@ -40,9 +40,9 @@ public class OneToOneChatHandler {
                 ChatMessageMapper.toUpdateChatRoomList(chatRoom.getMemberChatRoomId(), message, unReadMap));
     }
 
-    private void saveLastMessageToRedis(ChatMessage message, String key, String timeKey) {
-        redisTemplate.opsForValue().set(key + message.getChatRoomId(), message.getMessage());
-        redisTemplate.opsForValue().set(timeKey + message.getChatRoomId(), String.valueOf(message.getMessageTime()));
+    private void saveLastMessageToRedis(ChatMessage message) {
+        redisTemplate.opsForValue().set("memberChat:lastMessage" + message.getChatRoomId(), message.getMessage());
+        redisTemplate.opsForValue().set("memberChat:lastMessageTime" + message.getChatRoomId(), String.valueOf(message.getMessageTime()));
     }
 
     private Map<Long, Long> countUnread(MemberChatRoom chatRoom, ChatMessage message, Set<String> onlineMembers) {

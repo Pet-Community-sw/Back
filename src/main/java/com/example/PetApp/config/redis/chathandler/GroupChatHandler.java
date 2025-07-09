@@ -29,7 +29,7 @@ public class GroupChatHandler {
 
         messagingTemplate.convertAndSend("/sub/chat/" + chatRoom.getChatRoomId(), message);
 
-        saveLastMessageToRedis(message, "chat:lastMessage", "chat:lastMessageTime");
+        saveLastMessageToRedis(message);
 
         Set<String> onlineProfiles = redisTemplate.opsForSet()
                 .members("chatRoomId:" + chatRoom.getChatRoomId() + ":onlineProfiles");
@@ -40,9 +40,9 @@ public class GroupChatHandler {
                 ChatMessageMapper.toUpdateChatRoomList(chatRoom.getChatRoomId(), message, unReadMap));
     }
 
-    private void saveLastMessageToRedis(ChatMessage message, String key, String timeKey) {
-        redisTemplate.opsForValue().set(key + message.getChatRoomId(), message.getMessage());
-        redisTemplate.opsForValue().set(timeKey + message.getChatRoomId(), String.valueOf(message.getMessageTime()));
+    private void saveLastMessageToRedis(ChatMessage message) {
+        redisTemplate.opsForValue().set("chat:lastMessage" + message.getChatRoomId(), message.getMessage());
+        redisTemplate.opsForValue().set("chat:lastMessageTime" + message.getChatRoomId(), String.valueOf(message.getMessageTime()));
     }
 
     private Map<Long, Long> countUnread(ChatRoom chatRoom, ChatMessage message, Set<String> onlineProfiles) {

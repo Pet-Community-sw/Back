@@ -49,8 +49,7 @@ public class SseEmitterManager {
         });
 
         try {
-            sseEmitter.send(SseEmitter.event().name("connect").data("connected"));//더미코드를 보냄.
-            //503에러를 막고자 함.
+            sseEmitter.send(SseEmitter.event().name("connect").data("connected"));//503에러를 막고자 더미코드를 보냄.
         } catch (IOException e) {
             sseEmitterMap.remove(member.getMemberId());
             log.error("sse connect 오류 발생 ", e);

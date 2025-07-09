@@ -22,6 +22,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,7 @@ public class ChattingReaderImp implements ChattingReader{
     private final ChatMessageRepository chatMessageRepository;
 
 
+    @Transactional
     @Override
     public ChatMessageResponseDto getMessages(Long chatRoomId, Long userId, ChatMessage.ChatRoomType chatRoomType, int page) {
         log.info("getMessages 요청 chatRoomId : {}, userId :{}, chatRoomType : {}", chatRoomId, userId, chatRoomType);
@@ -113,7 +115,7 @@ public class ChattingReaderImp implements ChattingReader{
 
         UpdateChatUnReadCountDto updateChatUnReadCountDto = ChatRoomMapper.toUpdateChatUnReadCountDto(chatMessage);
 
-        simpMessagingTemplate.convertAndSend("/sub/chat/update/unReadCount", updateChatUnReadCountDto);//깃에 작성해야됨.
+        simpMessagingTemplate.convertAndSend("/sub/chat/update/unReadCount", updateChatUnReadCountDto);
         //이거 api명세서 작성해야됨. 안읽은 수 처리.
     }
 }
