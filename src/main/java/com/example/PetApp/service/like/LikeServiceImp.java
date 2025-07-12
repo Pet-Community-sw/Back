@@ -39,14 +39,20 @@ public class LikeServiceImp implements LikeService {
     public LikeResponseDto getLikes(PostType postType, Long postId) {
         log.info("getLikes 요청 postType : {}, postId : {}", postType, postId);
         List<LikeT> likes = new ArrayList<>();
-        if (postType == PostType.COMMUNITY) {
-            Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
-            likes = likeRepository.findAllByPost(post);
-        } else if (postType == PostType.RECOMMEND) {
-            RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(postId)
-                    .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
-            likes = likeRepository.findAllByRecommendRoutePost(recommendRoutePost);
+        switch (postType) {
+            case COMMUNITY -> {
+                Post post = postRepository.findById(postId)
+                        .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
+                likes = likeRepository.findAllByPost(post);
+            }
+            case RECOMMEND -> {
+                RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(postId)
+                        .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
+                likes = likeRepository.findAllByRecommendRoutePost(recommendRoutePost);
+            }
+            default -> {
+                throw new IllegalArgumentException("잘못된 postType입니다.");
+            }
         }
         return LikeMapper.toLikeResponseDto(LikeMapper.toLikeListDto(likes));
     }
@@ -57,28 +63,32 @@ public class LikeServiceImp implements LikeService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("회원이 존재하지 않습니다."));
 
-        Object postEntity;
-        if (likeDto.getPostType() == PostType.COMMUNITY) {
-            postEntity = postRepository.findById(likeDto.getPostId())
-                    .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
-        } else if (likeDto.getPostType() == PostType.RECOMMEND) {
-            postEntity = recommendRoutePostRepository.findById(likeDto.getPostId())
-                    .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
-        } else {
-            throw new IllegalArgumentException("잘못된 요청입니다.");
+        Object post;
+        switch (likeDto.getPostType()) {
+            case COMMUNITY -> {
+                post = postRepository.findById(likeDto.getPostId())
+                        .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
+            }
+            case RECOMMEND -> {
+                post = recommendRoutePostRepository.findById(likeDto.getPostId())
+                        .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
+            }
+            default -> {
+                throw new IllegalArgumentException("잘못된 postType입니다.");
+            }
         }
 
         // 좋아요 존재 여부
-        boolean isLiked = existsLike(postEntity, member);
+        boolean isLiked = existsLike(post, member);
 
         if (isLiked) {
             log.info("좋아요 삭제");
-            deleteLike(postEntity, member);
+            deleteLike(post, member);
             return ResponseEntity.ok().body("좋아요 삭제했습니다.");
         } else {
             log.info("좋아요 생성");
-            sendLikeNotification(postEntity, member);
-            createLike(postEntity, member);
+            sendLikeNotification(post, member);
+            createLike(post, member);
             return ResponseEntity.status(HttpStatus.CREATED).body("좋아요 생성했습니다.");
         }
     }
