@@ -14,7 +14,6 @@ import java.util.Set;
 
 @Getter
 @Entity
-@Table(name = "walking_together_post")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

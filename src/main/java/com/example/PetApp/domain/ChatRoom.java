@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "chatRoom")
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor

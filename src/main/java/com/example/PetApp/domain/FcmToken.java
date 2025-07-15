@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name = "fcm_token")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

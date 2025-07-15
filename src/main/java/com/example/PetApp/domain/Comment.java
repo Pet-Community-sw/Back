@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@Table(name = "comment")
 @Getter
 @NoArgsConstructor(access=AccessLevel.PROTECTED)
 @AllArgsConstructor

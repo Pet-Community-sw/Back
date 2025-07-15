@@ -6,7 +6,6 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "likeT")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

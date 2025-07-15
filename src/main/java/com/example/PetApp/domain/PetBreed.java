@@ -10,7 +10,6 @@ import javax.validation.constraints.NotEmpty;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
-@Table(name = "pet_breed")
 @Builder
 public class PetBreed {
 

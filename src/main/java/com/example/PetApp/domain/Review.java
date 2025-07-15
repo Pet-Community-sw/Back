@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder

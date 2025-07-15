@@ -18,7 +18,6 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "post")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
