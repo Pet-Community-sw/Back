@@ -1,4 +1,4 @@
-package com.example.PetApp.domain;
+package com.example.PetApp.domain.embedded;
 
 import lombok.*;
 

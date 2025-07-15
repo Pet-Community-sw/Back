@@ -1,6 +1,7 @@
 package com.example.PetApp.service.walkerpost;
 
 import com.example.PetApp.domain.*;
+import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
 import com.example.PetApp.dto.walkrecord.CreateWalkRecordResponseDto;
@@ -14,7 +15,6 @@ import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.service.memberchatRoom.MemberChatRoomService;
 import com.example.PetApp.service.walkrecord.WalkRecordService;
 import com.example.PetApp.util.SendNotificationUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.domain.embedded.Location;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

@@ -1,6 +1,6 @@
 package com.example.PetApp.service;
 
-import com.example.PetApp.domain.Applicant;
+import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.domain.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;

@@ -11,6 +11,10 @@ import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.service.chatroom.ChatRoomService;
 import com.example.PetApp.service.chatting.ChattingService;
+import com.example.PetApp.service.chatting.ChattingServiceImp;
+import com.example.PetApp.service.chatting.handler.ChatMessageHandler;
+import com.example.PetApp.service.chatting.handler.ChatMessageHandlerImp;
+import com.example.PetApp.service.chatting.handler.ChatRoomHandler;
 import com.example.PetApp.util.SendNotificationUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -34,8 +39,11 @@ import static org.mockito.Mockito.*;
 class ChattingServiceTest {
 
     @InjectMocks
-    private ChattingService chattingService;
-
+    private ChattingServiceImp chattingService;
+    @Mock
+    private ChatRoomHandler chatRoomHandler;
+    @InjectMocks
+    private ChatMessageHandlerImp chatMessageHandler;
     @Mock
     private RedisPublisher redisPublisher;
     @Mock
@@ -55,6 +63,27 @@ class ChattingServiceTest {
     @Mock
     private SetOperations<String, String> setOperations;
 
+    @Test
+    @DisplayName("sendToMessage - MANY, ENTER - 성공적으로 publish 호출됨")
+    void testSendToMessage_MANY_ENTER() {
+        // given
+        Long senderId = 1L;
+        Long chatRoomId = 101L;
+
+        ChatMessage message = ChatMessage.builder()
+                .chatRoomId(chatRoomId)
+                .senderId(senderId)
+                .senderName("초코")
+                .chatRoomType(ChatMessage.ChatRoomType.MANY)
+                .messageType(ChatMessage.MessageType.ENTER)
+                .build();
+
+        // when
+        chattingService.sendToMessage(message, senderId);
+
+        // then
+        verify(redisPublisher, times(1)).publish(any(ChatMessage.class));
+    }
     @Test
     @DisplayName("sendToMessage_MANY_TALK_성공")
     void test1() {

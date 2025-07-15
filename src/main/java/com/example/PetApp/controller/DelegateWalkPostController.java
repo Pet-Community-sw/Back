@@ -1,6 +1,6 @@
 package com.example.PetApp.controller;
 
-import com.example.PetApp.domain.Applicant;
+import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.dto.MessageResponse;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;

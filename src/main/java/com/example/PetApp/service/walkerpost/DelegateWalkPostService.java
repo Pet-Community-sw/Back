@@ -1,6 +1,6 @@
 package com.example.PetApp.service.walkerpost;
 
-import com.example.PetApp.domain.Applicant;
+import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
 import com.example.PetApp.dto.walkrecord.CreateWalkRecordResponseDto;
