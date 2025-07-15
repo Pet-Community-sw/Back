@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.embedded.Location;
 import lombok.*;
 import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,15 +34,8 @@ public class RecommendRoutePost {
     @Column(nullable = false)
     private String content;
 
-    @Setter
-    @NotNull
-    @Column(nullable = false)
-    private Double locationLongitude;
-
-    @Setter
-    @NotNull
-    @Column(nullable = false)
-    private Double locationLatitude;
+    @Embedded
+    private Location location;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

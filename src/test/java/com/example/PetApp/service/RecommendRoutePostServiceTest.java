@@ -2,6 +2,7 @@ package com.example.PetApp.service;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RecommendRoutePost;
+import com.example.PetApp.domain.embedded.Location;
 import com.example.PetApp.dto.recommendroutepost.*;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
@@ -92,8 +93,7 @@ public class RecommendRoutePostServiceTest {
                 .member(member)
                 .title("산책로 1")
                 .content("좋아요")
-                .locationLongitude(127.01)
-                .locationLatitude(37.55)
+                .location(new Location(127.01, 37.55))
                 .recommendRouteTime(LocalDateTime.now())
                 .build();
 
@@ -102,8 +102,7 @@ public class RecommendRoutePostServiceTest {
                 .member(member)
                 .title("산책로 2")
                 .content("좋아요")
-                .locationLongitude(127.02)
-                .locationLatitude(37.56)
+                .location(new Location(127.02, 37.56))
                 .recommendRouteTime(LocalDateTime.now())
                 .build();
 
@@ -139,8 +138,7 @@ public class RecommendRoutePostServiceTest {
                 .member(member)
                 .title("산책로 1")
                 .content("좋아요")
-                .locationLongitude(127.01)
-                .locationLatitude(37.55)
+                .location(new Location(127.01, 37.55))
                 .recommendRouteTime(LocalDateTime.now())
                 .build();
 
@@ -149,8 +147,7 @@ public class RecommendRoutePostServiceTest {
                 .member(member)
                 .title("산책로 2")
                 .content("좋아요")
-                .locationLongitude(127.02)
-                .locationLatitude(37.56)
+                .location(new Location(127.02, 37.56))
                 .recommendRouteTime(LocalDateTime.now())
                 .build();
 
@@ -187,8 +184,7 @@ public class RecommendRoutePostServiceTest {
                 .title("a")
                 .content("b")
                 .member(member)
-                .locationLongitude(127.06)
-                .locationLatitude(32.02)
+                .location(new Location(127.02, 37.56))
                 .recommendRouteTime(LocalDateTime.now())
                 .build();
 

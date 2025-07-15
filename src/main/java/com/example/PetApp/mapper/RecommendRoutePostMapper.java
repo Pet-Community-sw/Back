@@ -2,6 +2,7 @@ package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RecommendRoutePost;
+import com.example.PetApp.domain.embedded.Location;
 import com.example.PetApp.dto.recommendroutepost.CreateRecommendRoutePostDto;
 import com.example.PetApp.dto.recommendroutepost.GetRecommendPostResponseDto;
 import com.example.PetApp.dto.recommendroutepost.GetRecommendRoutePostsResponseDto;
@@ -16,8 +17,7 @@ public class RecommendRoutePostMapper {
         return RecommendRoutePost.builder()
                 .title(createRecommendRoutePostDto.getTitle())
                 .content(createRecommendRoutePostDto.getContent())
-                .locationLongitude(createRecommendRoutePostDto.getLocationLongitude())
-                .locationLatitude(createRecommendRoutePostDto.getLocationLatitude())
+                .location(new Location(createRecommendRoutePostDto.getLocationLongitude(), createRecommendRoutePostDto.getLocationLatitude()))
                 .member(member)
                 .build();
     }
@@ -34,8 +34,8 @@ public class RecommendRoutePostMapper {
                         .memberName(recommendRoutePost.getMember().getName())
                         .memberImageUrl(recommendRoutePost.getMember().getMemberImageUrl())
                         .likeCount(likeCountMap.getOrDefault(recommendRoutePost.getRecommendRouteId(), 0L))
-                        .locationLongitude(recommendRoutePost.getLocationLongitude())
-                        .locationLatitude(recommendRoutePost.getLocationLatitude())
+                        .locationLongitude(recommendRoutePost.getLocation().getLocationLongitude())
+                        .locationLatitude(recommendRoutePost.getLocation().getLocationLatitude())
                         .createdAt(TimeAgoUtil.getTimeAgo(recommendRoutePost.getRecommendRouteTime()))
                         .isOwner(member.getMemberId().equals(recommendRoutePost.getMember().getMemberId()))
                         .isLike(likedRecommendPostIds.contains(recommendRoutePost.getRecommendRouteId()))

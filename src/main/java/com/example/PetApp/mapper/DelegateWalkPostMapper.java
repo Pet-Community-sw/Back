@@ -3,6 +3,7 @@ package com.example.PetApp.mapper;
 import com.example.PetApp.domain.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
+import com.example.PetApp.domain.embedded.Location;
 import com.example.PetApp.dto.delegateWalkpost.CreateDelegateWalkPostDto;
 import com.example.PetApp.dto.delegateWalkpost.GetDelegateWalkPostsResponseDto;
 import com.example.PetApp.dto.delegateWalkpost.GetPostResponseDto;
@@ -15,12 +16,11 @@ import java.util.stream.Collectors;
 public class DelegateWalkPostMapper {
 
     public static DelegateWalkPost toEntity(CreateDelegateWalkPostDto createDelegateWalkPostDto, Profile profile) {
-        return  DelegateWalkPost.builder()
+        return DelegateWalkPost.builder()
                 .title(createDelegateWalkPostDto.getTitle())
                 .content(createDelegateWalkPostDto.getContent())
                 .price(createDelegateWalkPostDto.getPrice())
-                .locationLongitude(createDelegateWalkPostDto.getLocationLongitude())
-                .locationLatitude(createDelegateWalkPostDto.getLocationLatitude())
+                .location(new Location(createDelegateWalkPostDto.getLocationLongitude(), createDelegateWalkPostDto.getLocationLatitude()))
                 .allowedRadiusMeters(createDelegateWalkPostDto.getAllowedRadiusMeters())
                 .scheduledTime(createDelegateWalkPostDto.getScheduledTime())
                 .profile(profile)
@@ -46,8 +46,8 @@ public class DelegateWalkPostMapper {
                         .petImageUrl(delegateWalkPost.getProfile().getPetImageUrl())
                         .title(delegateWalkPost.getTitle())
                         .price(delegateWalkPost.getPrice())
-                        .locationLongitude(delegateWalkPost.getLocationLongitude())
-                        .locationLatitude(delegateWalkPost.getLocationLatitude())
+                        .locationLongitude(delegateWalkPost.getLocation().getLocationLongitude())
+                        .locationLatitude(delegateWalkPost.getLocation().getLocationLatitude())
                         .scheduledTime(delegateWalkPost.getScheduledTime())
                         .filtering(filter(delegateWalkPost, member))
                         .applicantCount(delegateWalkPost.getApplicants().size())
@@ -62,8 +62,8 @@ public class DelegateWalkPostMapper {
                 .title(delegateWalkPost.getTitle())
                 .content(delegateWalkPost.getContent())
                 .price(delegateWalkPost.getPrice())
-                .locationLongitude(delegateWalkPost.getLocationLongitude())
-                .locationLatitude(delegateWalkPost.getLocationLatitude())
+                .locationLongitude(delegateWalkPost.getLocation().getLocationLongitude())
+                .locationLatitude(delegateWalkPost.getLocation().getLocationLatitude())
                 .allowedRadiusMeters(delegateWalkPost.getAllowedRadiusMeters())
                 .scheduledTime(delegateWalkPost.getScheduledTime())
                 .petName(delegateWalkPost.getProfile().getPetName())

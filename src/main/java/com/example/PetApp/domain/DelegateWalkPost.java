@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.embedded.Location;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -43,15 +44,8 @@ public class DelegateWalkPost {
     @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private Long price;
 
-    @Setter
-    @NotNull
-    @Column(nullable = false)
-    private Double locationLongitude;
-
-    @Setter
-    @NotNull
-    @Column(nullable = false)
-    private Double locationLatitude;
+    @Embedded
+    private Location location;
 
     @Setter
     @NotNull

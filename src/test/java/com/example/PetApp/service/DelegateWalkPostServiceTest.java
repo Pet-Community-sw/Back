@@ -4,6 +4,7 @@ import com.example.PetApp.domain.Applicant;
 import com.example.PetApp.domain.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
+import com.example.PetApp.domain.embedded.Location;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
 import com.example.PetApp.exception.ConflictException;
@@ -123,6 +124,7 @@ public class DelegateWalkPostServiceTest {
                 .delegateWalkPostId(1L)
                 .title("산책 대행 1")
                 .profile(profile)
+                .location(new Location(127.01, 22.56))
                 .delegateWalkPostTime(LocalDateTime.now())
                 .build();
 
@@ -130,6 +132,7 @@ public class DelegateWalkPostServiceTest {
                 .delegateWalkPostId(2L)
                 .title("산책 대행 2")
                 .profile(profile)
+                .location(new Location(127.01, 22.56))
                 .delegateWalkPostTime(LocalDateTime.now())
                 .build();
 
@@ -175,6 +178,7 @@ public class DelegateWalkPostServiceTest {
                 .delegateWalkPostId(1L)
                 .title("도심 산책 대행")
                 .profile(profile)
+                .location(new Location(127.01, 22.56))
                 .delegateWalkPostTime(LocalDateTime.now())
                 .build();
 
@@ -182,6 +186,7 @@ public class DelegateWalkPostServiceTest {
                 .delegateWalkPostId(2L)
                 .title("강변 산책 대행")
                 .profile(profile)
+                .location(new Location(127.01, 22.56))
                 .delegateWalkPostTime(LocalDateTime.now())
                 .build();
 
@@ -221,6 +226,7 @@ public class DelegateWalkPostServiceTest {
                 .delegateWalkPostId(postId)
                 .title("산책 요청")
                 .profile(profile)
+                .location(new Location(127.01, 22.56))
                 .delegateWalkPostTime(LocalDateTime.now())
                 .build();
 

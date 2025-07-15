@@ -6,9 +6,10 @@ import javax.persistence.Embeddable;
 
 @Embeddable
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
+@Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Applicant {
 
     private Long memberId;
@@ -16,4 +17,5 @@ public class Applicant {
     private String content;
 
 }
+
 

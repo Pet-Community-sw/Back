@@ -8,8 +8,8 @@ public class LocationMapper {
 
     public static SendLocationDto toSendLocationDto(WalkRecord walkRecord, LocationMessage locationMessage) {
         return SendLocationDto.builder()
-                .locationLongitude(walkRecord.getDelegateWalkPost().getLocationLongitude())
-                .locationLatitude(walkRecord.getDelegateWalkPost().getLocationLatitude())
+                .locationLongitude(walkRecord.getDelegateWalkPost().getLocation().getLocationLongitude())
+                .locationLatitude(walkRecord.getDelegateWalkPost().getLocation().getLocationLatitude())
                 .walkerLongitude(locationMessage.getLongitude())
                 .walkerLatitude(locationMessage.getLatitude())
                 .build();
