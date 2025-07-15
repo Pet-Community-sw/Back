@@ -4,6 +4,7 @@ import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.Review;
 import com.example.PetApp.domain.WalkRecord;
+import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.dto.review.CreateReviewDto;
 import com.example.PetApp.dto.review.GetReviewList;
 import com.example.PetApp.dto.review.GetReviewListResponseDto;
@@ -19,8 +20,7 @@ public class ReviewMapper {
                 .member(walkRecord.getMember())
                 .profile(walkRecord.getDelegateWalkPost().getProfile())
                 .walkRecord(walkRecord)
-                .title(createReviewDto.getTitle())
-                .content(createReviewDto.getContent())
+                .postContent(new PostContent(createReviewDto.getTitle(), createReviewDto.getContent()))
                 .rating(createReviewDto.getRating())
                 .reviewType(createReviewDto.getReviewType())
                 .build();
@@ -29,10 +29,10 @@ public class ReviewMapper {
     public static GetReviewResponseDto toGetReviewResponseDto(Review review, Member member) {
         GetReviewResponseDto getReviewResponseDto = GetReviewResponseDto.builder()
                 .reviewId(review.getReviewId())
-                .title(review.getTitle())
-                .content(review.getContent())
+                .title(review.getPostContent().getTitle())
+                .content(review.getPostContent().getContent())
                 .rating(review.getRating())
-                .reviewTime(review.getReviewTime())
+                .reviewTime(review.getCreatedAt())
                 .build();
         if (review.getReviewType() == Review.ReviewType.PROFILE_TO_MEMBER) {
             getReviewResponseDto.setUserId(review.getProfile().getProfileId());
@@ -67,9 +67,9 @@ public class ReviewMapper {
                         .userId(review.getProfile().getProfileId())
                         .userName(review.getProfile().getPetName())
                         .userImageUrl(review.getProfile().getPetImageUrl())
-                        .title(review.getTitle())
+                        .title(review.getPostContent().getTitle())
                         .rating(review.getRating())
-                        .reviewTime(review.getReviewTime())
+                        .reviewTime(review.getCreatedAt())
                         .isOwner(review.getMember().equals(member))
                         .build()
                 ).collect(Collectors.toList());

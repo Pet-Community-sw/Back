@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -30,14 +31,8 @@ public class Post extends BaseTimeEntity {
     private Long postId;
 
     @Setter
-    @NotBlank
-    @Column(nullable = false)
-    private String title;
-
-    @Setter
-    @NotBlank
-    @Column(nullable = false)
-    private String content;
+    @Embedded
+    private PostContent postContent;
 
     @Setter
     @NotBlank

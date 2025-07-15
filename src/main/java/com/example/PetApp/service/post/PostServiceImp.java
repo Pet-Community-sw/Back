@@ -2,6 +2,7 @@ package com.example.PetApp.service.post;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
+import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.dto.like.LikeCountDto;
 import com.example.PetApp.dto.post.CreatePostResponseDto;
 import com.example.PetApp.dto.post.PostDto;
@@ -105,8 +106,7 @@ public class PostServiceImp implements PostService {
                 FileImageKind.POST);
 
         post.setPostImageUrl(imageFileName);
-        post.setTitle(updatePostDto.getTitle());
-        post.setContent(updatePostDto.getContent());
+        post.setPostContent(new PostContent(updatePostDto.getTitle(), updatePostDto.getContent()));
     }
 
     private  Map<Long, Long> getLikeCountMap(List<Post> posts) {

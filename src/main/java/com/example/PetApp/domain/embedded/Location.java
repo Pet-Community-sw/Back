@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-@Setter
 public class Location {
 
     @NotNull

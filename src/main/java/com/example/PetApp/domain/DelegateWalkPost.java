@@ -2,6 +2,7 @@ package com.example.PetApp.domain;
 
 import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.domain.embedded.Location;
+import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -32,23 +33,18 @@ public class DelegateWalkPost extends BaseTimeEntity {
     private Long delegateWalkPostId;
 
     @Setter
-    @NotBlank
-    @Column(nullable = false)
-    private String title;
+    @Embedded
+    private PostContent postContent;
 
     @Setter
-    @NotBlank
-    @Column(nullable = false)
-    private String content;
+    @Embedded
+    private Location location;
 
     @Setter
     @Min(0)
     @NotNull
     @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private Long price;
-
-    @Embedded
-    private Location location;
 
     @Setter
     @NotNull

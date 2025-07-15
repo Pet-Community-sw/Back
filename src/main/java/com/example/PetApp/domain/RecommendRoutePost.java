@@ -1,6 +1,7 @@
 package com.example.PetApp.domain;
 
 import com.example.PetApp.domain.embedded.Location;
+import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 import org.checkerframework.checker.units.qual.C;
@@ -26,14 +27,8 @@ public class RecommendRoutePost extends BaseTimeEntity {
     private Long recommendRouteId;
 
     @Setter
-    @NotBlank
-    @Column(nullable = false)
-    private String title;
-
-    @Setter
-    @NotBlank
-    @Column(nullable = false)
-    private String content;
+    @Embedded
+    private PostContent postContent;
 
     @Embedded
     private Location location;

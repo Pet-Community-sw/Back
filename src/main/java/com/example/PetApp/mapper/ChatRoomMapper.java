@@ -33,7 +33,7 @@ public class ChatRoomMapper {
                 .chatName(chatRoom.getName())
                 .chatLimitCount(chatRoom.getLimitCount())
                 .currentCount(chatRoom.getProfiles().size())
-                .chatRoomTime(chatRoom.getChatRoomTime())
+                .chatRoomTime(chatRoom.getCreatedAt())
                 .profiles(
                         chatRoom.getProfiles().stream()
                                 .map(profile -> ChatRoomProfilesResponseDto.builder()

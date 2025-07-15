@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -39,14 +40,8 @@ public class Review extends BaseTimeEntity {
     private WalkRecord walkRecord;
 
     @Setter
-    @NotBlank
-    @Column(nullable = false)
-    private String title;
-
-    @Setter
-    @NotBlank
-    @Column(nullable = false)
-    private String content;
+    @Embedded
+    private PostContent postContent;
 
     @Setter
     @NotNull

@@ -2,6 +2,7 @@ package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
+import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.post.GetPostResponseDto;
 import com.example.PetApp.dto.post.PostDto;
@@ -17,8 +18,7 @@ public class PostMapper {
 
     public static Post toEntity(PostDto postDto, String imageFileName, Member member) {
         return Post.builder()
-                .content(postDto.getContent())
-                .title(postDto.getTitle())
+                .postContent(new PostContent(postDto.getTitle(), postDto.getContent()))
                 .postImageUrl(imageFileName)
                 .member(member)
                 .build();
@@ -34,10 +34,10 @@ public class PostMapper {
                         .memberId(post.getMember().getMemberId())
                         .memberName(post.getMember().getName())
                         .memberImageUrl(post.getMember().getMemberImageUrl())
-                        .createdAt(TimeAgoUtil.getTimeAgo(post.getPostTime()))
+                        .createdAt(TimeAgoUtil.getTimeAgo(post.getCreatedAt()))
                         .viewCount(post.getViewCount())
                         .likeCount(likeCountMap.get(post.getPostId()))
-                        .title(post.getTitle())
+                        .title(post.getPostContent().getTitle())
                         .like(likedPostIds.contains(post.getPostId()))
                         .build()
                 )
@@ -50,20 +50,20 @@ public class PostMapper {
                                                           boolean isLike) {
         PostResponseDto postResponseDto=PostResponseDto.builder()
                 .postId(post.getPostId())
-                .title(post.getTitle())
+                .title(post.getPostContent().getTitle())
                 .postImageUrl(post.getPostImageUrl())
                 .viewCount(post.getViewCount())
                 .likeCount(likeCount)
                 .memberId(post.getMember().getMemberId())
                 .memberName(post.getMember().getName())
                 .memberImageUrl(post.getMember().getMemberImageUrl())
-                .createdAt(TimeAgoUtil.getTimeAgo(post.getPostTime()))
+                .createdAt(TimeAgoUtil.getTimeAgo(post.getCreatedAt()))
                 .like(isLike)
                 .build();
         List<GetCommentsResponseDto> commentsResponseDtos = CommentMapper.toGetCommentsResponseDtos(post, member);
 
         return GetPostResponseDto.builder()
-                .content(post.getContent())
+                .content(post.getPostContent().getContent())
                 .isOwner(post.getMember().equals(member))
                 .postResponseDto(postResponseDto)
                 .comments(commentsResponseDtos)

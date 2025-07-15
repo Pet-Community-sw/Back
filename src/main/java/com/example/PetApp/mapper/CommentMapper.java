@@ -46,7 +46,7 @@ public class CommentMapper {
                         comment.getMember().getMemberId(),
                         comment.getMember().getName(),
                         comment.getMember().getMemberImageUrl(),
-                        TimeAgoUtil.getTimeAgo(comment.getCommentTime()),
+                        TimeAgoUtil.getTimeAgo(comment.getCreatedAt()),
                         comment.getMember().equals(member)
                 )
         ).collect(Collectors.toList());

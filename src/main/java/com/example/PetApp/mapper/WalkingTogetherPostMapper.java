@@ -44,7 +44,7 @@ public class WalkingTogetherPostMapper {
                 .scheduledTime(walkingTogetherPost.getScheduledTime())
                 .currentCount(walkingTogetherPost.getProfiles().size())
                 .limitCount(walkingTogetherPost.getLimitCount())
-                .createdAt(TimeAgoUtil.getTimeAgo(walkingTogetherPost.getWalkingTogetherPostTime()))
+                .createdAt(TimeAgoUtil.getTimeAgo(walkingTogetherPost.getCreatedAt()))
                 .isOwner(walkingTogetherPost.getProfile().equals(profile))
                 .filtering(walkingTogetherPost.getAvoidBreeds().contains(petBreed.getPetBreedId()))//true이면 신청불가
                 .build();
