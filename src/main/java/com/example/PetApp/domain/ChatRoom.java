@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -17,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
-public class ChatRoom {
+public class ChatRoom extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,10 +33,6 @@ public class ChatRoom {
     @NotNull
     @Column(nullable = false)
     private int limitCount;
-
-    @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime chatRoomTime;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "walking_together_post_id")

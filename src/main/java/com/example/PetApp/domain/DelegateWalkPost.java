@@ -2,6 +2,7 @@ package com.example.PetApp.domain;
 
 import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.domain.embedded.Location;
+import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -20,7 +21,7 @@ import java.util.Set;
 @NoArgsConstructor(access=AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class DelegateWalkPost {
+public class DelegateWalkPost extends BaseTimeEntity {
     public enum DelegateWalkStatus {
         RECRUITING,   // 모집중
         COMPLETED     // 모집완료
@@ -72,10 +73,6 @@ public class DelegateWalkPost {
     @NotEmpty
     @Column(nullable = false)
     private LocalDateTime scheduledTime;
-
-    @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime delegateWalkPostTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id")

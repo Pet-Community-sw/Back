@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class WalkRecord {
+public class WalkRecord extends BaseTimeEntity {
 
     public enum WalkStatus {
         READY, START, FINISH, CANCELED

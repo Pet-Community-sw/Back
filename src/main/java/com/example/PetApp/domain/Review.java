@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class Review {
+public class Review extends BaseTimeEntity {
 
     public enum ReviewType {
         MEMBER_TO_PROFILE, PROFILE_TO_MEMBER
@@ -54,8 +55,4 @@ public class Review {
 
     @Enumerated(EnumType.STRING)
     private ReviewType reviewType;
-
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime reviewTime;
 }

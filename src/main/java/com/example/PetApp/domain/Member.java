@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,8 +21,14 @@ import java.util.Set;
 //기본 생성자를 protected로 두는 게 안전하고 객체지향적이다
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = "memberId") //엔티티의 동등/중복 판단은 memberId(유일한값)으로 판단하기 위함.
-public class Member {//수정 필요
+@EqualsAndHashCode(of = "memberId", callSuper = false) //엔티티의 동등/중복 판단은 memberId(유일한값)으로 판단하기 위함.
+/*
+* 부모 클래스의 필드를 equals/hashCode에 포함하고 싶다면
+ @EqualsAndHashCode(callSuper = true) 사용
+자식 클래스의 필드만 비교하고 싶다면
+ @EqualsAndHashCode(callSuper = false) 사용
+* */
+public class Member extends BaseTimeEntity {//수정 필요
 
     @Id
     @Column(name = "member_id")
@@ -52,10 +59,6 @@ public class Member {//수정 필요
     @Setter
     @Column(nullable = false)
     private String memberImageUrl;
-
-    @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime memberTime;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private RefreshToken refreshToken;

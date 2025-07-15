@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -15,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class MemberChatRoom {
+public class MemberChatRoom extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +27,4 @@ public class MemberChatRoom {
     @OneToMany(fetch = FetchType.LAZY)
     private List<Member> members = new ArrayList<>();
 
-    @CreationTimestamp
-    @Column(nullable = false)
-    private LocalDateTime memberChatRoomTime;
 }

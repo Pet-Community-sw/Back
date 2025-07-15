@@ -1,6 +1,7 @@
 package com.example.PetApp.domain;
 
 import com.example.PetApp.domain.embedded.Location;
+import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class RecommendRoutePost {
+public class RecommendRoutePost extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,10 +37,6 @@ public class RecommendRoutePost {
 
     @Embedded
     private Location location;
-
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime recommendRouteTime;
 
     @OneToMany(mappedBy = "recommendRoutePost",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WalkingTogetherPost> walkingTogetherPost;
