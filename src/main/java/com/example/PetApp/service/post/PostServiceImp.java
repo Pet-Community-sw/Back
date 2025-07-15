@@ -46,7 +46,7 @@ public class PostServiceImp implements PostService {
         log.info("getPosts 요청 : {}", email);
         Member member = memberRepository.findByEmail(email).get();
         Pageable pageable = PageRequest.of(page, 10);
-        List<Post> posts = postRepository.findByOrderByPostTimeDesc(pageable).getContent();
+        List<Post> posts = postRepository.findByOrderByCreatedAtDesc(pageable).getContent();
 
         return PostMapper.toPostListResponseDto(posts, getLikeCountMap(posts), getLikedPostIds(member, posts));
     }
