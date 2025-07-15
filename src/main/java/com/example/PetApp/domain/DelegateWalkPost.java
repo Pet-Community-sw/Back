@@ -37,7 +37,8 @@ public class DelegateWalkPost extends BaseTimeEntity {
     private String title;
 
     @Setter
-    @NotBlank    @Column(nullable = false)
+    @NotBlank
+    @Column(nullable = false)
     private String content;
 
     @Setter
