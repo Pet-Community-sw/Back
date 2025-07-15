@@ -2,6 +2,7 @@ package com.example.PetApp.service;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
+import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.dto.post.CreatePostResponseDto;
 import com.example.PetApp.dto.post.GetPostResponseDto;
 import com.example.PetApp.dto.post.PostDto;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -76,12 +78,12 @@ public class PostServiceTest {
         Post post = Post.builder()
                 .postId(100L)
                 .member(fakeMember)
-                .title("a")
-                .content("b")
+                .postContent(new PostContent("산책 대행 1", "내용 1"))
                 .viewCount(0L)
-                .postTime(LocalDateTime.now())
                 .comments(new ArrayList<>())
                 .build();
+
+        ReflectionTestUtils.setField(post, "createdAt", LocalDateTime.now());
 
         when(postRepository.findById(100L)).thenReturn(Optional.of(post));
         when(memberRepository.findByEmail("dlwlsh789@naver.com")).thenReturn(Optional.of(view));
@@ -106,13 +108,12 @@ public class PostServiceTest {
 
         Post post = Post.builder()
                 .postId(1L)
-                .title("aa")
-                .content("bb")
+                .postContent(new PostContent("산책 대행 1", "내용 1"))
                 .member(member)
                 .postImageUrl(null)
-                .postTime(LocalDateTime.now())
                 .comments(new ArrayList<>())
                 .build();
+
 
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
@@ -121,7 +122,7 @@ public class PostServiceTest {
         postServiceImp.updatePost(postId, postDto, email);
 
         //then
-        assertThat(post.getTitle()).isEqualTo("a");
+        assertThat(post.getPostContent().getContent()).isEqualTo("b");
     }
 
     @Test
@@ -135,11 +136,9 @@ public class PostServiceTest {
 
         Post post = Post.builder()
                 .postId(1L)
-                .title("aa")
-                .content("bb")
+                .postContent(new PostContent("산책 대행 1", "내용 1"))
                 .member(fakeMember)
                 .postImageUrl(null)
-                .postTime(LocalDateTime.now())
                 .comments(new ArrayList<>())
                 .build();
 

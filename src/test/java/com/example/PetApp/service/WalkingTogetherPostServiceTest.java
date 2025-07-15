@@ -1,6 +1,7 @@
 package com.example.PetApp.service;
 
 import com.example.PetApp.domain.*;
+import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.dto.chatroom.CreateChatRoomResponseDto;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostDto;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostResponseDto;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -57,18 +59,16 @@ public class WalkingTogetherPostServiceTest {
                 .avoidBreeds(Set.of(petBreed))
                 .build();
 
-        Profile fakeProfile = Profile.builder()
-                .profileId(2L)
-                .build();
         WalkingTogetherPost walkingTogetherPost = WalkingTogetherPost.builder()
                 .walkingTogetherPostId(1L)
                 .profile(profile)
                 .scheduledTime(LocalDateTime.now())
                 .profiles(Set.of(2L))
                 .limitCount(2)
-                .walkingTogetherPostTime(LocalDateTime.now())
                 .avoidBreeds(Set.of(1L))
                 .build();
+
+        ReflectionTestUtils.setField(walkingTogetherPost, "createdAt", LocalDateTime.now());
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
         when(walkingTogetherPostRepository.findById(walkingTogetherPostId)).thenReturn(Optional.of(walkingTogetherPost));
@@ -136,7 +136,7 @@ public class WalkingTogetherPostServiceTest {
         RecommendRoutePost recommendRoutePost = RecommendRoutePost.builder()
                 .recommendRouteId(recommendRoutePostId)
                 .member(Member.builder().memberId(1L).build())
-                .title("추천 산책길")
+                .postContent(new PostContent("산책길추천 1", "좋은 산책길"))
                 .build();
 
         PetBreed petBreed = PetBreed.builder()
@@ -148,17 +148,17 @@ public class WalkingTogetherPostServiceTest {
                 .walkingTogetherPostId(101L)
                 .profile(profile)
                 .recommendRoutePost(recommendRoutePost)
-                .walkingTogetherPostTime(LocalDateTime.now())
                 .scheduledTime(LocalDateTime.now())
                 .build();
+        ReflectionTestUtils.setField(post1, "createdAt", LocalDateTime.now());
 
         WalkingTogetherPost post2 = WalkingTogetherPost.builder()
                 .walkingTogetherPostId(102L)
                 .profile(profile)
                 .recommendRoutePost(recommendRoutePost)
-                .walkingTogetherPostTime(LocalDateTime.now())
                 .scheduledTime(LocalDateTime.now())
                 .build();
+        ReflectionTestUtils.setField(post2, "createdAt", LocalDateTime.now());
 
         List<WalkingTogetherPost> postList = List.of(post1, post2);
 
@@ -236,7 +236,7 @@ public class WalkingTogetherPostServiceTest {
 
         RecommendRoutePost recommendRoutePost = RecommendRoutePost.builder()
                 .recommendRouteId(recommendRoutePostId)
-                .title("추천 산책로")
+                .postContent(new PostContent("산책길추천 1", "좋은 산책길"))
                 .build();
 
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));

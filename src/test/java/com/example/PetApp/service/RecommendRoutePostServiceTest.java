@@ -3,6 +3,7 @@ package com.example.PetApp.service;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RecommendRoutePost;
 import com.example.PetApp.domain.embedded.Location;
+import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.dto.recommendroutepost.*;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -91,20 +93,20 @@ public class RecommendRoutePostServiceTest {
         RecommendRoutePost post1 = RecommendRoutePost.builder()
                 .recommendRouteId(1L)
                 .member(member)
-                .title("산책로 1")
-                .content("좋아요")
+                .postContent(new PostContent("산책로 1", "좋아요"))
                 .location(new Location(127.01, 37.55))
-                .recommendRouteTime(LocalDateTime.now())
                 .build();
+
+        ReflectionTestUtils.setField(post1, "createdAt", LocalDateTime.now());
 
         RecommendRoutePost post2 = RecommendRoutePost.builder()
                 .recommendRouteId(2L)
                 .member(member)
-                .title("산책로 2")
-                .content("좋아요")
+                .postContent(new PostContent("산책로 2", "좋아요"))
                 .location(new Location(127.02, 37.56))
-                .recommendRouteTime(LocalDateTime.now())
                 .build();
+
+        ReflectionTestUtils.setField(post2, "createdAt", LocalDateTime.now());
 
         List<RecommendRoutePost> posts = new ArrayList<>();
         posts.add(post2);
@@ -136,20 +138,20 @@ public class RecommendRoutePostServiceTest {
         RecommendRoutePost post1 = RecommendRoutePost.builder()
                 .recommendRouteId(1L)
                 .member(member)
-                .title("산책로 1")
-                .content("좋아요")
+                .postContent(new PostContent("산책로 1", "좋아요"))
                 .location(new Location(127.01, 37.55))
-                .recommendRouteTime(LocalDateTime.now())
                 .build();
+
+        ReflectionTestUtils.setField(post1, "createdAt", LocalDateTime.now());
 
         RecommendRoutePost post2 = RecommendRoutePost.builder()
                 .recommendRouteId(2L)
                 .member(member)
-                .title("산책로 2")
-                .content("좋아요")
+                .postContent(new PostContent("산책로 2", "좋아요"))
                 .location(new Location(127.02, 37.56))
-                .recommendRouteTime(LocalDateTime.now())
                 .build();
+
+        ReflectionTestUtils.setField(post2, "createdAt", LocalDateTime.now());
 
         List<RecommendRoutePost> posts = new ArrayList<>();
         posts.add(post2);
@@ -181,12 +183,12 @@ public class RecommendRoutePostServiceTest {
 
         RecommendRoutePost recommendRoutePost=RecommendRoutePost.builder()
                 .recommendRouteId(1L)
-                .title("a")
-                .content("b")
+                .postContent(new PostContent("산책로 1", "좋아요"))
                 .member(member)
                 .location(new Location(127.02, 37.56))
-                .recommendRouteTime(LocalDateTime.now())
                 .build();
+
+        ReflectionTestUtils.setField(recommendRoutePost, "createdAt", LocalDateTime.now());
 
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
@@ -198,8 +200,8 @@ public class RecommendRoutePostServiceTest {
 
         //then
         assertThat(result.getRecommendRoutePostId()).isEqualTo(recommendRoutePost.getRecommendRouteId());
-        assertThat(result.getTitle()).isEqualTo(recommendRoutePost.getTitle());
-        assertThat(result.getContent()).isEqualTo(recommendRoutePost.getContent());
+        assertThat(result.getTitle()).isEqualTo(recommendRoutePost.getPostContent().getTitle());
+        assertThat(result.getContent()).isEqualTo(recommendRoutePost.getPostContent().getContent());
         assertThat(result.getLikeCount()).isEqualTo(3L);
         assertThat(result.isLike()).isTrue();
 
@@ -242,8 +244,7 @@ public class RecommendRoutePostServiceTest {
                 .build();
 
         RecommendRoutePost recommendRoutePost=RecommendRoutePost.builder()
-                .title("a")
-                .content("b")
+                .postContent(new PostContent("산책로 1", "좋아요"))
                 .member(member)
                 .build();
 
@@ -254,8 +255,8 @@ public class RecommendRoutePostServiceTest {
         recommendRoutePostServiceImp.updateRecommendRoutePost(recommendRoutePostId, updateRecommendRoutePostDto, email);
 
         //then
-        assertThat(recommendRoutePost.getTitle()).isEqualTo("aa");
-        assertThat(recommendRoutePost.getContent()).isEqualTo("bb");
+        assertThat(recommendRoutePost.getPostContent().getTitle()).isEqualTo("aa");
+        assertThat(recommendRoutePost.getPostContent().getContent()).isEqualTo("bb");
     }
 
     @Test

@@ -5,6 +5,7 @@ import com.example.PetApp.domain.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.embedded.Location;
+import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
 import com.example.PetApp.exception.ConflictException;
@@ -25,6 +26,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -122,19 +124,22 @@ public class DelegateWalkPostServiceTest {
 
         DelegateWalkPost post1 = DelegateWalkPost.builder()
                 .delegateWalkPostId(1L)
-                .title("산책 대행 1")
+                .postContent(new PostContent("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
-                .delegateWalkPostTime(LocalDateTime.now())
                 .build();
+
+        ReflectionTestUtils.setField(post1, "createdAt", LocalDateTime.now());
+
 
         DelegateWalkPost post2 = DelegateWalkPost.builder()
                 .delegateWalkPostId(2L)
-                .title("산책 대행 2")
+                .postContent(new PostContent("산책 대행 2", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
-                .delegateWalkPostTime(LocalDateTime.now())
                 .build();
+
+        ReflectionTestUtils.setField(post2, "createdAt", LocalDateTime.now());
 
         List<DelegateWalkPost> postList = List.of(post1, post2);
 
@@ -176,19 +181,19 @@ public class DelegateWalkPostServiceTest {
 
         DelegateWalkPost post1 = DelegateWalkPost.builder()
                 .delegateWalkPostId(1L)
-                .title("도심 산책 대행")
+                .postContent(new PostContent("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
-                .delegateWalkPostTime(LocalDateTime.now())
                 .build();
+        ReflectionTestUtils.setField(post1, "createdAt", LocalDateTime.now());
 
         DelegateWalkPost post2 = DelegateWalkPost.builder()
                 .delegateWalkPostId(2L)
-                .title("강변 산책 대행")
+                .postContent(new PostContent("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
-                .delegateWalkPostTime(LocalDateTime.now())
                 .build();
+        ReflectionTestUtils.setField(post2, "createdAt", LocalDateTime.now());
 
         List<DelegateWalkPost> postList = List.of(post1, post2);
 
@@ -224,11 +229,11 @@ public class DelegateWalkPostServiceTest {
 
         DelegateWalkPost post = DelegateWalkPost.builder()
                 .delegateWalkPostId(postId)
-                .title("산책 요청")
+                .postContent(new PostContent("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
-                .delegateWalkPostTime(LocalDateTime.now())
                 .build();
+        ReflectionTestUtils.setField(post, "createdAt", LocalDateTime.now());
 
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
         when(delegateWalkPostRepository.findById(postId)).thenReturn(Optional.of(post));
@@ -709,7 +714,7 @@ public class DelegateWalkPostServiceTest {
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
                 .delegateWalkPostId(2L)
                 .profile(profile)
-                .content("a")
+                .postContent(new PostContent("산책 대행 1", "내용 1"))
                 .build();
 
         UpdateDelegateWalkPostDto updateDelegateWalkPostDto = UpdateDelegateWalkPostDto.builder()
@@ -728,7 +733,7 @@ public class DelegateWalkPostServiceTest {
         delegateWalkPostServiceImp.updateDelegateWalkPost(delegateWalkPostId, updateDelegateWalkPostDto, email);
 
         //then
-        assertThat(delegateWalkPost.getContent()).isEqualTo("bb");
+        assertThat(delegateWalkPost.getPostContent().getContent()).isEqualTo("bb");
 
     }
 
@@ -799,7 +804,7 @@ public class DelegateWalkPostServiceTest {
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
                 .delegateWalkPostId(2L)
                 .profile(profile)
-                .content("a")
+                .postContent(new PostContent("산책 대행 1", "내용 1"))
                 .build();
 
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));

@@ -1,6 +1,7 @@
 package com.example.PetApp.domain.superclass;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -16,5 +17,5 @@ public abstract class BaseTimeEntity {
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    public LocalDateTime createdAt;
 }

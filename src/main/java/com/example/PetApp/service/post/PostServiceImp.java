@@ -73,10 +73,7 @@ public class PostServiceImp implements PostService {
         if (!(post.getMember().equals(member))) {//조회수
             post.setViewCount(post.getViewCount()+1);
         }
-        return PostMapper.toGetPostResponseDto(post,
-                member,
-                likeRepository.countByPost(post),
-                likeRepository.existsByPostAndMember(post, member));
+        return PostMapper.toGetPostResponseDto(post, member, likeRepository.countByPost(post), likeRepository.existsByPostAndMember(post, member));
     }
 
     @Transactional
