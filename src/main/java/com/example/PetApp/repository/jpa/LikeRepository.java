@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-
+//프로젝션을 통해 한 번 번경해보자
 public interface LikeRepository extends JpaRepository<LikeT, Long> {
 
     @Query("select new com.example.PetApp.dto.like.LikeCountDto(l.post.postId, count(1))" +
