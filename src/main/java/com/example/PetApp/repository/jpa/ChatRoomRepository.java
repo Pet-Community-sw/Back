@@ -4,7 +4,6 @@ import com.example.PetApp.domain.ChatRoom;
 import com.example.PetApp.domain.WalkingTogetherPost;
 import com.example.PetApp.domain.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -23,9 +22,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     Optional<ChatRoom> findByWalkingTogetherPost(WalkingTogetherPost walkingTogetherPost);
 
     boolean existsByChatRoomIdAndProfilesContains(Long chatRoomId, Profile profile);
-
-    @Modifying
-    @Query("delete from ChatRoom c where c.chatRoomId=:chatRoomId")
-    void deleteByChatRoom(@Param("chatRoomId") Long chatRoomId);
 
 }

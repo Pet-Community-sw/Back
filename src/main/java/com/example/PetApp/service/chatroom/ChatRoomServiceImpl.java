@@ -93,7 +93,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoom.setProfiles(profiles);//방 사용자 수가 1이되면 채팅방 전체 삭제.
         if (chatRoomRepository.countByProfile(chatRoomId) <= 1) {
             chatMessageRepository.deleteByChatRoomId(chatRoomId);//채팅방 메시지 삭제.
-            chatRoomRepository.deleteByChatRoom(chatRoomId);//이게 왜안되는교?
+            chatRoomRepository.deleteById(chatRoomId);//이게 왜안되는교?
         }
     }
 
