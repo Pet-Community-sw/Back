@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MemberStatusServiceImp implements MemberStatusService {
+public class MemberStatusServiceImpl implements MemberStatusService {
 
     private final StringRedisTemplate stringRedisTemplate;
     private final MemberRepository memberRepository;

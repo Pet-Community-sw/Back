@@ -26,7 +26,7 @@ import static com.example.PetApp.domain.Review.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ReviewServiceImp implements ReviewService{
+public class ReviewServiceImpl implements ReviewService{
 
     private final ReviewRepository reviewRepository;
     private final WalkRecordRepository walkRecordRepository;

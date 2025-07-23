@@ -12,7 +12,7 @@ import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.WalkRecordMapper;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.WalkRecordRepository;
-import com.example.PetApp.service.walkrecord.WalkRecordServiceImp;
+import com.example.PetApp.service.walkrecord.WalkRecordServiceImpl;
 import com.example.PetApp.util.DistanceUtil;
 import com.example.PetApp.util.SendNotificationUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.*;
 public class WalkRecordServiceTest {
 
     @InjectMocks
-    private WalkRecordServiceImp walkRecordServiceImp;
+    private WalkRecordServiceImpl walkRecordServiceImpl;
     @Mock
     private WalkRecordRepository walkRecordRepository;
     @Mock
@@ -78,7 +78,7 @@ public class WalkRecordServiceTest {
             when(walkRecordRepository.save(any(WalkRecord.class))).thenReturn(WalkRecord.builder().walkRecordId(100L).build());
 
             //when
-            CreateWalkRecordResponseDto result = walkRecordServiceImp.createWalkRecord(delegateWalkPost);
+            CreateWalkRecordResponseDto result = walkRecordServiceImpl.createWalkRecord(delegateWalkPost);
 
             //then
             assertThat(result).isNotNull();
@@ -97,7 +97,7 @@ public class WalkRecordServiceTest {
         when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> walkRecordServiceImp.createWalkRecord(delegateWalkPost))
+        assertThatThrownBy(() -> walkRecordServiceImpl.createWalkRecord(delegateWalkPost))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 대리산책자 유저가 없습니다.");
     }
@@ -132,7 +132,7 @@ public class WalkRecordServiceTest {
                     .thenReturn(getWalkRecordResponseDto);
 
             // when
-            GetWalkRecordResponseDto result = walkRecordServiceImp.getWalkRecord(walkRecordId, email);
+            GetWalkRecordResponseDto result = walkRecordServiceImpl.getWalkRecord(walkRecordId, email);
 
             // then
             assertThat(result).isNotNull();
@@ -155,7 +155,7 @@ public class WalkRecordServiceTest {
         when(walkRecordRepository.findById(walkRecordId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> walkRecordServiceImp.getWalkRecord(walkRecordId, email))
+        assertThatThrownBy(() -> walkRecordServiceImpl.getWalkRecord(walkRecordId, email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책기록은 없습니다.");
     }
@@ -188,7 +188,7 @@ public class WalkRecordServiceTest {
         when(listOperations.index("walk:path:" + walkRecordId, -1)).thenReturn(location);
 
         //when
-        GetWalkRecordLocationResponseDto result = walkRecordServiceImp.getWalkRecordLocation(walkRecordId, email);
+        GetWalkRecordLocationResponseDto result = walkRecordServiceImpl.getWalkRecordLocation(walkRecordId, email);
 
         //then
         assertThat(result.getLastLocation()).isEqualTo(location);
@@ -206,7 +206,7 @@ public class WalkRecordServiceTest {
         when(walkRecordRepository.findById(walkRecordId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> walkRecordServiceImp.getWalkRecordLocation(walkRecordId, email))
+        assertThatThrownBy(() -> walkRecordServiceImpl.getWalkRecordLocation(walkRecordId, email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책기록이 없습니다.");
     }
@@ -237,7 +237,7 @@ public class WalkRecordServiceTest {
         when(walkRecordRepository.findById(walkRecordId)).thenReturn(Optional.of(walkRecord));
 
         //when & then
-        assertThatThrownBy(() -> walkRecordServiceImp.getWalkRecordLocation(walkRecordId, email))
+        assertThatThrownBy(() -> walkRecordServiceImpl.getWalkRecordLocation(walkRecordId, email))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("권한 없음.");
     }
@@ -280,7 +280,7 @@ public class WalkRecordServiceTest {
         when(walkRecordRepository.findById(walkRecordId)).thenReturn(Optional.of(walkRecord));
 
         // when
-        walkRecordServiceImp.updateStartWalkRecord(walkRecordId, email);
+        walkRecordServiceImpl.updateStartWalkRecord(walkRecordId, email);
 
         // then
         assertThat(walkRecord.getWalkStatus()).isEqualTo(WalkRecord.WalkStatus.START);
@@ -301,7 +301,7 @@ public class WalkRecordServiceTest {
         when(walkRecordRepository.findById(walkRecordId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> walkRecordServiceImp.updateStartWalkRecord(walkRecordId, email))
+        assertThatThrownBy(() -> walkRecordServiceImpl.updateStartWalkRecord(walkRecordId, email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책기록은 없습니다.");
     }
@@ -331,7 +331,7 @@ public class WalkRecordServiceTest {
         when(walkRecordRepository.findById(walkRecordId)).thenReturn(Optional.of(walkRecord));
 
         // when & then
-        assertThatThrownBy(() -> walkRecordServiceImp.updateStartWalkRecord(walkRecordId, email))
+        assertThatThrownBy(() -> walkRecordServiceImpl.updateStartWalkRecord(walkRecordId, email))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("권한 없음.");
     }
@@ -378,7 +378,7 @@ public class WalkRecordServiceTest {
             mockedStatic.when(() -> DistanceUtil.calculateTotalDistance(paths)).thenReturn(1.2);
 
             // when
-            walkRecordServiceImp.updateFinishWalkRecord(walkRecordId, email);
+            walkRecordServiceImpl.updateFinishWalkRecord(walkRecordId, email);
 
             // then
             assertThat(walkRecord.getWalkStatus()).isEqualTo(WalkRecord.WalkStatus.FINISH);
@@ -403,7 +403,7 @@ public class WalkRecordServiceTest {
         when(walkRecordRepository.findById(walkRecordId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> walkRecordServiceImp.updateFinishWalkRecord(walkRecordId, email))
+        assertThatThrownBy(() -> walkRecordServiceImpl.updateFinishWalkRecord(walkRecordId, email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책기록은 없습니다.");
     }
@@ -429,7 +429,7 @@ public class WalkRecordServiceTest {
         when(walkRecordRepository.findById(walkRecordId)).thenReturn(Optional.of(walkRecord));
 
         // when & then
-        assertThatThrownBy(() -> walkRecordServiceImp.updateFinishWalkRecord(walkRecordId, email))
+        assertThatThrownBy(() -> walkRecordServiceImpl.updateFinishWalkRecord(walkRecordId, email))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("권한 없음.");
     }

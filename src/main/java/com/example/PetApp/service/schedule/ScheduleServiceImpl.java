@@ -5,7 +5,6 @@ import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.WalkingTogetherPost;
 import com.example.PetApp.dto.schedule.GetSchedulesResponseDto;
-import com.example.PetApp.dto.schedule.ScheduleType;
 import com.example.PetApp.dto.schedule.TimeDto;
 import com.example.PetApp.mapper.ScheduleMapper;
 import com.example.PetApp.repository.jpa.DelegateWalkPostRepository;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ScheduleServiceImp implements ScheduleService {
+public class ScheduleServiceImpl implements ScheduleService {
 
     private final ProfileRepository profileRepository;
 

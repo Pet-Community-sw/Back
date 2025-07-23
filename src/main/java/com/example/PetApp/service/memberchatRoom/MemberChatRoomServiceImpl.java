@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor//리펙토링 필수
 @Slf4j
-public class MemberChatRoomServiceImp implements MemberChatRoomService {
+public class MemberChatRoomServiceImpl implements MemberChatRoomService {
 
     private final MemberChatRoomRepository memberChatRoomRepository;
     private final MemberRepository memberRepository;

@@ -8,28 +8,23 @@ import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.ProfileMapper;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
-import com.example.PetApp.security.jwt.util.JwtTokenizer;
 import com.example.PetApp.service.dogbreed.PetBreedService;
 import com.example.PetApp.service.token.TokenService;
-import com.example.PetApp.util.RedisUtil;
 import com.example.PetApp.util.imagefile.FileImageKind;
 import com.example.PetApp.util.imagefile.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.MonthDay;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProfileServiceImp implements ProfileService {
+public class ProfileServiceImpl implements ProfileService {
 
     @Value("${spring.dog.profile.image.upload}")
     private String profileUploadDir;

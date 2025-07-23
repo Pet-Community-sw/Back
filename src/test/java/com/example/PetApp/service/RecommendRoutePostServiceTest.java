@@ -10,7 +10,7 @@ import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
-import com.example.PetApp.service.recommendroutepost.RecommendRoutePostServiceImp;
+import com.example.PetApp.service.recommendroutepost.RecommendRoutePostServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.*;
 public class RecommendRoutePostServiceTest {
 
     @InjectMocks
-    private RecommendRoutePostServiceImp recommendRoutePostServiceImp;
+    private RecommendRoutePostServiceImpl recommendRoutePostServiceImpl;
 
     @Mock
     private RecommendRoutePostRepository recommendRoutePostRepository;
@@ -72,7 +72,7 @@ public class RecommendRoutePostServiceTest {
 //        });
 
         //when
-        CreateRecommendRoutePostResponseDto result = recommendRoutePostServiceImp.createRecommendRoutePost(createRecommendRoutePostDto, email);
+        CreateRecommendRoutePostResponseDto result = recommendRoutePostServiceImpl.createRecommendRoutePost(createRecommendRoutePostDto, email);
 
         //then
         assertThat(result).isNotNull();
@@ -118,7 +118,7 @@ public class RecommendRoutePostServiceTest {
         when(likeRepository.findLikedRecommendIds(member, posts)).thenReturn(List.of(1L));
 
         //when
-        List<GetRecommendRoutePostsResponseDto> result = recommendRoutePostServiceImp.getRecommendRoutePosts(127.0, 128.0, 37.0, 38.0, 0, email);
+        List<GetRecommendRoutePostsResponseDto> result = recommendRoutePostServiceImpl.getRecommendRoutePosts(127.0, 128.0, 37.0, 38.0, 0, email);
 
         //then
         assertThat(result).hasSize(2);
@@ -163,7 +163,7 @@ public class RecommendRoutePostServiceTest {
         when(likeRepository.findLikedRecommendIds(member, posts)).thenReturn(List.of(1L));
 
         //when
-        List<GetRecommendRoutePostsResponseDto> result = recommendRoutePostServiceImp.getRecommendRoutePosts(127.02, 37.56, 0, email);
+        List<GetRecommendRoutePostsResponseDto> result = recommendRoutePostServiceImpl.getRecommendRoutePosts(127.02, 37.56, 0, email);
 
         //then
         assertThat(result).hasSize(2);
@@ -196,7 +196,7 @@ public class RecommendRoutePostServiceTest {
         when(likeRepository.existsByRecommendRoutePostAndMember(any(RecommendRoutePost.class), any(Member.class))).thenReturn(true);
 
         //when
-        GetRecommendPostResponseDto result = recommendRoutePostServiceImp.getRecommendRoutePost(recommendRoutePostId, email);
+        GetRecommendPostResponseDto result = recommendRoutePostServiceImpl.getRecommendRoutePost(recommendRoutePostId, email);
 
         //then
         assertThat(result.getRecommendRoutePostId()).isEqualTo(recommendRoutePost.getRecommendRouteId());
@@ -222,7 +222,7 @@ public class RecommendRoutePostServiceTest {
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> recommendRoutePostServiceImp.getRecommendRoutePost(recommendRoutePostId, email))
+        assertThatThrownBy(() -> recommendRoutePostServiceImpl.getRecommendRoutePost(recommendRoutePostId, email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책길 추천 게시물은 없습니다.");
     }
@@ -252,7 +252,7 @@ public class RecommendRoutePostServiceTest {
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
 
         //when
-        recommendRoutePostServiceImp.updateRecommendRoutePost(recommendRoutePostId, updateRecommendRoutePostDto, email);
+        recommendRoutePostServiceImpl.updateRecommendRoutePost(recommendRoutePostId, updateRecommendRoutePostDto, email);
 
         //then
         assertThat(recommendRoutePost.getPostContent().getTitle()).isEqualTo("aa");
@@ -274,7 +274,7 @@ public class RecommendRoutePostServiceTest {
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> recommendRoutePostServiceImp.updateRecommendRoutePost(recommendRoutePostId, any(UpdateRecommendRoutePostDto.class), email))
+        assertThatThrownBy(() -> recommendRoutePostServiceImpl.updateRecommendRoutePost(recommendRoutePostId, any(UpdateRecommendRoutePostDto.class), email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책길 추천 게시글은 없습니다.");
     }
@@ -303,7 +303,7 @@ public class RecommendRoutePostServiceTest {
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
 
         //when & then
-        assertThatThrownBy(() -> recommendRoutePostServiceImp.updateRecommendRoutePost(recommendRoutePostId, any(UpdateRecommendRoutePostDto.class), email))
+        assertThatThrownBy(() -> recommendRoutePostServiceImpl.updateRecommendRoutePost(recommendRoutePostId, any(UpdateRecommendRoutePostDto.class), email))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("수정 권한이 없습니다.");
     }
@@ -328,7 +328,7 @@ public class RecommendRoutePostServiceTest {
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
 
         //when
-        recommendRoutePostServiceImp.deleteRecommendRoutePost(recommendRoutePostId, email);
+        recommendRoutePostServiceImpl.deleteRecommendRoutePost(recommendRoutePostId, email);
 
         //then
         verify(recommendRoutePostRepository).deleteById(recommendRoutePostId);
@@ -350,7 +350,7 @@ public class RecommendRoutePostServiceTest {
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> recommendRoutePostServiceImp.deleteRecommendRoutePost(recommendRoutePostId, email))
+        assertThatThrownBy(() -> recommendRoutePostServiceImpl.deleteRecommendRoutePost(recommendRoutePostId, email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책길 추천 게시글은 없습니다.");
     }
@@ -379,7 +379,7 @@ public class RecommendRoutePostServiceTest {
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
 
         //when & then
-        assertThatThrownBy(() -> recommendRoutePostServiceImp.deleteRecommendRoutePost(recommendRoutePostId, email))
+        assertThatThrownBy(() -> recommendRoutePostServiceImpl.deleteRecommendRoutePost(recommendRoutePostId, email))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("삭제 권한이 없습니다.");
     }

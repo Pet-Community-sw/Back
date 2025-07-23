@@ -10,7 +10,7 @@ import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.LocationMapper;
 import com.example.PetApp.repository.jpa.WalkRecordRepository;
-import com.example.PetApp.service.walkrecord.LocationServiceImp;
+import com.example.PetApp.service.walkrecord.LocationServiceImpl;
 import com.example.PetApp.util.HaversineUtil;
 import com.example.PetApp.util.SendNotificationUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class LocationServiceTest {
     @InjectMocks
-    private LocationServiceImp locationServiceImp;
+    private LocationServiceImpl locationServiceImpl;
     @Mock
     private SimpMessagingTemplate simpMessagingTemplate;
     @Mock
@@ -94,7 +94,7 @@ public class LocationServiceTest {
             haversineUtilStatic.when(() -> HaversineUtil.calculateDistanceInMeters(37.0, 127.0, 37.0005, 127.0005)).thenReturn(15.0);
 
             // when
-            locationServiceImp.sendLocation(message, memberId.toString());
+            locationServiceImpl.sendLocation(message, memberId.toString());
 
             // then
             verify(sendNotificationUtil).sendNotification(eq(owner), contains("벗어났습니다"));
@@ -156,7 +156,7 @@ public class LocationServiceTest {
             haversineUtilStatic.when(() -> HaversineUtil.calculateDistanceInMeters(baseLat, baseLon, walkerLat, walkerLon)).thenReturn(60.0);
 
             // when
-            locationServiceImp.sendLocation(message, memberId);
+            locationServiceImpl.sendLocation(message, memberId);
 
             // then
             verify(sendNotificationUtil).sendNotification(eq(owner), contains("벗어났습니다"));
@@ -178,7 +178,7 @@ public class LocationServiceTest {
         when(walkRecordRepository.findById(walkRecordId)).thenReturn(Optional.empty());
 
         // expect
-        assertThatThrownBy(() -> locationServiceImp.sendLocation(locationMessage, anyString()))
+        assertThatThrownBy(() -> locationServiceImpl.sendLocation(locationMessage, anyString()))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책 기록이 없습니다.");
     }
@@ -204,7 +204,7 @@ public class LocationServiceTest {
         when(walkRecordRepository.findById(locationMessage.getWalkRecordId())).thenReturn(Optional.of(walkRecord));
 
         //when & then
-        assertThatThrownBy(() -> locationServiceImp.sendLocation(locationMessage, memberId))
+        assertThatThrownBy(() -> locationServiceImpl.sendLocation(locationMessage, memberId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("접근 권한 없음.");
     }
@@ -238,7 +238,7 @@ public class LocationServiceTest {
         when(walkRecordRepository.findById(walkRecordId)).thenReturn(Optional.of(walkRecord));
 
         // when & then
-        assertThatThrownBy(() -> locationServiceImp.sendLocation(message, memberId))
+        assertThatThrownBy(() -> locationServiceImpl.sendLocation(message, memberId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("start 권한 없음.");
     }

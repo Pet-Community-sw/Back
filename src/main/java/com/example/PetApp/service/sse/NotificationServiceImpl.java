@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class NotificationServiceImp implements NotificationService {
+public class NotificationServiceImpl implements NotificationService {
 
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, Object> notificationRedisTemplate;

@@ -13,7 +13,7 @@ import com.example.PetApp.mapper.ChatRoomMapper;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
-import com.example.PetApp.service.chatroom.ChatRoomServiceImp;
+import com.example.PetApp.service.chatroom.ChatRoomServiceImpl;
 import com.example.PetApp.service.chatting.ChattingReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.*;
 class ChatRoomServiceTest {
 
     @InjectMocks
-    private ChatRoomServiceImp chatRoomServiceImp;
+    private ChatRoomServiceImpl chatRoomServiceImpl;
 
     @Mock
     private ChatRoomRepository chatRoomRepository;
@@ -84,7 +84,7 @@ class ChatRoomServiceTest {
         when(valueOperations.get("unRead:99:" + profileId)).thenReturn("3");
 
         // when
-        List<ChatRoomsResponseDto> result = chatRoomServiceImp.getChatRooms(profileId);
+        List<ChatRoomsResponseDto> result = chatRoomServiceImpl.getChatRooms(profileId);
 
         // then
         assertThat(result).hasSize(1);
@@ -102,7 +102,7 @@ class ChatRoomServiceTest {
         when(profileRepository.findById(profileId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> chatRoomServiceImp.getChatRooms(profileId))
+        assertThatThrownBy(() -> chatRoomServiceImpl.getChatRooms(profileId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("권한이 없습니다.");
 
@@ -134,7 +134,7 @@ class ChatRoomServiceTest {
         when(chatRoomRepository.save(any(ChatRoom.class))).thenReturn(chatRoom);
 
         // when
-        CreateChatRoomResponseDto result = chatRoomServiceImp.createChatRoom(post, profile);
+        CreateChatRoomResponseDto result = chatRoomServiceImpl.createChatRoom(post, profile);
 
         // then
         assertThat(result).isNotNull();
@@ -167,7 +167,7 @@ class ChatRoomServiceTest {
         when(chatRoomRepository.findByWalkingTogetherPost(post)).thenReturn(Optional.of(existingRoom));
 
         // when
-        CreateChatRoomResponseDto result = chatRoomServiceImp.createChatRoom(post, profile);
+        CreateChatRoomResponseDto result = chatRoomServiceImpl.createChatRoom(post, profile);
 
         // then
         assertThat(result.getChatRoomId()).isEqualTo(100L);
@@ -202,7 +202,7 @@ class ChatRoomServiceTest {
         when(chatRoomRepository.findByWalkingTogetherPost(post)).thenReturn(Optional.of(chatRoom));
 
         //when & then
-        assertThatThrownBy(() -> chatRoomServiceImp.createChatRoom(post, profile))
+        assertThatThrownBy(() -> chatRoomServiceImpl.createChatRoom(post, profile))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("인원초과");
         assertThat(chatRoom.getProfiles()).hasSize(1);
@@ -228,7 +228,7 @@ class ChatRoomServiceTest {
         when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.of(chatRoom));
 
         //when
-        List<Long> result = chatRoomServiceImp.getProfiles(chatRoomId);
+        List<Long> result = chatRoomServiceImpl.getProfiles(chatRoomId);
 
         //then
         assertThat(result.size()).isEqualTo(2);
@@ -244,7 +244,7 @@ class ChatRoomServiceTest {
         when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> chatRoomServiceImp.getProfiles(chatRoomId))
+        assertThatThrownBy(() -> chatRoomServiceImpl.getProfiles(chatRoomId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("채팅방 없습니다.");
     }
@@ -273,7 +273,7 @@ class ChatRoomServiceTest {
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
 
         //when
-        chatRoomServiceImp.deleteChatRoom(chatRoomId, profileId);
+        chatRoomServiceImpl.deleteChatRoom(chatRoomId, profileId);
 
         //then
         verify(chatMessageRepository).deleteByChatRoomId(chatRoomId);
@@ -308,7 +308,7 @@ class ChatRoomServiceTest {
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile3));
 
         //when&then
-        assertThatThrownBy(() -> chatRoomServiceImp.deleteChatRoom(chatRoomId, profileId))
+        assertThatThrownBy(() -> chatRoomServiceImpl.deleteChatRoom(chatRoomId, profileId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("권한이 없습니다.");
     }
@@ -323,7 +323,7 @@ class ChatRoomServiceTest {
         when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> chatRoomServiceImp.deleteChatRoom(chatRoomId, profileId))
+        assertThatThrownBy(() -> chatRoomServiceImpl.deleteChatRoom(chatRoomId, profileId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 채팅방은 없습니다.");
     }
@@ -341,7 +341,7 @@ class ChatRoomServiceTest {
         when(profileRepository.findById(profileId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> chatRoomServiceImp.deleteChatRoom(chatRoomId, profileId))
+        assertThatThrownBy(() -> chatRoomServiceImpl.deleteChatRoom(chatRoomId, profileId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("프로필 등록해주세요.");
     }
@@ -380,7 +380,7 @@ class ChatRoomServiceTest {
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
 
         //when
-        chatRoomServiceImp.updateChatRoom(chatRoomId, updateChatRoomDto, profileId);
+        chatRoomServiceImpl.updateChatRoom(chatRoomId, updateChatRoomDto, profileId);
 
         //then
         assertThat(chatRoom.getName()).isEqualTo("멍멍");
@@ -403,7 +403,7 @@ class ChatRoomServiceTest {
         when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> chatRoomServiceImp.updateChatRoom(chatRoomId, updateChatRoomDto, profileId))
+        assertThatThrownBy(() -> chatRoomServiceImpl.updateChatRoom(chatRoomId, updateChatRoomDto, profileId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 채팅방은 없습니다.");
 
@@ -430,7 +430,7 @@ class ChatRoomServiceTest {
         when(profileRepository.findById(profileId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> chatRoomServiceImp.updateChatRoom(chatRoomId, updateChatRoomDto, profileId))
+        assertThatThrownBy(() -> chatRoomServiceImpl.updateChatRoom(chatRoomId, updateChatRoomDto, profileId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("프로필 등록해주세요.");
 
@@ -476,7 +476,7 @@ class ChatRoomServiceTest {
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(fakeProfile));
 
         //when & then
-        assertThatThrownBy(() -> chatRoomServiceImp.updateChatRoom(chatRoomId, updateChatRoomDto, profileId))
+        assertThatThrownBy(() -> chatRoomServiceImpl.updateChatRoom(chatRoomId, updateChatRoomDto, profileId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("수정 권한이 없습니다.");
     }

@@ -11,7 +11,7 @@ import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.jpa.ReviewRepository;
 import com.example.PetApp.repository.jpa.WalkRecordRepository;
-import com.example.PetApp.service.review.ReviewServiceImp;
+import com.example.PetApp.service.review.ReviewServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 public class ReviewServiceTest {
 
     @InjectMocks
-    private ReviewServiceImp reviewServiceImp;
+    private ReviewServiceImpl reviewServiceImpl;
     @Mock
     private ReviewRepository reviewRepository;
     @Mock
@@ -78,7 +78,7 @@ public class ReviewServiceTest {
             when(reviewRepository.save(any(Review.class))).thenReturn(Review.builder().reviewId(1L).build());
 
             //when
-            CreateReviewResponseDto result = reviewServiceImp.createReview(createReviewDto, email);
+            CreateReviewResponseDto result = reviewServiceImpl.createReview(createReviewDto, email);
 
             //then
             assertThat(result).isNotNull();
@@ -97,7 +97,7 @@ public class ReviewServiceTest {
         when(walkRecordRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> reviewServiceImp.createReview(createReviewDto, anyString()))
+        assertThatThrownBy(() -> reviewServiceImpl.createReview(createReviewDto, anyString()))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책기록은 없습니다.");
     }
@@ -115,7 +115,7 @@ public class ReviewServiceTest {
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(Member.builder().build()));
 
         //when & then
-        assertThatThrownBy(() -> reviewServiceImp.createReview(createReviewDto, anyString()))
+        assertThatThrownBy(() -> reviewServiceImpl.createReview(createReviewDto, anyString()))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("산책을 다해야 후기를 작성할 수 있습니다.");
     }
@@ -141,7 +141,7 @@ public class ReviewServiceTest {
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(fakeMember));
 
         //when & then
-        assertThatThrownBy(() -> reviewServiceImp.createReview(createReviewDto, anyString()))
+        assertThatThrownBy(() -> reviewServiceImpl.createReview(createReviewDto, anyString()))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("권한 없음.");
 
@@ -215,7 +215,7 @@ public class ReviewServiceTest {
                     )).thenReturn(expected);
 
             // when
-            GetReviewListResponseDto result = reviewServiceImp.getReviewListByMember(targetMember.getMemberId(), email);
+            GetReviewListResponseDto result = reviewServiceImpl.getReviewListByMember(targetMember.getMemberId(), email);
 
             // then
             assertThat(result).isEqualTo(expected);
@@ -232,7 +232,7 @@ public class ReviewServiceTest {
         when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> reviewServiceImp.getReviewListByMember(1L, "test"))
+        assertThatThrownBy(() -> reviewServiceImpl.getReviewListByMember(1L, "test"))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 유저는 없습니다.");
     }
@@ -268,7 +268,7 @@ public class ReviewServiceTest {
             mockStatic.when(() -> ReviewMapper.toGetReviewResponseDto(review, member)).thenReturn(expected);
 
             // when
-            GetReviewResponseDto result = reviewServiceImp.getReview(reviewId, email);
+            GetReviewResponseDto result = reviewServiceImpl.getReview(reviewId, email);
 
             // then
             assertThat(result).isEqualTo(expected);
@@ -289,7 +289,7 @@ public class ReviewServiceTest {
         when(reviewRepository.findById(reviewId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> reviewServiceImp.getReview(reviewId, email))
+        assertThatThrownBy(() -> reviewServiceImpl.getReview(reviewId, email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책기록은 없습니다.");
     }
@@ -324,7 +324,7 @@ public class ReviewServiceTest {
         when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
 
         // when
-        reviewServiceImp.updateReview(reviewId, updateReviewDto, email);
+        reviewServiceImpl.updateReview(reviewId, updateReviewDto, email);
 
         // then
         assertThat(review.getPostContent().getTitle()).isEqualTo("aa");
@@ -340,7 +340,7 @@ public class ReviewServiceTest {
         when(reviewRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> reviewServiceImp.updateReview(1L, any(UpdateReviewDto.class), "test"))
+        assertThatThrownBy(() -> reviewServiceImpl.updateReview(1L, any(UpdateReviewDto.class), "test"))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 리뷰가 없습니다.");
     }
@@ -362,7 +362,7 @@ public class ReviewServiceTest {
         when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
 
         //when & then
-        assertThatThrownBy(() -> reviewServiceImp.updateReview(1L, any(UpdateReviewDto.class), "test"))
+        assertThatThrownBy(() -> reviewServiceImpl.updateReview(1L, any(UpdateReviewDto.class), "test"))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("권한이 없습니다.");
     }
@@ -386,7 +386,7 @@ public class ReviewServiceTest {
         when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
 
         // when
-        reviewServiceImp.deleteReview(reviewId, email);
+        reviewServiceImpl.deleteReview(reviewId, email);
 
         // then
         verify(reviewRepository).deleteById(reviewId);
@@ -400,7 +400,7 @@ public class ReviewServiceTest {
         when(reviewRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> reviewServiceImp.deleteReview(1L, "test"))
+        assertThatThrownBy(() -> reviewServiceImpl.deleteReview(1L, "test"))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 리뷰가 없습니다.");
     }
@@ -422,7 +422,7 @@ public class ReviewServiceTest {
         when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(review));
 
         //when & then
-        assertThatThrownBy(() -> reviewServiceImp.deleteReview(1L, "test"))
+        assertThatThrownBy(() -> reviewServiceImpl.deleteReview(1L, "test"))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("권한이 없습니다.");
     }

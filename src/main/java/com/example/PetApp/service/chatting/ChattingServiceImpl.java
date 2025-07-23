@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ChattingServiceImp implements ChattingService {
+public class ChattingServiceImpl implements ChattingService {
 
     private final ChatMessageHandler chatMessageHandler;
     private final ChatRoomHandler chatRoomHandler;

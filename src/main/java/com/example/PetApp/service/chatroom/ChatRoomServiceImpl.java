@@ -27,7 +27,7 @@ import static com.example.PetApp.domain.ChatMessage.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ChatRoomServiceImp implements ChatRoomService {
+public class ChatRoomServiceImpl implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ProfileRepository profileRepository;

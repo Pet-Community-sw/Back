@@ -11,10 +11,8 @@ import com.example.PetApp.mapper.RecommendRoutePostMapper;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
-import com.example.PetApp.util.TimeAgoUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RecommendRoutePostServiceImp implements RecommendRoutePostService{
+public class RecommendRoutePostServiceImpl implements RecommendRoutePostService{
 
     private final RecommendRoutePostRepository recommendRoutePostRepository;
     private final MemberRepository memberRepository;

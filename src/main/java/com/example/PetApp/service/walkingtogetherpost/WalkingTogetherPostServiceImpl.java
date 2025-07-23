@@ -29,7 +29,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class WalkingTogetherPostServiceImp implements WalkingTogetherPostService {
+public class WalkingTogetherPostServiceImpl implements WalkingTogetherPostService {
 
     private final ChatRoomService chatRoomService;
     private final WalkingTogetherPostRepository walkingTogetherPostRepository;

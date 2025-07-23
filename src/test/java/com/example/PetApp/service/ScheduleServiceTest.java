@@ -11,7 +11,7 @@ import com.example.PetApp.repository.jpa.DelegateWalkPostRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.jpa.WalkingTogetherPostRepository;
-import com.example.PetApp.service.schedule.ScheduleServiceImp;
+import com.example.PetApp.service.schedule.ScheduleServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 public class ScheduleServiceTest {
 
     @InjectMocks
-    private ScheduleServiceImp scheduleServiceImp;
+    private ScheduleServiceImpl scheduleServiceImpl;
     @Mock
     private ProfileRepository profileRepository;
     @Mock
@@ -72,7 +72,7 @@ public class ScheduleServiceTest {
                 .thenReturn(List.of(delegatePost));
 
         // When
-        List<GetSchedulesResponseDto> result = scheduleServiceImp.getSchedules(start, end, profileId);
+        List<GetSchedulesResponseDto> result = scheduleServiceImpl.getSchedules(start, end, profileId);
 
         // Then
         assertThat(result).hasSize(2);

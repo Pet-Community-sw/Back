@@ -16,7 +16,7 @@ import com.example.PetApp.repository.jpa.DelegateWalkPostRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.service.memberchatRoom.MemberChatRoomService;
-import com.example.PetApp.service.walkerpost.DelegateWalkPostServiceImp;
+import com.example.PetApp.service.walkerpost.DelegateWalkPostServiceImpl;
 import com.example.PetApp.service.walkrecord.WalkRecordService;
 import com.example.PetApp.util.SendNotificationUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
 public class DelegateWalkPostServiceTest {
 
     @InjectMocks
-    private DelegateWalkPostServiceImp delegateWalkPostServiceImp;
+    private DelegateWalkPostServiceImpl delegateWalkPostServiceImpl;
     @Mock
     private DelegateWalkPostRepository delegateWalkPostRepository;
     @Mock
@@ -84,7 +84,7 @@ public class DelegateWalkPostServiceTest {
 //        });
 
         //when
-        CreateDelegateWalkPostResponseDto result = delegateWalkPostServiceImp.createDelegateWalkPost(createDelegateWalkPostDto, profileId);
+        CreateDelegateWalkPostResponseDto result = delegateWalkPostServiceImpl.createDelegateWalkPost(createDelegateWalkPostDto, profileId);
 
         //then
         assertThat(result).isNotNull();
@@ -98,7 +98,7 @@ public class DelegateWalkPostServiceTest {
         when(profileRepository.findById(1L)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.createDelegateWalkPost(any(CreateDelegateWalkPostDto.class), 1L))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.createDelegateWalkPost(any(CreateDelegateWalkPostDto.class), 1L))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("프로필 등록해주세요.");
     }
@@ -149,7 +149,7 @@ public class DelegateWalkPostServiceTest {
                 .thenReturn(postList);
 
         // when
-        List<GetDelegateWalkPostsResponseDto> result = delegateWalkPostServiceImp
+        List<GetDelegateWalkPostsResponseDto> result = delegateWalkPostServiceImpl
                 .getDelegateWalkPostsByLocation(minLon, minLat, maxLon, maxLat, email);
 
         // then
@@ -201,7 +201,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findByDelegateWalkPostByPlace(longitude, latitude)).thenReturn(postList);
 
         // when
-        List<GetDelegateWalkPostsResponseDto> result = delegateWalkPostServiceImp.getDelegateWalkPostsByPlace(longitude, latitude, email);
+        List<GetDelegateWalkPostsResponseDto> result = delegateWalkPostServiceImpl.getDelegateWalkPostsByPlace(longitude, latitude, email);
 
         // then
         assertThat(result).hasSize(2);
@@ -239,7 +239,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(postId)).thenReturn(Optional.of(post));
 
         // when
-        GetPostResponseDto result = delegateWalkPostServiceImp.getDelegateWalkPost(postId, email);
+        GetPostResponseDto result = delegateWalkPostServiceImpl.getDelegateWalkPost(postId, email);
 
         // then
         assertThat(result).isNotNull();
@@ -261,7 +261,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.getDelegateWalkPost(delegateWalkPostId, email))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.getDelegateWalkPost(delegateWalkPostId, email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 대리산책자 게시글은 없습니다.");
     }
@@ -287,7 +287,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.getDelegateWalkPost(delegateWalkPostId, email))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.getDelegateWalkPost(delegateWalkPostId, email))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("프로필 등록해주세요.");
     }
@@ -326,7 +326,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
 
         //when
-        Set<Applicant> result = delegateWalkPostServiceImp.getApplicants(delegateWalkPostId, profileId);
+        Set<Applicant> result = delegateWalkPostServiceImpl.getApplicants(delegateWalkPostId, profileId);
 
         //then
         assertThat(result).containsExactlyInAnyOrder(applicant, applicant2);
@@ -339,7 +339,7 @@ public class DelegateWalkPostServiceTest {
         when(profileRepository.findById(1L)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.getApplicants(anyLong(), 1L))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.getApplicants(anyLong(), 1L))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("프로필 등록해주세요.");
     }
@@ -357,7 +357,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(1L)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.getApplicants(1L, profileId))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.getApplicants(1L, profileId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 대리산책자 게시글은 없습니다.");
     }
@@ -386,7 +386,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.getApplicants(delegateWalkPostId, profileId))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.getApplicants(delegateWalkPostId, profileId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("권한 없음.");
     }
@@ -423,7 +423,7 @@ public class DelegateWalkPostServiceTest {
             mockStatic.when(() -> DelegateWalkPostMapper.filter(delegateWalkPost, member)).thenReturn(false);
 
             // when
-            ApplyToDelegateWalkPostResponseDto result = delegateWalkPostServiceImp.applyToDelegateWalkPost(delegateWalkPostId, content, email);
+            ApplyToDelegateWalkPostResponseDto result = delegateWalkPostServiceImpl.applyToDelegateWalkPost(delegateWalkPostId, content, email);
 
             // then
             assertThat(result).isNotNull();
@@ -441,7 +441,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(1L)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.applyToDelegateWalkPost(1L, anyString(), email))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.applyToDelegateWalkPost(1L, anyString(), email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 대리산책자 게시글은 없습니다.");
     }
@@ -465,7 +465,7 @@ public class DelegateWalkPostServiceTest {
         try (MockedStatic<DelegateWalkPostMapper> mockStatic = mockStatic(DelegateWalkPostMapper.class)) {
             mockStatic.when(() -> DelegateWalkPostMapper.filter(post, member)).thenReturn(true);
             // when & then
-            assertThatThrownBy(() -> delegateWalkPostServiceImp.applyToDelegateWalkPost(postId, "지원합니다!", email))
+            assertThatThrownBy(() -> delegateWalkPostServiceImpl.applyToDelegateWalkPost(postId, "지원합니다!", email))
                     .isInstanceOf(ForbiddenException.class)
                     .hasMessage("프로필 등록해주세요.");
         }
@@ -493,7 +493,7 @@ public class DelegateWalkPostServiceTest {
             mockStatic.when(() -> DelegateWalkPostMapper.filter(delegateWalkPost, member)).thenReturn(false);
 
             // when & then
-            assertThatThrownBy(() -> delegateWalkPostServiceImp.applyToDelegateWalkPost(postId, "또 지원", email))
+            assertThatThrownBy(() -> delegateWalkPostServiceImpl.applyToDelegateWalkPost(postId, "또 지원", email))
                     .isInstanceOf(ConflictException.class)
                     .hasMessage("이미 신청한 회원입니다.");
 
@@ -520,7 +520,7 @@ public class DelegateWalkPostServiceTest {
             mockStatic.when(() -> DelegateWalkPostMapper.filter(delegateWalkPost, member)).thenReturn(false);
 
             // when & then
-            assertThatThrownBy(() -> delegateWalkPostServiceImp.applyToDelegateWalkPost(postId, "지각 지원", email))
+            assertThatThrownBy(() -> delegateWalkPostServiceImpl.applyToDelegateWalkPost(postId, "지각 지원", email))
                     .isInstanceOf(ConflictException.class)
                     .hasMessage("모집 완료 게시글입니다.");
         }
@@ -568,7 +568,7 @@ public class DelegateWalkPostServiceTest {
         when(memberChatRoomService.createMemberChatRoom(member, fakeMember)).thenReturn(chatRoomDto);
 
         // when
-        CreateMemberChatRoomResponseDto result = delegateWalkPostServiceImp.selectApplicant(delegateWalkPostId, applicantMemberId, email);
+        CreateMemberChatRoomResponseDto result = delegateWalkPostServiceImpl.selectApplicant(delegateWalkPostId, applicantMemberId, email);
 
         // then
         assertThat(result).isNotNull();
@@ -587,7 +587,7 @@ public class DelegateWalkPostServiceTest {
         when(memberRepository.findById(applicantMemberId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.selectApplicant(anyLong(), applicantMemberId, "test"))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.selectApplicant(anyLong(), applicantMemberId, "test"))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 지원자는 없습니다.");
     }
@@ -608,7 +608,7 @@ public class DelegateWalkPostServiceTest {
         when(memberRepository.findById(applicantMemberId)).thenReturn(Optional.of(Member.builder().build()));
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.selectApplicant(delegateWalkPostId, applicantMemberId, email))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.selectApplicant(delegateWalkPostId, applicantMemberId, email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 대리산책자 게시글은 없습니다.");
     }
@@ -652,7 +652,7 @@ public class DelegateWalkPostServiceTest {
         when(memberRepository.findById(applicantMemberId)).thenReturn(Optional.of(applicantMember));
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
 
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.selectApplicant(delegateWalkPostId, applicantMemberId, email))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.selectApplicant(delegateWalkPostId, applicantMemberId, email))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("권한 없음.");
 
@@ -690,7 +690,7 @@ public class DelegateWalkPostServiceTest {
         when(memberRepository.findById(applicantMemberId)).thenReturn(Optional.of(applicantMember));
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
 
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.selectApplicant(delegateWalkPostId, applicantMemberId, email))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.selectApplicant(delegateWalkPostId, applicantMemberId, email))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("해당 지원자는 없습니다.");
     }
@@ -730,7 +730,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
 
         //when
-        delegateWalkPostServiceImp.updateDelegateWalkPost(delegateWalkPostId, updateDelegateWalkPostDto, email);
+        delegateWalkPostServiceImpl.updateDelegateWalkPost(delegateWalkPostId, updateDelegateWalkPostDto, email);
 
         //then
         assertThat(delegateWalkPost.getPostContent().getContent()).isEqualTo("bb");
@@ -748,7 +748,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.updateDelegateWalkPost(delegateWalkPostId, any(UpdateDelegateWalkPostDto.class), email))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.updateDelegateWalkPost(delegateWalkPostId, any(UpdateDelegateWalkPostDto.class), email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 대리산책자 게시글은 없습니다.");
     }
@@ -780,7 +780,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.updateDelegateWalkPost(delegateWalkPostId, any(UpdateDelegateWalkPostDto.class), email))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.updateDelegateWalkPost(delegateWalkPostId, any(UpdateDelegateWalkPostDto.class), email))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("수정 권한 없음.");
     }
@@ -811,7 +811,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
 
         //when
-        delegateWalkPostServiceImp.deleteDelegateWalkPost(delegateWalkPostId, email);
+        delegateWalkPostServiceImpl.deleteDelegateWalkPost(delegateWalkPostId, email);
 
         //then
         verify(delegateWalkPostRepository).deleteById(delegateWalkPostId);
@@ -829,7 +829,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.deleteDelegateWalkPost(delegateWalkPostId, email))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.deleteDelegateWalkPost(delegateWalkPostId, email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 대리산책자 게시글은 없습니다.");
     }
@@ -861,7 +861,7 @@ public class DelegateWalkPostServiceTest {
         when(delegateWalkPostRepository.findById(delegateWalkPostId)).thenReturn(Optional.of(delegateWalkPost));
 
         //when & then
-        assertThatThrownBy(() -> delegateWalkPostServiceImp.deleteDelegateWalkPost(delegateWalkPostId, email))
+        assertThatThrownBy(() -> delegateWalkPostServiceImpl.deleteDelegateWalkPost(delegateWalkPostId, email))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("삭제 권한 없음.");
     }

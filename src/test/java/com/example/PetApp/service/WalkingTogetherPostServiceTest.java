@@ -11,7 +11,7 @@ import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.repository.jpa.*;
 import com.example.PetApp.service.chatroom.ChatRoomService;
-import com.example.PetApp.service.walkingtogetherpost.WalkingTogetherPostServiceImp;
+import com.example.PetApp.service.walkingtogetherpost.WalkingTogetherPostServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class WalkingTogetherPostServiceTest {
     @InjectMocks
-    private WalkingTogetherPostServiceImp walkingTogetherPostServiceImp;
+    private WalkingTogetherPostServiceImpl walkingTogetherPostServiceImpl;
     @Mock
     private ChatRoomService chatRoomService;
     @Mock
@@ -76,7 +76,7 @@ public class WalkingTogetherPostServiceTest {
 
 
         //when
-        GetWalkingTogetherPostResponseDto result = walkingTogetherPostServiceImp.getWalkingTogetherPost(walkingTogetherPostId, profileId);
+        GetWalkingTogetherPostResponseDto result = walkingTogetherPostServiceImpl.getWalkingTogetherPost(walkingTogetherPostId, profileId);
 
         //then
         assertThat(result.getWalkingTogetherPostId()).isEqualTo(1L);
@@ -94,7 +94,7 @@ public class WalkingTogetherPostServiceTest {
         when(profileRepository.findById(profileId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> walkingTogetherPostServiceImp.getWalkingTogetherPost(walkingTogetherPostId, profileId))
+        assertThatThrownBy(() -> walkingTogetherPostServiceImpl.getWalkingTogetherPost(walkingTogetherPostId, profileId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("프로필 설정 해주세요.");
 
@@ -116,7 +116,7 @@ public class WalkingTogetherPostServiceTest {
         when(walkingTogetherPostRepository.findById(walkingTogetherPostId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> walkingTogetherPostServiceImp.getWalkingTogetherPost(walkingTogetherPostId, profileId))
+        assertThatThrownBy(() -> walkingTogetherPostServiceImpl.getWalkingTogetherPost(walkingTogetherPostId, profileId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 함께 산책해요 게시글은 없습니다.");
     }
@@ -169,7 +169,7 @@ public class WalkingTogetherPostServiceTest {
 
         // when
         List<GetWalkingTogetherPostResponseDto> result =
-                walkingTogetherPostServiceImp.getWalkingTogetherPosts(recommendRoutePostId, profileId);
+                walkingTogetherPostServiceImpl.getWalkingTogetherPosts(recommendRoutePostId, profileId);
 
         // then
         assertThat(result).hasSize(2);
@@ -192,7 +192,7 @@ public class WalkingTogetherPostServiceTest {
         when(profileRepository.findById(profileId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> walkingTogetherPostServiceImp.getWalkingTogetherPosts(recommendRoutePostId, profileId))
+        assertThatThrownBy(() -> walkingTogetherPostServiceImpl.getWalkingTogetherPosts(recommendRoutePostId, profileId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("프로필 설정 해주세요.");
     }
@@ -211,7 +211,7 @@ public class WalkingTogetherPostServiceTest {
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> walkingTogetherPostServiceImp.getWalkingTogetherPosts(recommendRoutePostId, profileId))
+        assertThatThrownBy(() -> walkingTogetherPostServiceImpl.getWalkingTogetherPosts(recommendRoutePostId, profileId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책길 추천 게시글은 없습니다.");
     }
@@ -249,7 +249,7 @@ public class WalkingTogetherPostServiceTest {
 
         // when
         CreateWalkingTogetherPostResponseDto result =
-                walkingTogetherPostServiceImp.createWalkingTogetherPost(dto, profileId);
+                walkingTogetherPostServiceImpl.createWalkingTogetherPost(dto, profileId);
 
         // then
         assertThat(result).isNotNull();
@@ -269,7 +269,7 @@ public class WalkingTogetherPostServiceTest {
         when(profileRepository.findById(profileId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> walkingTogetherPostServiceImp.createWalkingTogetherPost(any(CreateWalkingTogetherPostDto.class), profileId))
+        assertThatThrownBy(() -> walkingTogetherPostServiceImpl.createWalkingTogetherPost(any(CreateWalkingTogetherPostDto.class), profileId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("프로필 설정 해주세요.");
     }
@@ -292,7 +292,7 @@ public class WalkingTogetherPostServiceTest {
         when(recommendRoutePostRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> walkingTogetherPostServiceImp.createWalkingTogetherPost(createWalkingTogetherPostDto, profileId))
+        assertThatThrownBy(() -> walkingTogetherPostServiceImpl.createWalkingTogetherPost(createWalkingTogetherPostDto, profileId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 산책길 추천 게시글은 없습니다.");
 
@@ -330,7 +330,7 @@ public class WalkingTogetherPostServiceTest {
         when(chatRoomService.createChatRoom(post, profile)).thenReturn(chatRoomResponseDto);
 
         // when
-        CreateChatRoomResponseDto result = walkingTogetherPostServiceImp.startMatch(walkingTogetherPostId, profileId);
+        CreateChatRoomResponseDto result = walkingTogetherPostServiceImpl.startMatch(walkingTogetherPostId, profileId);
 
         // then
         assertThat(result).isNotNull();
@@ -345,7 +345,7 @@ public class WalkingTogetherPostServiceTest {
         when(profileRepository.findById(2L)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> walkingTogetherPostServiceImp.startMatch(anyLong(), 2L))
+        assertThatThrownBy(() -> walkingTogetherPostServiceImpl.startMatch(anyLong(), 2L))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("프로필 설정해주세요.");
 
@@ -367,7 +367,7 @@ public class WalkingTogetherPostServiceTest {
         when(walkingTogetherPostRepository.findById(walkingTogetherPostId)).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> walkingTogetherPostServiceImp.startMatch(walkingTogetherPostId, profileId))
+        assertThatThrownBy(() -> walkingTogetherPostServiceImpl.startMatch(walkingTogetherPostId, profileId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 함께 산책해요 게시글은 없습니다.");
     }
@@ -395,7 +395,7 @@ public class WalkingTogetherPostServiceTest {
         when(walkingTogetherPostRepository.findById(walkingTogetherPostId)).thenReturn(Optional.of(post));
 
         //when & then
-        assertThatThrownBy(() -> walkingTogetherPostServiceImp.startMatch(walkingTogetherPostId, profileId))
+        assertThatThrownBy(() -> walkingTogetherPostServiceImpl.startMatch(walkingTogetherPostId, profileId))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("이미 채팅방에 들어가있습니다.");
 
@@ -423,7 +423,7 @@ public class WalkingTogetherPostServiceTest {
         when(petBreedRepository.findByName("불독")).thenReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> walkingTogetherPostServiceImp.startMatch(walkingTogetherPostId, profileId))
+        assertThatThrownBy(() -> walkingTogetherPostServiceImpl.startMatch(walkingTogetherPostId, profileId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 견종을 찾을 수 없습니다.");
     }
@@ -457,7 +457,7 @@ public class WalkingTogetherPostServiceTest {
         when(petBreedRepository.findByName("도베르만")).thenReturn(Optional.of(petBreed));
 
         //when & then
-        assertThatThrownBy(() -> walkingTogetherPostServiceImp.startMatch(walkingTogetherPostId, profileId))
+        assertThatThrownBy(() -> walkingTogetherPostServiceImpl.startMatch(walkingTogetherPostId, profileId))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("해당 종은 참여할 수 없습니다.");
     }

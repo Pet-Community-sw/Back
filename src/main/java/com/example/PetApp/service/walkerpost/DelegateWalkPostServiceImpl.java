@@ -28,7 +28,7 @@ import java.util.Set;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class DelegateWalkPostServiceImp implements DelegateWalkPostService {
+public class DelegateWalkPostServiceImpl implements DelegateWalkPostService {
 
     private final DelegateWalkPostRepository delegateWalkPostRepository;
     private final ProfileRepository profileRepository;

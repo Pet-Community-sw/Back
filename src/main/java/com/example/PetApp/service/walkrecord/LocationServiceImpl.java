@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class LocationServiceImp implements LocationService {//예외 처리해야됨.
+public class LocationServiceImpl implements LocationService {//예외 처리해야됨.
 
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final StringRedisTemplate stringRedisTemplate;

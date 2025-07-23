@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class TokenServiceImp implements TokenService {//리펙토링 필요.
+public class TokenServiceImpl implements TokenService {//리펙토링 필요.
 
     private final RefreshRepository refreshRepository;
     private final JwtTokenizer jwtTokenizer;

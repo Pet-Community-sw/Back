@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class OfflineUserServiceImp implements OfflineUserService{
+public class OfflineUserServiceImpl implements OfflineUserService{
 
     private final StringRedisTemplate stringRedisTemplate;
 

@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 class MemberServiceTest {
 
     @InjectMocks
-    private com.example.PetApp.service.member.MemberServiceImp memberServiceImp;
+    private com.example.PetApp.service.member.MemberServiceImpl memberServiceImp;
     @Mock
     private MemberRepository memberRepository;
     @Mock

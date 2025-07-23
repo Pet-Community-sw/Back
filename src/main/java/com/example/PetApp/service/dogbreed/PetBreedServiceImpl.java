@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class PetBreedServiceImp implements PetBreedService {
+public class PetBreedServiceImpl implements PetBreedService {
 
     private final PetBreedRepository petBreedRepository;
     @Override

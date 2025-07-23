@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PostServiceImp implements PostService {
+public class PostServiceImpl implements PostService {
 
     @Value("${spring.dog.post.image.upload}")
     private String postUploadDir;

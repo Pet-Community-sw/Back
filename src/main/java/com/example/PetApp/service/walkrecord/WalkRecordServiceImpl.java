@@ -25,7 +25,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class WalkRecordServiceImp implements WalkRecordService{
+public class WalkRecordServiceImpl implements WalkRecordService{
 
     private final WalkRecordRepository walkRecordRepository;
     private final MemberRepository memberRepository;
