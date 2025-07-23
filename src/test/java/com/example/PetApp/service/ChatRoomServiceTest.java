@@ -277,7 +277,7 @@ class ChatRoomServiceTest {
 
         //then
         verify(chatMessageRepository).deleteByChatRoomId(chatRoomId);
-        verify(chatRoomRepository).deleteByChatRoom(chatRoomId);
+        verify(chatRoomRepository).deleteById(chatRoomId);
     }
 
     @Test

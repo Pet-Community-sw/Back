@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,8 +46,8 @@ public class PostServiceImpl implements PostService {
     public List<PostResponseDto> getPosts(int page, String email) {
         log.info("getPosts 요청 : {}", email);
         Member member = memberRepository.findByEmail(email).get();
-        Pageable pageable = PageRequest.of(page, 10);
-        List<Post> posts = postRepository.findByOrderByCreatedAtDesc(pageable).getContent();
+        PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "postId"));
+        List<Post> posts = postRepository.findAll(pageRequest).getContent();
 
         return PostMapper.toPostListResponseDto(posts, getLikeCountMap(posts), getLikedPostIds(member, posts));
     }

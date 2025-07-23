@@ -15,5 +15,4 @@ public interface MemberChatRoomRepository extends JpaRepository<MemberChatRoom, 
 
     List<MemberChatRoom> findAllByMembersContains(Member member);
 
-
 }
