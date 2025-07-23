@@ -65,9 +65,6 @@ public class MemberChatRoomServiceImpl implements MemberChatRoomService {
         Member fromMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다."));
         Member member = memberRepository.findByEmail(email).get();
-        if (memberChatRoomRepository.existsByMembers(fromMember, member)) {
-            throw new ConflictException("이미 있는 방입니다.");
-        }
         MemberChatRoom memberChatRoom = getMemberChatRoom(fromMember, member);
         MemberChatRoom newMemberChatRoom = memberChatRoomRepository.save(memberChatRoom);
         return new CreateMemberChatRoomResponseDto(newMemberChatRoom.getMemberChatRoomId());
