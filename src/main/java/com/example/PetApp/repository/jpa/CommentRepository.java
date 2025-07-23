@@ -8,5 +8,4 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findAllByRecommendRoutePost(RecommendRoutePost recommendRoutePost);
 }
