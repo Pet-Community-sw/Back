@@ -30,7 +30,6 @@ import java.util.Set;
 public class Member extends BaseTimeEntity {//수정 필요
 
     @Id
-    @Column(name = "member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 

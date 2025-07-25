@@ -6,7 +6,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -40,10 +39,16 @@ public class Profile extends BaseTimeEntity {
     @Column(nullable = false)
     private String petAge;
 
+//    @Setter
+//    @NotBlank//이것도 바꿔야할듯.
+//    @Column(nullable = false)
+//    private String petBreed;
+
     @Setter
-    @NotBlank//이것도 바꿔야할듯.
-    @Column(nullable = false)
-    private String petBreed;
+    @NotBlank
+    @JoinColumn(name = "pet_breed_id", nullable = false)
+    @OneToOne
+    private PetBreed petBreed;
 
     @Setter
     @NotBlank

@@ -17,7 +17,7 @@ public interface DelegateWalkPostRepository extends JpaRepository<DelegateWalkPo
             "POINT(:longitude, :latitude)) <= 1000 " +
             "order by d.scheduledTime desc"
             , nativeQuery = true)
-    List<DelegateWalkPost> findByDelegateWalkPostByPlace(
+    List<DelegateWalkPost> findByDelegateWalkPostByPlace(//나중에 paging해야할듯.
             @Param("longitude") Double longitude,
             @Param("latitude") Double latitude
     );
