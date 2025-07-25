@@ -1,6 +1,7 @@
 package com.example.PetApp.service.member;
 
 import com.example.PetApp.domain.Member;
+import com.example.PetApp.domain.MemberRole;
 import com.example.PetApp.domain.Role;
 import com.example.PetApp.dto.member.*;
 import com.example.PetApp.exception.ConflictException;
@@ -143,6 +144,10 @@ public class MemberServiceImpl implements MemberService{
 
     private void setRole(Member member) {
         Role role = roleRepository.findByName("ROLE_USER").get();
-        member.addRole(role);
+        MemberRole memberRole=MemberRole.builder()
+                .member(member)
+                .role(role)
+                .build();
+        member.addRole(memberRole);
     }
 }

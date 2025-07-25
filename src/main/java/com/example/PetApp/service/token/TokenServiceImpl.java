@@ -1,6 +1,7 @@
 package com.example.PetApp.service.token;
 
 import com.example.PetApp.domain.Member;
+import com.example.PetApp.domain.MemberRole;
 import com.example.PetApp.domain.RefreshToken;
 import com.example.PetApp.domain.Role;
 import com.example.PetApp.dto.member.AccessTokenResponseDto;
@@ -42,8 +43,13 @@ public class TokenServiceImpl implements TokenService {//리펙토링 필요.
     @Override
     public LoginResponseDto save(Member member, HttpServletResponse response) {
         Optional<RefreshToken> byMember = refreshRepository.findByMember(member);
-        List<String> roles = member.getRoles().stream().map(Role::getName).collect(Collectors.toList());
-
+        List<String> roles = member.getMemberRoles().stream().map(memberRole -> memberRole.getRole().getName()).collect(Collectors.toList());
+        /*
+        * JWT는 직렬화된 토큰 문자열이며,
+            그 안에 Role이라는 도메인 객체 전체를 넣는 건 부적절하기 때문입니다
+        *
+        *
+        * */
 
         String accessToken = jwtTokenizer.createAccessToken(member.getMemberId(), null, member.getEmail(),roles);
         String refreshToken = jwtTokenizer.createRefreshToken(member.getMemberId(), member.getEmail(), roles);
@@ -160,9 +166,9 @@ public class TokenServiceImpl implements TokenService {//리펙토링 필요.
     @NotNull
     private static List<String> getRoles(Member member) {
         return member
-                .getRoles()
+                .getMemberRoles()
                 .stream()
-                .map(Role::getName)
+                .map(memberRole -> memberRole.getRole().getName())
                 .collect(Collectors.toList());
     }
 

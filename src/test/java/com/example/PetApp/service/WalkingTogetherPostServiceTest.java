@@ -12,6 +12,7 @@ import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.repository.jpa.*;
 import com.example.PetApp.service.chatroom.ChatRoomService;
 import com.example.PetApp.service.walkingtogetherpost.WalkingTogetherPostServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +43,25 @@ public class WalkingTogetherPostServiceTest {
     private PetBreedRepository petBreedRepository;
     @Mock
     private RecommendRoutePostRepository recommendRoutePostRepository;
+
+    private PetBreed petBreed;
+
+    private Profile profile;
+
+    @BeforeEach
+    void setUp() {
+        petBreed = PetBreed.builder()
+                .petBreedId(1L)
+                .name("푸들")
+                .build();
+
+        profile = Profile.builder()
+                .profileId(1L)
+                .petBreed(petBreed)
+                .avoidBreeds(Set.of(petBreed))
+                .build();
+
+    }
 
     @Test
     @DisplayName("getWalkingTogetherPost_성공")
@@ -107,9 +127,11 @@ public class WalkingTogetherPostServiceTest {
         Long walkingTogetherPostId = 1L;
         Long profileId = 10L;
 
+        Optional<PetBreed> petBreed = petBreedRepository.findByName("푸들");
+
         Profile profile = Profile.builder()
                 .profileId(profileId)
-                .petBreed("푸들")
+                .petBreed(petBreed.get())
                 .build();
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
@@ -127,11 +149,6 @@ public class WalkingTogetherPostServiceTest {
         // given
         Long profileId = 1L;
         Long recommendRoutePostId = 2L;
-
-        Profile profile = Profile.builder()
-                .profileId(profileId)
-                .petBreed("푸들")
-                .build();
 
         RecommendRoutePost recommendRoutePost = RecommendRoutePost.builder()
                 .recommendRouteId(recommendRoutePostId)
@@ -203,11 +220,6 @@ public class WalkingTogetherPostServiceTest {
         Long profileId = 1L;
         Long recommendRoutePostId = 2L;
 
-        Profile profile = Profile.builder()
-                .profileId(profileId)
-                .petBreed("말티즈")
-                .build();
-
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.empty());
 
@@ -227,11 +239,6 @@ public class WalkingTogetherPostServiceTest {
                 .recommendRoutePostId(recommendRoutePostId)
                 .scheduledTime(LocalDateTime.now().plusDays(1))
                 .limitCount(3)
-                .build();
-
-        Profile profile = Profile.builder()
-                .profileId(profileId)
-                .petBreed("푸들")
                 .build();
 
         RecommendRoutePost recommendRoutePost = RecommendRoutePost.builder()
@@ -305,11 +312,6 @@ public class WalkingTogetherPostServiceTest {
         Long walkingTogetherPostId = 1L;
         Long profileId = 2L;
 
-        Profile profile = Profile.builder()
-                .profileId(profileId)
-                .petBreed("리트리버")
-                .build();
-
         WalkingTogetherPost post = WalkingTogetherPost.builder()
                 .walkingTogetherPostId(walkingTogetherPostId)
                 .profiles(new HashSet<>()) // 아직 매칭 안 된 상태
@@ -326,7 +328,7 @@ public class WalkingTogetherPostServiceTest {
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
         when(walkingTogetherPostRepository.findById(walkingTogetherPostId)).thenReturn(Optional.of(post));
-        when(petBreedRepository.findByName("리트리버")).thenReturn(Optional.of(petBreed));
+        when(petBreedRepository.findByName("푸들")).thenReturn(Optional.of(petBreed));
         when(chatRoomService.createChatRoom(post, profile)).thenReturn(chatRoomResponseDto);
 
         // when
@@ -358,10 +360,6 @@ public class WalkingTogetherPostServiceTest {
         Long profileId = 2L;
         Long walkingTogetherPostId = 1L;
 
-        Profile profile = Profile.builder()
-                .profileId(profileId)
-                .petBreed("푸들")
-                .build();
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
         when(walkingTogetherPostRepository.findById(walkingTogetherPostId)).thenReturn(Optional.empty());
@@ -381,11 +379,6 @@ public class WalkingTogetherPostServiceTest {
         Long walkingTogetherPostId = 1L;
         Set<Long> profiles = new HashSet<>();
         profiles.add(profileId);
-
-        Profile profile = Profile.builder()
-                .profileId(profileId)
-                .petBreed("푸들")
-                .build();
 
         WalkingTogetherPost post = WalkingTogetherPost.builder()
                 .profiles(profiles)
@@ -408,11 +401,6 @@ public class WalkingTogetherPostServiceTest {
         Long walkingTogetherPostId = 1L;
         Long profileId = 2L;
 
-        Profile profile = Profile.builder()
-                .profileId(profileId)
-                .petBreed("불독")
-                .build();
-
         WalkingTogetherPost post = WalkingTogetherPost.builder()
                 .profiles(new HashSet<>())
                 .avoidBreeds(new HashSet<>())
@@ -420,7 +408,7 @@ public class WalkingTogetherPostServiceTest {
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
         when(walkingTogetherPostRepository.findById(walkingTogetherPostId)).thenReturn(Optional.of(post));
-        when(petBreedRepository.findByName("불독")).thenReturn(Optional.empty());
+        when(petBreedRepository.findByName("푸들")).thenReturn(Optional.empty());
 
         //when & then
         assertThatThrownBy(() -> walkingTogetherPostServiceImpl.startMatch(walkingTogetherPostId, profileId))
@@ -436,11 +424,6 @@ public class WalkingTogetherPostServiceTest {
         Long walkingTogetherPostId = 1L;
         Set<Long> profiles = new HashSet<>();
         profiles.add(3L);
-
-        Profile profile = Profile.builder()
-                .profileId(profileId)
-                .petBreed("도베르만")
-                .build();
 
         PetBreed petBreed = PetBreed.builder()
                 .petBreedId(3L)
