@@ -76,6 +76,7 @@ public class WalkingTogetherPostServiceTest {
 
         Profile profile = Profile.builder()
                 .profileId(1L)
+                .petBreed(petBreed)
                 .avoidBreeds(Set.of(petBreed))
                 .build();
 
@@ -126,13 +127,6 @@ public class WalkingTogetherPostServiceTest {
         // given
         Long walkingTogetherPostId = 1L;
         Long profileId = 10L;
-
-        Optional<PetBreed> petBreed = petBreedRepository.findByName("푸들");
-
-        Profile profile = Profile.builder()
-                .profileId(profileId)
-                .petBreed(petBreed.get())
-                .build();
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
         when(walkingTogetherPostRepository.findById(walkingTogetherPostId)).thenReturn(Optional.empty());
@@ -437,7 +431,7 @@ public class WalkingTogetherPostServiceTest {
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
         when(walkingTogetherPostRepository.findById(walkingTogetherPostId)).thenReturn(Optional.of(post));
-        when(petBreedRepository.findByName("도베르만")).thenReturn(Optional.of(petBreed));
+        when(petBreedRepository.findByName("푸들")).thenReturn(Optional.of(petBreed));
 
         //when & then
         assertThatThrownBy(() -> walkingTogetherPostServiceImpl.startMatch(walkingTogetherPostId, profileId))
