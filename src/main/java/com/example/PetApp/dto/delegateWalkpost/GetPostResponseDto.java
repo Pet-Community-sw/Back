@@ -1,5 +1,6 @@
 package com.example.PetApp.dto.delegateWalkpost;
 
+import com.example.PetApp.domain.PetBreed;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

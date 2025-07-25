@@ -67,7 +67,7 @@ public class DelegateWalkPostMapper {
                 .scheduledTime(delegateWalkPost.getScheduledTime())
                 .petName(delegateWalkPost.getProfile().getPetName())
                 .petImageUrl(delegateWalkPost.getProfile().getPetImageUrl())
-                .petBreed(delegateWalkPost.getProfile().getPetBreed())
+                .petBreed(String.valueOf(delegateWalkPost.getProfile().getPetBreed()))
                 .extraInfo(delegateWalkPost.getProfile().getExtraInfo())
                 .applicantCount(delegateWalkPost.getApplicants().size())
                 .createdAt(TimeAgoUtil.getTimeAgo(delegateWalkPost.getCreatedAt()))

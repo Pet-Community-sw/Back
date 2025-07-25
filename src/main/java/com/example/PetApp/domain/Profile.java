@@ -39,11 +39,6 @@ public class Profile extends BaseTimeEntity {
     @Column(nullable = false)
     private String petAge;
 
-//    @Setter
-//    @NotBlank//이것도 바꿔야할듯.
-//    @Column(nullable = false)
-//    private String petBreed;
-
     @Setter
     @NotBlank
     @JoinColumn(name = "pet_breed_id", nullable = false)

@@ -42,11 +42,11 @@ public class ProfileServiceImpl implements ProfileService {
         if (profileRepository.countByMember(member) >= 4) {
             throw new ConflictException("프로필은 최대 4개 입니다.");
         }
-        petBreedService.findByName(profileDto.getPetBreed())
+        PetBreed petBreed = petBreedService.findByName(profileDto.getPetBreed())
                 .orElseThrow(() -> new NotFoundException("종을 다시 입력해주세요."));
 
         String imageFileName = FileUploadUtil.fileUpload(profileDto.getPetImageUrl(), profileUploadDir, FileImageKind.PROFILE);
-        Profile profile = ProfileMapper.toEntity(profileDto, member, imageFileName);
+        Profile profile = ProfileMapper.toEntity(profileDto, member, imageFileName, petBreed);
         validateBreed(profileDto, profile);
         profileRepository.save(profile);
         log.info("imageUrl: {}", imageFileName);
@@ -84,7 +84,7 @@ public class ProfileServiceImpl implements ProfileService {
         Member member = memberRepository.findByEmail(email).get();
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new NotFoundException("해당 프로필은 없습니다."));
-        petBreedService.findByName(profileDto.getPetBreed())
+        PetBreed petBreed = petBreedService.findByName(profileDto.getPetBreed())
                 .orElseThrow(() -> new NotFoundException("종을 다시 입력해주세요."));
 
         if (!(member.equals(profile.getMember()))) {
@@ -92,7 +92,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
         validateBreed(profileDto, profile);
         String imageFimeName = FileUploadUtil.fileUpload(profileDto.getPetImageUrl(), profileUploadDir, FileImageKind.PROFILE);
-        ProfileMapper.updateProfile(profile, profileDto, imageFimeName);
+        ProfileMapper.updateProfile(profile, profileDto, imageFimeName, petBreed);
     }
 
     @Transactional

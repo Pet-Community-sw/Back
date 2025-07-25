@@ -1,6 +1,7 @@
 package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.Member;
+import com.example.PetApp.domain.PetBreed;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.profile.AccessTokenByProfileIdResponseDto;
 import com.example.PetApp.dto.profile.GetProfileResponseDto;
@@ -15,13 +16,13 @@ import java.util.List;
 import static com.example.PetApp.util.AgeUtil.CalculateAge;
 
 public class ProfileMapper {
-    public static Profile toEntity(ProfileDto profileDto, Member member, String imageFileName) {
+    public static Profile toEntity(ProfileDto profileDto, Member member, String imageFileName, PetBreed petBreed) {
         return Profile.builder()
                 .member(member)
                 .petImageUrl(imageFileName)
                 .petBirthDate(profileDto.getPetBirthDate())
                 .extraInfo(profileDto.getExtraInfo())
-                .petBreed(profileDto.getPetBreed())
+                .petBreed(petBreed)
                 .petAge(AgeUtil.CalculateAge(profileDto.getPetBirthDate())+"살")
                 .petName(profileDto.getPetName())
                 .build();
@@ -30,7 +31,7 @@ public class ProfileMapper {
     public static GetProfileResponseDto toGetProfileResponseDto(Profile profile, Member member) {
         return GetProfileResponseDto.builder()
                 .profileId(profile.getProfileId())
-                .petBreed(profile.getPetBreed())
+                .petBreed(String.valueOf(profile.getPetBreed()))
                 .petImageUrl(profile.getPetImageUrl())
                 .memberId(profile.getMember().getMemberId())
                 .petName(profile.getPetName())
@@ -59,12 +60,12 @@ public class ProfileMapper {
                 .build();
     }
 
-    public static void updateProfile(Profile profile, ProfileDto profileDto, String imageFimeName) {
+    public static void updateProfile(Profile profile, ProfileDto profileDto, String imageFimeName, PetBreed petBreed) {
         profile.setPetImageUrl("/profile/" + imageFimeName);
         profile.setPetName(profileDto.getPetName());
         profile.setPetBirthDate(profileDto.getPetBirthDate());
         profile.setPetAge(CalculateAge(profileDto.getPetBirthDate()) + "살");
-        profile.setPetBreed(profileDto.getPetBreed());
+        profile.setPetBreed(petBreed);
         profile.setExtraInfo(profileDto.getExtraInfo());
         profile.getAvoidBreeds().clear();
     }
