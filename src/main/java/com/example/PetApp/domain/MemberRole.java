@@ -18,10 +18,10 @@ public class MemberRole extends BaseTimeEntity {
     private Long memberRoleId;
 
     @ManyToOne
-    @JoinColumn(name = "memberId")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "roleId")
+    @JoinColumn(name = "role_id")
     private Role role;
 }

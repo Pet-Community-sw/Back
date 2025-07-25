@@ -27,5 +27,4 @@ public class Role {
     @Builder.Default
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberRole> memberRoles=new ArrayList<>();
-
 }
