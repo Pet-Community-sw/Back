@@ -1,7 +1,7 @@
 package com.example.PetApp.service;
 
 import com.example.PetApp.domain.*;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.chatroom.CreateChatRoomResponseDto;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostDto;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostResponseDto;
@@ -147,7 +147,7 @@ public class WalkingTogetherMatchServiceTest {
         RecommendRoutePost recommendRoutePost = RecommendRoutePost.builder()
                 .recommendRouteId(recommendRoutePostId)
                 .member(Member.builder().memberId(1L).build())
-                .postContent(new PostContent("산책길추천 1", "좋은 산책길"))
+                .content(new Content("산책길추천 1", "좋은 산책길"))
                 .build();
 
         PetBreed petBreed = PetBreed.builder()
@@ -237,7 +237,7 @@ public class WalkingTogetherMatchServiceTest {
 
         RecommendRoutePost recommendRoutePost = RecommendRoutePost.builder()
                 .recommendRouteId(recommendRoutePostId)
-                .postContent(new PostContent("산책길추천 1", "좋은 산책길"))
+                .content(new Content("산책길추천 1", "좋은 산책길"))
                 .build();
 
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));

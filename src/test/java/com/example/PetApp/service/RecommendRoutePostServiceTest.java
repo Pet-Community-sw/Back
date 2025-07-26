@@ -3,7 +3,7 @@ package com.example.PetApp.service;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RecommendRoutePost;
 import com.example.PetApp.domain.embedded.Location;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.recommendroutepost.*;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
@@ -93,7 +93,7 @@ public class RecommendRoutePostServiceTest {
         RecommendRoutePost post1 = RecommendRoutePost.builder()
                 .recommendRouteId(1L)
                 .member(member)
-                .postContent(new PostContent("산책로 1", "좋아요"))
+                .content(new Content("산책로 1", "좋아요"))
                 .location(new Location(127.01, 37.55))
                 .build();
 
@@ -102,7 +102,7 @@ public class RecommendRoutePostServiceTest {
         RecommendRoutePost post2 = RecommendRoutePost.builder()
                 .recommendRouteId(2L)
                 .member(member)
-                .postContent(new PostContent("산책로 2", "좋아요"))
+                .content(new Content("산책로 2", "좋아요"))
                 .location(new Location(127.02, 37.56))
                 .build();
 
@@ -138,7 +138,7 @@ public class RecommendRoutePostServiceTest {
         RecommendRoutePost post1 = RecommendRoutePost.builder()
                 .recommendRouteId(1L)
                 .member(member)
-                .postContent(new PostContent("산책로 1", "좋아요"))
+                .content(new Content("산책로 1", "좋아요"))
                 .location(new Location(127.01, 37.55))
                 .build();
 
@@ -147,7 +147,7 @@ public class RecommendRoutePostServiceTest {
         RecommendRoutePost post2 = RecommendRoutePost.builder()
                 .recommendRouteId(2L)
                 .member(member)
-                .postContent(new PostContent("산책로 2", "좋아요"))
+                .content(new Content("산책로 2", "좋아요"))
                 .location(new Location(127.02, 37.56))
                 .build();
 
@@ -183,7 +183,7 @@ public class RecommendRoutePostServiceTest {
 
         RecommendRoutePost recommendRoutePost=RecommendRoutePost.builder()
                 .recommendRouteId(1L)
-                .postContent(new PostContent("산책로 1", "좋아요"))
+                .content(new Content("산책로 1", "좋아요"))
                 .member(member)
                 .location(new Location(127.02, 37.56))
                 .build();
@@ -200,8 +200,8 @@ public class RecommendRoutePostServiceTest {
 
         //then
         assertThat(result.getRecommendRoutePostId()).isEqualTo(recommendRoutePost.getRecommendRouteId());
-        assertThat(result.getTitle()).isEqualTo(recommendRoutePost.getPostContent().getTitle());
-        assertThat(result.getContent()).isEqualTo(recommendRoutePost.getPostContent().getContent());
+        assertThat(result.getTitle()).isEqualTo(recommendRoutePost.getContent().getTitle());
+        assertThat(result.getContent()).isEqualTo(recommendRoutePost.getContent().getContent());
         assertThat(result.getLikeCount()).isEqualTo(3L);
         assertThat(result.isLike()).isTrue();
 
@@ -244,7 +244,7 @@ public class RecommendRoutePostServiceTest {
                 .build();
 
         RecommendRoutePost recommendRoutePost=RecommendRoutePost.builder()
-                .postContent(new PostContent("산책로 1", "좋아요"))
+                .content(new Content("산책로 1", "좋아요"))
                 .member(member)
                 .build();
 
@@ -255,8 +255,8 @@ public class RecommendRoutePostServiceTest {
         recommendRoutePostServiceImpl.updateRecommendRoutePost(recommendRoutePostId, updateRecommendRoutePostDto, email);
 
         //then
-        assertThat(recommendRoutePost.getPostContent().getTitle()).isEqualTo("aa");
-        assertThat(recommendRoutePost.getPostContent().getContent()).isEqualTo("bb");
+        assertThat(recommendRoutePost.getContent().getTitle()).isEqualTo("aa");
+        assertThat(recommendRoutePost.getContent().getContent()).isEqualTo("bb");
     }
 
     @Test

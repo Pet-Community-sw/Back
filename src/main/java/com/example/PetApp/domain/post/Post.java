@@ -1,7 +1,7 @@
 package com.example.PetApp.domain.post;
 
 import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.domain.like.Like;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
@@ -24,7 +24,7 @@ public abstract class Post extends BaseTimeEntity {
     private Long postId;
 
     @Embedded
-    private PostContent postContent;
+    private Content content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)

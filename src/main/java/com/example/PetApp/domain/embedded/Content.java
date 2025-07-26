@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class PostContent {
+public class Content {
 
     @NotBlank
     @Column(nullable = false)

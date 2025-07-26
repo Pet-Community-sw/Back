@@ -1,7 +1,7 @@
 package com.example.PetApp.service;
 
 import com.example.PetApp.domain.*;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.review.*;
 import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.ForbiddenException;
@@ -166,7 +166,7 @@ public class ReviewServiceTest {
 
         Review review = Review.builder()
                 .reviewId(10L)
-                .postContent(new PostContent("산책기록 1", "좋아요"))
+                .content(new Content("산책기록 1", "좋아요"))
                 .rating(5)
                 .member(targetMember)
                 .profile(Profile.builder()
@@ -251,7 +251,7 @@ public class ReviewServiceTest {
 
         Review review = Review.builder()
                 .reviewId(reviewId)
-                .postContent(new PostContent("리뷰제목", "좋아요"))
+                .content(new Content("리뷰제목", "좋아요"))
                 .rating(4)
                 .build();
 
@@ -310,7 +310,7 @@ public class ReviewServiceTest {
                 .reviewId(reviewId)
                 .member(member)
                 .reviewType(Review.ReviewType.MEMBER_TO_PROFILE)
-                .postContent(new PostContent("aa", "bb"))
+                .content(new Content("aa", "bb"))
                 .rating(3)
                 .build();
 
@@ -327,8 +327,8 @@ public class ReviewServiceTest {
         reviewServiceImpl.updateReview(reviewId, updateReviewDto, email);
 
         // then
-        assertThat(review.getPostContent().getTitle()).isEqualTo("aa");
-        assertThat(review.getPostContent().getContent()).isEqualTo("bb");
+        assertThat(review.getContent().getTitle()).isEqualTo("aa");
+        assertThat(review.getContent().getContent()).isEqualTo("bb");
         assertThat(review.getRating()).isEqualTo(5);
     }
 

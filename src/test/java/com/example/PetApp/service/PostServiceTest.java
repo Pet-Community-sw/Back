@@ -2,7 +2,7 @@ package com.example.PetApp.service;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.post.CreatePostResponseDto;
 import com.example.PetApp.dto.post.GetPostResponseDto;
 import com.example.PetApp.dto.post.PostDto;
@@ -78,7 +78,7 @@ public class PostServiceTest {
         Post post = Post.builder()
                 .postId(100L)
                 .member(fakeMember)
-                .postContent(new PostContent("산책 대행 1", "내용 1"))
+                .content(new Content("산책 대행 1", "내용 1"))
                 .viewCount(0L)
                 .comments(new ArrayList<>())
                 .build();
@@ -108,7 +108,7 @@ public class PostServiceTest {
 
         Post post = Post.builder()
                 .postId(1L)
-                .postContent(new PostContent("산책 대행 1", "내용 1"))
+                .content(new Content("산책 대행 1", "내용 1"))
                 .member(member)
                 .postImageUrl(null)
                 .comments(new ArrayList<>())
@@ -122,7 +122,7 @@ public class PostServiceTest {
         postServiceImpl.updatePost(postId, postDto, email);
 
         //then
-        assertThat(post.getPostContent().getContent()).isEqualTo("b");
+        assertThat(post.getContent().getContent()).isEqualTo("b");
     }
 
     @Test
@@ -136,7 +136,7 @@ public class PostServiceTest {
 
         Post post = Post.builder()
                 .postId(1L)
-                .postContent(new PostContent("산책 대행 1", "내용 1"))
+                .content(new Content("산책 대행 1", "내용 1"))
                 .member(fakeMember)
                 .postImageUrl(null)
                 .comments(new ArrayList<>())

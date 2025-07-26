@@ -5,7 +5,7 @@ import com.example.PetApp.domain.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.embedded.Location;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
 import com.example.PetApp.exception.ConflictException;
@@ -124,7 +124,7 @@ public class DelegateWalkPostServiceTest {
 
         DelegateWalkPost post1 = DelegateWalkPost.builder()
                 .delegateWalkPostId(1L)
-                .postContent(new PostContent("산책 대행 1", "내용 1"))
+                .content(new Content("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
                 .build();
@@ -134,7 +134,7 @@ public class DelegateWalkPostServiceTest {
 
         DelegateWalkPost post2 = DelegateWalkPost.builder()
                 .delegateWalkPostId(2L)
-                .postContent(new PostContent("산책 대행 2", "내용 1"))
+                .content(new Content("산책 대행 2", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
                 .build();
@@ -181,7 +181,7 @@ public class DelegateWalkPostServiceTest {
 
         DelegateWalkPost post1 = DelegateWalkPost.builder()
                 .delegateWalkPostId(1L)
-                .postContent(new PostContent("산책 대행 1", "내용 1"))
+                .content(new Content("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
                 .build();
@@ -189,7 +189,7 @@ public class DelegateWalkPostServiceTest {
 
         DelegateWalkPost post2 = DelegateWalkPost.builder()
                 .delegateWalkPostId(2L)
-                .postContent(new PostContent("산책 대행 1", "내용 1"))
+                .content(new Content("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
                 .build();
@@ -229,7 +229,7 @@ public class DelegateWalkPostServiceTest {
 
         DelegateWalkPost post = DelegateWalkPost.builder()
                 .delegateWalkPostId(postId)
-                .postContent(new PostContent("산책 대행 1", "내용 1"))
+                .content(new Content("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
                 .build();
@@ -714,7 +714,7 @@ public class DelegateWalkPostServiceTest {
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
                 .delegateWalkPostId(2L)
                 .profile(profile)
-                .postContent(new PostContent("산책 대행 1", "내용 1"))
+                .content(new Content("산책 대행 1", "내용 1"))
                 .build();
 
         UpdateDelegateWalkPostDto updateDelegateWalkPostDto = UpdateDelegateWalkPostDto.builder()
@@ -733,7 +733,7 @@ public class DelegateWalkPostServiceTest {
         delegateWalkPostServiceImpl.updateDelegateWalkPost(delegateWalkPostId, updateDelegateWalkPostDto, email);
 
         //then
-        assertThat(delegateWalkPost.getPostContent().getContent()).isEqualTo("bb");
+        assertThat(delegateWalkPost.getContent().getContent()).isEqualTo("bb");
 
     }
 
@@ -804,7 +804,7 @@ public class DelegateWalkPostServiceTest {
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
                 .delegateWalkPostId(2L)
                 .profile(profile)
-                .postContent(new PostContent("산책 대행 1", "내용 1"))
+                .content(new Content("산책 대행 1", "내용 1"))
                 .build();
 
         when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));

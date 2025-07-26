@@ -1,10 +1,9 @@
 package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.Review;
 import com.example.PetApp.domain.WalkRecord;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.review.CreateReviewDto;
 import com.example.PetApp.dto.review.GetReviewList;
 import com.example.PetApp.dto.review.GetReviewListResponseDto;
@@ -20,7 +19,7 @@ public class ReviewMapper {
                 .member(walkRecord.getMember())
                 .profile(walkRecord.getDelegateWalkPost().getProfile())
                 .walkRecord(walkRecord)
-                .postContent(new PostContent(createReviewDto.getTitle(), createReviewDto.getContent()))
+                .content(new Content(createReviewDto.getTitle(), createReviewDto.getContent()))
                 .rating(createReviewDto.getRating())
                 .reviewType(createReviewDto.getReviewType())
                 .build();
@@ -29,8 +28,8 @@ public class ReviewMapper {
     public static GetReviewResponseDto toGetReviewResponseDto(Review review, Member member) {
         GetReviewResponseDto getReviewResponseDto = GetReviewResponseDto.builder()
                 .reviewId(review.getReviewId())
-                .title(review.getPostContent().getTitle())
-                .content(review.getPostContent().getContent())
+                .title(review.getContent().getTitle())
+                .content(review.getContent().getContent())
                 .rating(review.getRating())
                 .reviewTime(review.getCreatedAt())
                 .build();
@@ -67,7 +66,7 @@ public class ReviewMapper {
                         .userId(review.getProfile().getProfileId())
                         .userName(review.getProfile().getPetName())
                         .userImageUrl(review.getProfile().getPetImageUrl())
-                        .title(review.getPostContent().getTitle())
+                        .title(review.getContent().getTitle())
                         .rating(review.getRating())
                         .reviewTime(review.getCreatedAt())
                         .isOwner(review.getMember().equals(member))

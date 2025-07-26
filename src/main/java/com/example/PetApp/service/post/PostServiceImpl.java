@@ -2,7 +2,7 @@ package com.example.PetApp.service.post;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.like.LikeCountDto;
 import com.example.PetApp.dto.post.CreatePostResponseDto;
 import com.example.PetApp.dto.post.PostDto;
@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,7 +103,7 @@ public class PostServiceImpl implements PostService {
                 FileImageKind.POST);
 
         post.setPostImageUrl(imageFileName);
-        post.setPostContent(new PostContent(updatePostDto.getTitle(), updatePostDto.getContent()));
+        post.setContent(new Content(updatePostDto.getTitle(), updatePostDto.getContent()));
     }
 
     private  Map<Long, Long> getLikeCountMap(List<Post> posts) {

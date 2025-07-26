@@ -2,14 +2,12 @@ package com.example.PetApp.domain;
 
 import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.domain.embedded.Location;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -33,7 +31,7 @@ public class DelegateWalkPost extends BaseTimeEntity {
 
     @Setter
     @Embedded
-    private PostContent postContent;
+    private Content content;
 
     @Setter
     @Embedded

@@ -2,7 +2,7 @@ package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.post.GetPostResponseDto;
 import com.example.PetApp.dto.post.PostDto;
@@ -18,7 +18,7 @@ public class PostMapper {
 
     public static Post toEntity(PostDto postDto, String imageFileName, Member member) {
         return Post.builder()
-                .postContent(new PostContent(postDto.getTitle(), postDto.getContent()))
+                .content(new Content(postDto.getTitle(), postDto.getContent()))
                 .postImageUrl(imageFileName)
                 .member(member)
                 .build();
@@ -37,7 +37,7 @@ public class PostMapper {
                         .createdAt(TimeAgoUtil.getTimeAgo(post.getCreatedAt()))
                         .viewCount(post.getViewCount())
                         .likeCount(likeCountMap.get(post.getPostId()))
-                        .title(post.getPostContent().getTitle())
+                        .title(post.getContent().getTitle())
                         .like(likedPostIds.contains(post.getPostId()))
                         .build()
                 )
@@ -50,7 +50,7 @@ public class PostMapper {
                                                           boolean isLike) {
         PostResponseDto postResponseDto=PostResponseDto.builder()
                 .postId(post.getPostId())
-                .title(post.getPostContent().getTitle())
+                .title(post.getContent().getTitle())
                 .postImageUrl(post.getPostImageUrl())
                 .viewCount(post.getViewCount())
                 .likeCount(likeCount)
@@ -63,7 +63,7 @@ public class PostMapper {
         List<GetCommentsResponseDto> commentsResponseDtos = CommentMapper.toGetCommentsResponseDtos(post, member);
 
         return GetPostResponseDto.builder()
-                .content(post.getPostContent().getContent())
+                .content(post.getContent().getContent())
                 .isOwner(post.getMember().equals(member))
                 .postResponseDto(postResponseDto)
                 .comments(commentsResponseDtos)

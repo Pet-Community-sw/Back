@@ -2,7 +2,7 @@ package com.example.PetApp.service.recommendroutepost;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RecommendRoutePost;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.like.LikeCountDto;
 import com.example.PetApp.dto.recommendroutepost.*;
 import com.example.PetApp.exception.ForbiddenException;
@@ -95,7 +95,7 @@ public class RecommendRoutePostServiceImpl implements RecommendRoutePostService{
         if (!(post.getMember().equals(member))) {
             throw new ForbiddenException("수정 권한이 없습니다.");
         }
-        post.setPostContent(new PostContent(updateRecommendRoutePostDto.getTitle(), updateRecommendRoutePostDto.getContent()));
+        post.setContent(new Content(updateRecommendRoutePostDto.getTitle(), updateRecommendRoutePostDto.getContent()));
     }
 
     @Transactional

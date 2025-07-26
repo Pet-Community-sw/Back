@@ -4,7 +4,7 @@ import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.Review;
 import com.example.PetApp.domain.WalkRecord;
-import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.review.*;
 import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.ForbiddenException;
@@ -90,7 +90,7 @@ public class ReviewServiceImpl implements ReviewService{
         log.info("updateReview 요청 reviewId : {}, email : {}", reviewId, email);
         Review review = findReviewWithAuth(reviewId, email);
 
-        review.setPostContent(new PostContent(updateReviewDto.getTitle(), updateReviewDto.getContent()));
+        review.setContent(new Content(updateReviewDto.getTitle(), updateReviewDto.getContent()));
         review.setRating(updateReviewDto.getRating());
     }
 
