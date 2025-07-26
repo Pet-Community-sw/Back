@@ -1,8 +1,10 @@
-package com.example.PetApp.domain;
+package com.example.PetApp.domain.like;
 
+import com.example.PetApp.domain.RecommendRoutePost;
 import com.example.PetApp.domain.superclass.Like;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
@@ -12,6 +14,7 @@ import javax.persistence.ManyToOne;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class RecommendRoutePostLike extends Like {
 
     @ManyToOne

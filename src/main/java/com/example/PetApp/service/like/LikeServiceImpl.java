@@ -1,17 +1,14 @@
 package com.example.PetApp.service.like;
 
-import com.example.PetApp.domain.LikeT;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.RecommendRoutePost;
+import com.example.PetApp.domain.superclass.Like;
 import com.example.PetApp.dto.like.LikeDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.LikeMapper;
-import com.example.PetApp.repository.jpa.LikeRepository;
-import com.example.PetApp.repository.jpa.MemberRepository;
-import com.example.PetApp.repository.jpa.PostRepository;
-import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
+import com.example.PetApp.repository.jpa.*;
 import com.example.PetApp.service.comment.PostType;
 import com.example.PetApp.util.SendNotificationUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +23,10 @@ import java.util.List;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor//like를 superclass로 둠으로써 likeId 겹칠일이없음.
 public class LikeServiceImpl implements LikeService {
-    private final LikeRepository likeRepository;
+    private final PostLikeRepository postLikeRepository;
+    private final RecommendRoutePostLikeRepository recommendRoutePostLikeRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final RecommendRoutePostRepository recommendRoutePostRepository;
@@ -38,12 +36,12 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public LikeResponseDto getLikes(PostType postType, Long postId) {
         log.info("getLikes 요청 postType : {}, postId : {}", postType, postId);
-        List<LikeT> likes = new ArrayList<>();
+        List<Like> likes = new ArrayList<>();
         switch (postType) {
             case COMMUNITY -> {
                 Post post = postRepository.findById(postId)
                         .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
-                likes = likeRepository.findAllByPost(post);
+                likes = postLikeRepository.findAllByPost(post);
             }
             case RECOMMEND -> {
                 RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(postId)

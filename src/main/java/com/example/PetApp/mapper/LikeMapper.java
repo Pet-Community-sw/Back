@@ -1,6 +1,5 @@
 package com.example.PetApp.mapper;
 
-import com.example.PetApp.domain.LikeT;
 import com.example.PetApp.dto.like.LikeListDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
 
