@@ -68,7 +68,7 @@ public class Profile extends BaseTimeEntity {
     private Set<PetBreed> avoidBreeds = new HashSet<>();
 
     @OneToMany(mappedBy = "profile",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WalkingTogetherPost> walkingTogetherPost;
+    private List<WalkingTogetherMatch> walkingTogetherMatch;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<ChatRoom> chatRooms;

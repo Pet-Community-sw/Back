@@ -1,7 +1,7 @@
 package com.example.PetApp.repository.jpa;
 
 import com.example.PetApp.domain.ChatRoom;
-import com.example.PetApp.domain.WalkingTogetherPost;
+import com.example.PetApp.domain.WalkingTogetherMatch;
 import com.example.PetApp.domain.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +19,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     List<ChatRoom> findAllByProfilesContains(Profile profile);// 이거 검사해봐야할듯.
 
-    Optional<ChatRoom> findByWalkingTogetherPost(WalkingTogetherPost walkingTogetherPost);
+    Optional<ChatRoom> findByWalkingTogetherPost(WalkingTogetherMatch walkingTogetherMatch);
 
     boolean existsByChatRoomIdAndProfilesContains(Long chatRoomId, Profile profile);
 

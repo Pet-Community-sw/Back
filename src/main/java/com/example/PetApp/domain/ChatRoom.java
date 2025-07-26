@@ -2,13 +2,10 @@ package com.example.PetApp.domain;
 
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +32,7 @@ public class ChatRoom extends BaseTimeEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "walking_together_post_id")
-    private WalkingTogetherPost walkingTogetherPost;
+    private WalkingTogetherMatch walkingTogetherMatch;
 
     @Setter
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})

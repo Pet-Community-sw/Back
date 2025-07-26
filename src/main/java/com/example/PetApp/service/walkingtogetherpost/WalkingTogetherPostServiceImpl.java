@@ -2,7 +2,7 @@ package com.example.PetApp.service.walkingtogetherpost;
 
 
 import com.example.PetApp.domain.RecommendRoutePost;
-import com.example.PetApp.domain.WalkingTogetherPost;
+import com.example.PetApp.domain.WalkingTogetherMatch;
 import com.example.PetApp.domain.PetBreed;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.chatroom.CreateChatRoomResponseDto;
@@ -44,11 +44,11 @@ public class WalkingTogetherPostServiceImpl implements WalkingTogetherPostServic
         log.info("getWalingTogetherPost 요청 walkingTogetherPostId : {}, profileId : {}", walkingTogetherPostId,profileId);
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new ForbiddenException("프로필 설정 해주세요."));
-        WalkingTogetherPost walkingTogetherPost = walkingTogetherPostRepository.findById(walkingTogetherPostId)
+        WalkingTogetherMatch walkingTogetherMatch = walkingTogetherPostRepository.findById(walkingTogetherPostId)
                 .orElseThrow(() -> new NotFoundException("해당 함께 산책해요 게시글은 없습니다."));
         PetBreed petBreed = petBreedRepository.findByName(profile.getPetBreed().getName()).get();
 
-        return WalkingTogetherPostMapper.toGetWalkingTogetherPostResponseDto(walkingTogetherPostId, walkingTogetherPost, profile, petBreed);
+        return WalkingTogetherPostMapper.toGetWalkingTogetherPostResponseDto(walkingTogetherPostId, walkingTogetherMatch, profile, petBreed);
 
     }
 
@@ -61,8 +61,8 @@ public class WalkingTogetherPostServiceImpl implements WalkingTogetherPostServic
         RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(recommendRoutePostId)
                 .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
         PetBreed petBreed = petBreedRepository.findByName(profile.getPetBreed().getName()).get();
-        List<WalkingTogetherPost> walkingTogetherPosts = walkingTogetherPostRepository.findAllByRecommendRoutePost(recommendRoutePost);
-        return WalkingTogetherPostMapper.toGetWalkingTogetherPostResponseDtos(walkingTogetherPosts, petBreed);
+        List<WalkingTogetherMatch> walkingTogetherMatches = walkingTogetherPostRepository.findAllByRecommendRoutePost(recommendRoutePost);
+        return WalkingTogetherPostMapper.toGetWalkingTogetherPostResponseDtos(walkingTogetherMatches, petBreed);
     }
 
     @Transactional
@@ -73,33 +73,33 @@ public class WalkingTogetherPostServiceImpl implements WalkingTogetherPostServic
                 .orElseThrow(() -> new ForbiddenException("프로필 설정 해주세요."));
         RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(createWalkingTogetherPostDto.getRecommendRoutePostId())
                 .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
-        WalkingTogetherPost walkingTogetherPost = WalkingTogetherPostMapper.toEntity(profile, recommendRoutePost, createWalkingTogetherPostDto);
-        walkingTogetherPost.addMatchPostProfiles(profileId);
-        walkingTogetherPost.addAvoidBreeds(profile);
-        WalkingTogetherPost savedWalkingTogetherPost = walkingTogetherPostRepository.save(walkingTogetherPost);
-        return new CreateWalkingTogetherPostResponseDto(savedWalkingTogetherPost.getWalkingTogetherPostId());
+        WalkingTogetherMatch walkingTogetherMatch = WalkingTogetherPostMapper.toEntity(profile, recommendRoutePost, createWalkingTogetherPostDto);
+        walkingTogetherMatch.addMatchPostProfiles(profileId);
+        walkingTogetherMatch.addAvoidBreeds(profile);
+        WalkingTogetherMatch savedWalkingTogetherMatch = walkingTogetherPostRepository.save(walkingTogetherMatch);
+        return new CreateWalkingTogetherPostResponseDto(savedWalkingTogetherMatch.getWalkingTogetherPostId());
     }
 
     @Transactional
     @Override
     public void updateWalkingTogetherPost(Long walkingTogetherPostId, UpdateWalkingTogetherPostDto updateWalkingTogetherPostDto, Long profileId) {
         log.info("updateWalkingTogetherPost 요청 walkingTogetherPostId : {}, profileId : {}", walkingTogetherPostId, profileId);
-        WalkingTogetherPost walkingTogetherPost = walkingTogetherPostRepository.findById(walkingTogetherPostId)
+        WalkingTogetherMatch walkingTogetherMatch = walkingTogetherPostRepository.findById(walkingTogetherPostId)
                 .orElseThrow(() -> new NotFoundException("해당 함께 산책해요 게시글은 없습니다."));
-        if (!walkingTogetherPost.getProfile().getProfileId().equals(profileId)) {
+        if (!walkingTogetherMatch.getProfile().getProfileId().equals(profileId)) {
             throw new ForbiddenException("수정 권한 없음.");
         }
-        walkingTogetherPost.setScheduledTime(updateWalkingTogetherPostDto.getScheduledTime());
-        walkingTogetherPost.setLimitCount(updateWalkingTogetherPostDto.getLimitCount());
+        walkingTogetherMatch.setScheduledTime(updateWalkingTogetherPostDto.getScheduledTime());
+        walkingTogetherMatch.setLimitCount(updateWalkingTogetherPostDto.getLimitCount());
     }
 
     @Transactional
     @Override
     public void deleteWalkingTogetherPost(Long walkingTogetherPostId, Long profileId) {
         log.info("deleteWalkingTogetherPost 요청 walkingTogetherPostId : {}, profileId : {}", walkingTogetherPostId, profileId);
-        WalkingTogetherPost walkingTogetherPost = walkingTogetherPostRepository.findById(walkingTogetherPostId)
+        WalkingTogetherMatch walkingTogetherMatch = walkingTogetherPostRepository.findById(walkingTogetherPostId)
                 .orElseThrow(() -> new NotFoundException("해당 함께 산책해요 게시글은 없습니다."));
-        if (!walkingTogetherPost.getProfile().getProfileId().equals(profileId)) {
+        if (!walkingTogetherMatch.getProfile().getProfileId().equals(profileId)) {
             throw new ForbiddenException("삭제 권한 없음.");
         }
         walkingTogetherPostRepository.deleteById(walkingTogetherPostId);
@@ -112,27 +112,27 @@ public class WalkingTogetherPostServiceImpl implements WalkingTogetherPostServic
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new ForbiddenException("프로필 설정해주세요."));
 
-        WalkingTogetherPost walkingTogetherPost = walkingTogetherPostRepository.findById(walkingTogetherPostId)
+        WalkingTogetherMatch walkingTogetherMatch = walkingTogetherPostRepository.findById(walkingTogetherPostId)
                 .orElseThrow(() -> new NotFoundException("해당 함께 산책해요 게시글은 없습니다."));
 
-        if (walkingTogetherPost.getProfiles().contains(profileId)) {
+        if (walkingTogetherMatch.getProfiles().contains(profileId)) {
             throw new ConflictException("이미 채팅방에 들어가있습니다.");
         }
 
         PetBreed petBreed = petBreedRepository.findByName(profile.getPetBreed().getName())
                 .orElseThrow(() -> new NotFoundException("해당 견종을 찾을 수 없습니다."));
 
-        if (walkingTogetherPost.getAvoidBreeds().contains(petBreed.getPetBreedId())) {
+        if (walkingTogetherMatch.getAvoidBreeds().contains(petBreed.getPetBreedId())) {
             throw new ForbiddenException("해당 종은 참여할 수 없습니다.");
         }
 
-        addMatchingAndAvoid(walkingTogetherPost, profileId, profile);
+        addMatchingAndAvoid(walkingTogetherMatch, profileId, profile);
 
-        return chatRoomService.createChatRoom(walkingTogetherPost, profile);
+        return chatRoomService.createChatRoom(walkingTogetherMatch, profile);
     }
 
 
-    private void addMatchingAndAvoid(WalkingTogetherPost post, Long profileId, Profile profile) {
+    private void addMatchingAndAvoid(WalkingTogetherMatch post, Long profileId, Profile profile) {
         post.addMatchPostProfiles(profileId);
         post.addAvoidBreeds(profile);
     }

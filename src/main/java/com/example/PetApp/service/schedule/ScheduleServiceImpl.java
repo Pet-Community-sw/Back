@@ -3,7 +3,7 @@ package com.example.PetApp.service.schedule;
 import com.example.PetApp.domain.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
-import com.example.PetApp.domain.WalkingTogetherPost;
+import com.example.PetApp.domain.WalkingTogetherMatch;
 import com.example.PetApp.dto.schedule.GetSchedulesResponseDto;
 import com.example.PetApp.dto.schedule.TimeDto;
 import com.example.PetApp.mapper.ScheduleMapper;
@@ -46,9 +46,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         Optional<Profile> profile = profileRepository.findById(profileId);
 
         if (profile.isPresent()) {
-            List<WalkingTogetherPost> walkingTogetherPostList =
+            List<WalkingTogetherMatch> walkingTogetherMatchList =
                     walkingTogetherPostRepository.findAllByProfileContainsAndScheduledTimeBetween(profile.get(), timeDto.getStart(), timeDto.getEnd());
-            List<GetSchedulesResponseDto> list = walkingTogetherPostList.stream()
+            List<GetSchedulesResponseDto> list = walkingTogetherMatchList.stream()
                     .map(walkingTogetherPost -> ScheduleMapper.toGetSchedulesResponseDto(profile.get(), walkingTogetherPost)
             ).collect(Collectors.toList());
             getSchedulesResponseDtos.addAll(list);

@@ -4,14 +4,8 @@ import com.example.PetApp.domain.embedded.Location;
 import com.example.PetApp.domain.embedded.PostContent;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
-import org.checkerframework.checker.units.qual.C;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -33,7 +27,7 @@ public class RecommendRoutePost extends BaseTimeEntity {
     private Location location;
 
     @OneToMany(mappedBy = "recommendRoutePost",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WalkingTogetherPost> walkingTogetherPost;
+    private List<WalkingTogetherMatch> walkingTogetherMatch;
 
     @OneToMany(mappedBy = "recommendRoutePost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeT> likeTs;

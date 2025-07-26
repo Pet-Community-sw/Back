@@ -1,8 +1,7 @@
 package com.example.PetApp.domain.post;
 
 import com.example.PetApp.domain.Comment;
-import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.WalkingTogetherPost;
+import com.example.PetApp.domain.WalkingTogetherMatch;
 import com.example.PetApp.domain.embedded.Location;
 import lombok.*;
 
@@ -21,7 +20,7 @@ public class RecommendRoutePost extends Post{
     private Location location;
 
     @OneToMany(mappedBy = "recommendRoutePost",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WalkingTogetherPost> walkingTogetherPost;
+    private List<WalkingTogetherMatch> walkingTogetherMatch;
 
     @OneToMany(mappedBy = "recommendRoutePost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeT> likeTs;
