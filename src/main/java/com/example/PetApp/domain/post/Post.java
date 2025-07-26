@@ -2,10 +2,13 @@ package com.example.PetApp.domain.post;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.embedded.PostContent;
+import com.example.PetApp.domain.like.Like;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -26,5 +29,8 @@ public abstract class Post extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Like> likes = new ArrayList<>();
 
 }
