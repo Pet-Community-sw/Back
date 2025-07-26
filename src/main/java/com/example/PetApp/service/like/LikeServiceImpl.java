@@ -3,7 +3,7 @@ package com.example.PetApp.service.like;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
 import com.example.PetApp.domain.RecommendRoutePost;
-import com.example.PetApp.domain.superclass.Like;
+import com.example.PetApp.domain.like.Like;
 import com.example.PetApp.dto.like.LikeDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
 import com.example.PetApp.exception.NotFoundException;
