@@ -25,12 +25,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor//like를 superclass로 둠으로써 likeId 겹칠일이없음.
 public class LikeServiceImpl implements LikeService {
-    private final PostLikeRepository postLikeRepository;
-    private final RecommendRoutePostLikeRepository recommendRoutePostLikeRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final RecommendRoutePostRepository recommendRoutePostRepository;
+    private final LikeRepository likeRepository;
     private final SendNotificationUtil sendNotificationUtil;
+
 
     @Transactional(readOnly = true)
     @Override
@@ -53,6 +53,10 @@ public class LikeServiceImpl implements LikeService {
             }
         }
         return LikeMapper.toLikeResponseDto(LikeMapper.toLikeListDto(likes));
+    }
+
+    public LikeResponseDto getLikes(Long postId) {
+        log.info("kdk");
     }
 
     @Transactional
