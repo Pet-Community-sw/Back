@@ -1,6 +1,7 @@
 package com.example.PetApp.service.like;
 
 import com.example.PetApp.domain.Member;
+import com.example.PetApp.domain.like.Like;
 import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.domain.RecommendRoutePost;
 import com.example.PetApp.dto.like.LikeResponseDto;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 
 @Slf4j
@@ -31,8 +34,28 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public LikeResponseDto getLikes(Long postId) {
         log.info("getLikes 요청 postId : {}", postId);
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
         return LikeMapper.toLikeResponseDto(post.getLikes());
+    }
+
+    public ResponseEntity<?> createAndDeleteLike(Long postId, String email) {
+        log.info("createAndDeleteLike 요청 postId : {}", postId);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("회원이 존재하지 않습니다."));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
+        Optional<Like> existingLike = post.getLikes().stream()
+                .filter(like -> like.getMember().equals(member))
+                .findFirst();
+        if (existingLike.isPresent()) {
+            Like like = existingLike.get();
+            likeRepository.delete(like);
+        } else {
+
+        }
+
+
     }
 
     @Transactional

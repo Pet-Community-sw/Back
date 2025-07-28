@@ -1,5 +1,6 @@
 package com.example.PetApp.domain.like;
 
+import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Post;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class NomalostLike extends Like {
+public class NomalPostLike extends Like {
+
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
