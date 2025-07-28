@@ -32,7 +32,7 @@ public class NormalPost extends Post{
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    @Builder.Default
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LikeT> likeTs = new ArrayList<>();
+//    @Builder.Default
+//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<LikeT> likeTs = new ArrayList<>();
 }

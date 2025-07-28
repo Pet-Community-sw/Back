@@ -1,7 +1,7 @@
 package com.example.PetApp.service.like;
 
 import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.Post;
+import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.domain.RecommendRoutePost;
 import com.example.PetApp.domain.like.Like;
 import com.example.PetApp.dto.like.LikeDto;
@@ -52,11 +52,13 @@ public class LikeServiceImpl implements LikeService {
                 throw new IllegalArgumentException("잘못된 postType입니다.");
             }
         }
-        return LikeMapper.toLikeResponseDto(LikeMapper.toLikeListDto(likes));
+        return LikeMapper.toLikeResponseDto(likes);
     }
 
     public LikeResponseDto getLikes(Long postId) {
-        log.info("kdk");
+        log.info("getLikes 요청 postId : {}", postId);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
+        return LikeMapper.toLikeResponseDto(post.getLikes());
     }
 
     @Transactional

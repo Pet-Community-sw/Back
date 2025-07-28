@@ -13,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class PostLike extends Like {
+public class NomalostLike extends Like {
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)

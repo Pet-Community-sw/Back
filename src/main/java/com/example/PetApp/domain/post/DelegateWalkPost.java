@@ -64,7 +64,7 @@ public class DelegateWalkPost extends Post{
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DelegateWalkStatus status = DelegateWalkStatus.RECRUITING//기본값을 모집중으로 선언.
+    private DelegateWalkStatus status = DelegateWalkStatus.RECRUITING;//기본값을 모집중으로 선언.
 
     @Builder.Default
     @ElementCollection

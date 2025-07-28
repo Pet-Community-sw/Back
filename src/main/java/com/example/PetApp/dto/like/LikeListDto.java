@@ -7,6 +7,7 @@ import lombok.Getter;
 @Builder
 public class LikeListDto {
 
+    private Long memberId;
     private String memberName;
     private String memberImageUrl;
 }

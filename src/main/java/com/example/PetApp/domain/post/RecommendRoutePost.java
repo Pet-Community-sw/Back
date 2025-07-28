@@ -22,8 +22,8 @@ public class RecommendRoutePost extends Post{
     @OneToMany(mappedBy = "recommendRoutePost",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WalkingTogetherMatch> walkingTogetherMatch;
 
-    @OneToMany(mappedBy = "recommendRoutePost", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LikeT> likeTs;
+//    @OneToMany(mappedBy = "recommendRoutePost", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<LikeT> likeTs;
 
     @OneToMany(mappedBy = "recommendRoutePost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
