@@ -27,7 +27,7 @@ public class LikeController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createAndDeleteLike(@RequestBody @Valid LikeDto likeDto, Authentication authentication) {
-        return likeService.createAndDeleteLike(likeDto, AuthUtil.getEmail(authentication));
+    public ResponseEntity<?> createAndDeleteLike(@RequestBody Long postId, Authentication authentication) {
+        return likeService.createAndDeleteLike(postId, AuthUtil.getEmail(authentication));
     }
 }

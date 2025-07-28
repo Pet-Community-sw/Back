@@ -3,13 +3,10 @@ package com.example.PetApp.service.like;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.domain.RecommendRoutePost;
-import com.example.PetApp.domain.like.Like;
-import com.example.PetApp.dto.like.LikeDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.LikeMapper;
 import com.example.PetApp.repository.jpa.*;
-import com.example.PetApp.service.comment.PostType;
 import com.example.PetApp.util.SendNotificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -42,18 +37,18 @@ public class LikeServiceImpl implements LikeService {
 
     @Transactional
     @Override
-    public ResponseEntity<?> createAndDeleteLike(LikeDto likeDto, String email) {
+    public ResponseEntity<?> createAndDeleteLike(Long postId, String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("회원이 존재하지 않습니다."));
 
         Object post;
-        switch (likeDto.getPostType()) {
+        switch (postId.getPostType()) {
             case COMMUNITY -> {
-                post = postRepository.findById(likeDto.getPostId())
+                post = postRepository.findById(postId.getPostId())
                         .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
             }
             case RECOMMEND -> {
-                post = recommendRoutePostRepository.findById(likeDto.getPostId())
+                post = recommendRoutePostRepository.findById(postId.getPostId())
                         .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
             }
             default -> {
