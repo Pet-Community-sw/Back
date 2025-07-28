@@ -25,4 +25,7 @@ public abstract class Like extends BaseTimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    public Like(Member member) {
+        this.member = member;
+    }
 }

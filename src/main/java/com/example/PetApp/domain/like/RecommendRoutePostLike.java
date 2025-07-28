@@ -1,7 +1,7 @@
 package com.example.PetApp.domain.like;
 
 import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.RecommendRoutePost;
+import com.example.PetApp.domain.post.RecommendRoutePost;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,4 +24,8 @@ public class RecommendRoutePostLike extends Like {
     @JoinColumn(name = "recommend_route_post_id", nullable = false)
     private RecommendRoutePost recommendRoutePost;
 
+    public RecommendRoutePostLike(Member member, RecommendRoutePost recommendRoutePost) {
+        super(member);
+        this.recommendRoutePost = recommendRoutePost;
+    }
 }
