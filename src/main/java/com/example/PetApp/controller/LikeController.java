@@ -21,9 +21,9 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    @GetMapping("/{postType}/{postId}")
-    public LikeResponseDto getLikes(@PathVariable PostType postType, @PathVariable Long postId) {
-        return likeService.getLikes(postType, postId);
+    @GetMapping("/{postId}")//api 명세서 수정해야함.
+    public LikeResponseDto getLikes(@PathVariable Long postId) {
+        return likeService.getLikes(postId);
     }
 
     @PostMapping()

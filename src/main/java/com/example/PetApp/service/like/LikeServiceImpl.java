@@ -34,27 +34,6 @@ public class LikeServiceImpl implements LikeService {
 
     @Transactional(readOnly = true)
     @Override
-    public LikeResponseDto getLikes(PostType postType, Long postId) {
-        log.info("getLikes 요청 postType : {}, postId : {}", postType, postId);
-        List<Like> likes = new ArrayList<>();
-        switch (postType) {
-            case COMMUNITY -> {
-                Post post = postRepository.findById(postId)
-                        .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
-                likes = postLikeRepository.findAllByPost(post);
-            }
-            case RECOMMEND -> {
-                RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(postId)
-                        .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
-                likes = likeRepository.findAllByRecommendRoutePost(recommendRoutePost);
-            }
-            default -> {
-                throw new IllegalArgumentException("잘못된 postType입니다.");
-            }
-        }
-        return LikeMapper.toLikeResponseDto(likes);
-    }
-
     public LikeResponseDto getLikes(Long postId) {
         log.info("getLikes 요청 postId : {}", postId);
         Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));

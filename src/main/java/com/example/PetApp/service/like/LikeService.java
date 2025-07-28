@@ -12,5 +12,5 @@ public interface LikeService {
 
     ResponseEntity<?> createAndDeleteLike(LikeDto likeDto, String email);
 
-    LikeResponseDto getLikes(PostType postType, Long postId);
+    LikeResponseDto getLikes(Long postId);
 }
