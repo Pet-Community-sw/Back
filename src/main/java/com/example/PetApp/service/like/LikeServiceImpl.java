@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor//like를 superclass로 둠으로써 likeId 겹칠일이없음.
+@RequiredArgsConstructor//like를 superclass로 둠으로써 likeId 겹칠일이없음. 코드 100줄이상 줄임. ㄷㄷ
 public class LikeServiceImpl implements LikeService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;

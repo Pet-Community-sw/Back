@@ -48,6 +48,8 @@ public class PostServiceImpl implements PostService {
         PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "postId"));
         List<Post> posts = postRepository.findAll(pageRequest).getContent();
 
+
+
         return PostMapper.toPostListResponseDto(posts, getLikeCountMap(posts), getLikedPostIds(member, posts));
     }
 
