@@ -7,7 +7,6 @@ import com.example.PetApp.domain.like.NormalPostLike;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +17,6 @@ import java.util.List;
 @Getter
 @Builder
 public class NormalPost extends Post{
-
-    @Setter
-    @NotBlank
-    @Column(nullable = false)
-    private String postImageUrl;
-
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();

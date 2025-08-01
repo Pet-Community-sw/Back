@@ -29,6 +29,9 @@ public abstract class Post extends BaseTimeEntity {
     private Content content;
 
     @Setter
+    private String postImageUrl;// viewCount랑 postImageUrl 명세서에 추가해야함.
+
+    @Setter
     @Min(0)
     @NotNull
     @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
