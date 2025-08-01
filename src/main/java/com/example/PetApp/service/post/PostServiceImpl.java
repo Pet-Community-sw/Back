@@ -1,7 +1,7 @@
 package com.example.PetApp.service.post;
 
 import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.Post;
+import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.like.LikeCountDto;
 import com.example.PetApp.dto.post.CreatePostResponseDto;
@@ -44,11 +44,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostResponseDto> getPosts(int page, String email) {
         log.info("getPosts 요청 : {}", email);
-        Member member = memberRepository.findByEmail(email).get();
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("해당 유저가 없습니다."));
         PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "postId"));
         List<Post> posts = postRepository.findAll(pageRequest).getContent();
-
-
 
         return PostMapper.toPostListResponseDto(posts, getLikeCountMap(posts), getLikedPostIds(member, posts));
     }

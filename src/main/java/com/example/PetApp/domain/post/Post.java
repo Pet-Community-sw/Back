@@ -7,6 +7,8 @@ import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,12 @@ public abstract class Post extends BaseTimeEntity {
 
     @Embedded
     private Content content;
+
+    @Setter
+    @Min(0)
+    @NotNull
+    @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    private Long viewCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)

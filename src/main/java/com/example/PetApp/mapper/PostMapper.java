@@ -1,7 +1,7 @@
 package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.Post;
+import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.dto.post.GetPostResponseDto;
