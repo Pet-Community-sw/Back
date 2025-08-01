@@ -1,16 +1,15 @@
-package com.example.PetApp.service.post;
+package com.example.PetApp.service.post.normal;
 
 import com.example.PetApp.dto.post.CreatePostResponseDto;
 import com.example.PetApp.dto.post.GetPostResponseDto;
 import com.example.PetApp.dto.post.PostDto;
 import com.example.PetApp.dto.post.PostResponseDto;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public interface PostService {
+public interface NormalPostService {
 
     List<PostResponseDto> getPosts(int page, String email);
 

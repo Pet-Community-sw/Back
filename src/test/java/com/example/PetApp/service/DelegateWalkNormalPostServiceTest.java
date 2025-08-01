@@ -16,7 +16,7 @@ import com.example.PetApp.repository.jpa.DelegateWalkPostRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.service.memberchatRoom.MemberChatRoomService;
-import com.example.PetApp.service.walkerpost.DelegateWalkPostServiceImpl;
+import com.example.PetApp.service.post.delegate.DelegateWalkPostServiceImpl;
 import com.example.PetApp.service.walkrecord.WalkRecordService;
 import com.example.PetApp.util.SendNotificationUtil;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +39,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class DelegateWalkPostServiceTest {
+public class
+DelegateWalkNormalPostServiceTest {
 
     @InjectMocks
     private DelegateWalkPostServiceImpl delegateWalkPostServiceImpl;

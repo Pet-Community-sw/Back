@@ -1,7 +1,9 @@
-package com.example.PetApp.service.walkerpost;
+package com.example.PetApp.service.post.delegate;
 
 import com.example.PetApp.domain.*;
 import com.example.PetApp.domain.embedded.Applicant;
+import com.example.PetApp.domain.post.DelegateWalkPost;
+import com.example.PetApp.domain.post.DelegateWalkStatus;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
 import com.example.PetApp.dto.walkrecord.CreateWalkRecordResponseDto;
@@ -47,7 +49,7 @@ public class DelegateWalkPostServiceImpl implements DelegateWalkPostService {
         DelegateWalkPost delegateWalkPost = DelegateWalkPostMapper.toEntity(createDelegateWalkPostDto, profile);
 
         DelegateWalkPost savedDelegateWalkPost = delegateWalkPostRepository.save(delegateWalkPost);
-        return new CreateDelegateWalkPostResponseDto(savedDelegateWalkPost.getDelegateWalkPostId());
+        return new CreateDelegateWalkPostResponseDto(savedDelegateWalkPost.getPostId());
     }
 
     @Transactional(readOnly = true)
@@ -105,7 +107,7 @@ public class DelegateWalkPostServiceImpl implements DelegateWalkPostService {
         } else if (delegateWalkPost.getApplicants().stream().noneMatch(applicant -> applicant.getMemberId().equals(memberId))) {
             throw new ConflictException("해당 지원자는 없습니다.");
         }
-        delegateWalkPost.setStatus(DelegateWalkPost.DelegateWalkStatus.COMPLETED);
+        delegateWalkPost.setStatus(DelegateWalkStatus.COMPLETED);
         delegateWalkPost.setSelectedApplicantMemberId(memberId);
         //켈린더에 넣는 로직필요.
         sendNotification(applicantMember, "대리산책자 지원에 선정되었습니다.");
@@ -176,7 +178,7 @@ public class DelegateWalkPostServiceImpl implements DelegateWalkPostService {
         } else if (delegateWalkPost.getApplicants().stream().
                 anyMatch(applicant -> applicant.getMemberId().equals(member.getMemberId()))) {
             throw new ConflictException("이미 신청한 회원입니다.");
-        } else if (delegateWalkPost.getStatus() == DelegateWalkPost.DelegateWalkStatus.COMPLETED) {
+        } else if (delegateWalkPost.getStatus() == DelegateWalkStatus.COMPLETED) {
             throw new ConflictException("모집 완료 게시글입니다.");
         }
         delegateWalkPost.getApplicants().add(Applicant.builder()
@@ -186,9 +188,6 @@ public class DelegateWalkPostServiceImpl implements DelegateWalkPostService {
         sendToDelegateWalkPostNotification(member, delegateWalkPost);
         return new ApplyToDelegateWalkPostResponseDto(member.getMemberId());
     }
-
-
-
 
     private void sendToDelegateWalkPostNotification(Member member, DelegateWalkPost delegateWalkPost) {
         String message = member.getName() + "님이 회원님의 대리산책자 게시글에 지원했습니다.";

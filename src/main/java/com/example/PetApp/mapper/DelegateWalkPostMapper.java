@@ -1,6 +1,6 @@
 package com.example.PetApp.mapper;
 
-import com.example.PetApp.domain.DelegateWalkPost;
+import com.example.PetApp.domain.post.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.embedded.Location;
@@ -39,7 +39,7 @@ public class DelegateWalkPostMapper {
     public static List<GetDelegateWalkPostsResponseDto> toGetDelegateWalkPostsResponseDtos(Member member, List<DelegateWalkPost> delegateWalkPosts) {
         return delegateWalkPosts.stream()
                 .map(delegateWalkPost -> GetDelegateWalkPostsResponseDto.builder()
-                        .delegateWalkPostId(delegateWalkPost.getDelegateWalkPostId())
+                        .delegateWalkPostId(delegateWalkPost.getPostId())
                         .profileId(delegateWalkPost.getProfile().getProfileId())
                         .petName(delegateWalkPost.getProfile().getPetName())
                         .petImageUrl(delegateWalkPost.getProfile().getPetImageUrl())
@@ -57,7 +57,7 @@ public class DelegateWalkPostMapper {
 
     public static GetPostResponseDto toGetPostResponseDto(DelegateWalkPost delegateWalkPost) {
         return GetPostResponseDto.builder()
-                .delegateWalkPostId(delegateWalkPost.getDelegateWalkPostId())
+                .delegateWalkPostId(delegateWalkPost.getPostId())
                 .title(delegateWalkPost.getContent().getTitle())
                 .content(delegateWalkPost.getContent().getContent())
                 .price(delegateWalkPost.getPrice())

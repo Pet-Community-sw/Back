@@ -1,4 +1,4 @@
-package com.example.PetApp.service.walkerpost;
+package com.example.PetApp.service.post.delegate;
 
 import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.dto.delegateWalkpost.*;

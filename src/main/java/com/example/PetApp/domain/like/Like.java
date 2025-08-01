@@ -14,7 +14,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 @Getter
-public abstract class Like extends BaseTimeEntity {
+public class Like extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

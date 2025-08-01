@@ -1,4 +1,4 @@
-package com.example.PetApp.service.recommendroutepost;
+package com.example.PetApp.service.post.recommend;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.RecommendRoutePost;

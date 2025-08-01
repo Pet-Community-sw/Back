@@ -10,7 +10,7 @@ import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
-import com.example.PetApp.service.post.PostServiceImpl;
+import com.example.PetApp.service.post.normal.NormalNormalPostServiceImpl;
 import com.example.PetApp.util.Mapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,10 +30,10 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-public class PostServiceTest {
+public class NormalPostServiceTest {
 
     @InjectMocks
-    private PostServiceImpl postServiceImpl;
+    private NormalNormalPostServiceImpl normalPostServiceImpl;
 
     @Mock
     private PostRepository postRepository;
@@ -61,7 +61,7 @@ public class PostServiceTest {
 //            return fakePost.toBuilder().postId(100L).build();
 //        });
         //when
-        CreatePostResponseDto result = postServiceImpl.createPost(postDto, email);
+        CreatePostResponseDto result = normalPostServiceImpl.createPost(postDto, email);
 
         //then
         assertThat(result).isNotNull();
@@ -87,11 +87,11 @@ public class PostServiceTest {
 
         when(postRepository.findById(100L)).thenReturn(Optional.of(post));
         when(memberRepository.findByEmail("dlwlsh789@naver.com")).thenReturn(Optional.of(view));
-        when(likeRepository.countByPost(post.getPostId())).thenReturn(6L);
+        when(likeRepository.countByPost(post)).thenReturn(6L);
         when(likeRepository.existsByPostAndMember(post, view)).thenReturn(true);
 
         //when
-        GetPostResponseDto fakePost = postServiceImpl.getPost(100L, "dlwlsh789@naver.com");
+        GetPostResponseDto fakePost = normalPostServiceImpl.getPost(100L, "dlwlsh789@naver.com");
 
         //then
         assertThat(fakePost).isNotNull();
@@ -119,7 +119,7 @@ public class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
         //when
-        postServiceImpl.updatePost(postId, postDto, email);
+        normalPostServiceImpl.updatePost(postId, postDto, email);
 
         //then
         assertThat(post.getContent().getContent()).isEqualTo("b");
@@ -146,7 +146,7 @@ public class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
 
         //when
-        assertThatThrownBy(() -> postServiceImpl.updatePost(postId, Mapper.toPostDto(), email))
+        assertThatThrownBy(() -> normalPostServiceImpl.updatePost(postId, Mapper.toPostDto(), email))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessage("수정 권한이 없습니다.");
 

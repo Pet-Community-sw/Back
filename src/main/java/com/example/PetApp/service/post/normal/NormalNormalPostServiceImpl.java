@@ -1,4 +1,4 @@
-package com.example.PetApp.service.post;
+package com.example.PetApp.service.post.normal;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.post.Post;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PostServiceImpl implements PostService {
+public class NormalNormalPostServiceImpl implements NormalPostService {
 
     @Value("${spring.dog.post.image.upload}")
     private String postUploadDir;
@@ -74,7 +74,7 @@ public class PostServiceImpl implements PostService {
             post.setViewCount(post.getViewCount()+1);
         }
 
-        return PostMapper.toGetPostResponseDto(post, member, likeRepository.countByPost(postId), likeRepository.existsByPostAndMember(post, member));
+        return PostMapper.toGetPostResponseDto(post, member, likeRepository.countByPost(post), likeRepository.existsByPostAndMember(post, member));
     }
 
     @Transactional

@@ -5,6 +5,7 @@ import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.domain.like.Like;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -17,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @DiscriminatorColumn(name = "post_type")
-@Builder
+@SuperBuilder
 @Getter
 public abstract class Post extends BaseTimeEntity {
 

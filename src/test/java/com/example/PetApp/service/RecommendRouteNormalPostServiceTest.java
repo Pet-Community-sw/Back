@@ -10,7 +10,7 @@ import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
-import com.example.PetApp.service.recommendroutepost.RecommendRoutePostServiceImpl;
+import com.example.PetApp.service.post.recommend.RecommendRoutePostServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +33,7 @@ import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RecommendRoutePostServiceTest {
+public class RecommendRouteNormalPostServiceTest {
 
     @InjectMocks
     private RecommendRoutePostServiceImpl recommendRoutePostServiceImpl;

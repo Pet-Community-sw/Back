@@ -2,7 +2,7 @@ package com.example.PetApp.controller;
 
 import com.example.PetApp.dto.MessageResponse;
 import com.example.PetApp.dto.recommendroutepost.*;
-import com.example.PetApp.service.recommendroutepost.RecommendRoutePostService;
+import com.example.PetApp.service.post.recommend.RecommendRoutePostService;
 import com.example.PetApp.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

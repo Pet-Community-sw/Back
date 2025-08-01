@@ -1,4 +1,4 @@
-package com.example.PetApp.service.recommendroutepost;
+package com.example.PetApp.service.post.recommend;
 
 import com.example.PetApp.dto.recommendroutepost.*;
 import org.springframework.stereotype.Service;

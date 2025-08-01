@@ -5,7 +5,7 @@ import com.example.PetApp.dto.MessageResponse;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
 import com.example.PetApp.dto.walkrecord.CreateWalkRecordResponseDto;
-import com.example.PetApp.service.walkerpost.DelegateWalkPostService;
+import com.example.PetApp.service.post.delegate.DelegateWalkPostService;
 import com.example.PetApp.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,12 +1,10 @@
 package com.example.PetApp.domain.post;
 
-import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.domain.embedded.Location;
-import com.example.PetApp.domain.like.DelegateWalkPostLike;
-import com.example.PetApp.domain.like.Like;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -20,7 +18,7 @@ import java.util.Set;
 @DiscriminatorValue("DELEGATE")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 public class DelegateWalkPost extends Post{
 
