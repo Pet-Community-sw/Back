@@ -61,7 +61,10 @@ public class LikeServiceImpl implements LikeService {
 
     private ResponseEntity<String> createLike(Post post, Member member) {
         log.info("좋아요 생성");
-        Like like = post.createLike(member);
+        Like like = Like.builder()
+                .member(member)
+                .post(post)
+                .build();
         post.getLikes().add(like);
         likeRepository.save(like);
 

@@ -1,7 +1,7 @@
 package com.example.PetApp.service;
 
 import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.Post;
+import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.post.CreatePostResponseDto;
 import com.example.PetApp.dto.post.GetPostResponseDto;
@@ -87,7 +87,7 @@ public class PostServiceTest {
 
         when(postRepository.findById(100L)).thenReturn(Optional.of(post));
         when(memberRepository.findByEmail("dlwlsh789@naver.com")).thenReturn(Optional.of(view));
-        when(likeRepository.countByPost(post)).thenReturn(6L);
+        when(likeRepository.countByPost(post.getPostId())).thenReturn(6L);
         when(likeRepository.existsByPostAndMember(post, view)).thenReturn(true);
 
         //when

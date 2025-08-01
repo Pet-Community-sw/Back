@@ -26,6 +26,7 @@ public abstract class Post extends BaseTimeEntity {
     private Long postId;
 
     @Embedded
+    @Setter
     private Content content;
 
     @Setter
@@ -44,6 +45,6 @@ public abstract class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes = new ArrayList<>();
 
-    public abstract Like createLike(Member member);//게시글에서 Like생성 책임 위임
+//    public abstract Like createLike(Member member);//게시글에서 Like생성 책임 위임
 
 }

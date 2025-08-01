@@ -75,9 +75,9 @@ public class DelegateWalkPost extends Post{
     private Set<Applicant> applicants = new HashSet<>();
 
 
-    @Override
-    public Like createLike(Member member) {
-        return new DelegateWalkPostLike(member, this);
-    }
+//    @Override
+//    public Like createLike(Member member) {
+//        return new DelegateWalkPostLike(member, this);
+//    }
 }
 

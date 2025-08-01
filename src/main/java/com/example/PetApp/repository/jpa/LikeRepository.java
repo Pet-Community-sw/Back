@@ -2,6 +2,7 @@ package com.example.PetApp.repository.jpa;
 
 import com.example.PetApp.domain.*;
 import com.example.PetApp.domain.like.Like;
+import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.dto.like.LikeCountDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,19 +28,20 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     @Query("select l.recommendRoutePost.recommendRouteId from Like l where l.member=:member and l.recommendRoutePost in :recommendRoutePosts")
     List<Long> findLikedRecommendIds(@Param("member") Member member, @Param("recommendRoutePosts") List<RecommendRoutePost> recommendRoutePosts);
 
-    Long countByPost(Post post);
+    @Query(value = "select count(*) from like where post_id = :postId", nativeQuery = true)
+    Long countByPost(@Param("postId")Long postId);
 
-    Long countByRecommendRoutePost(RecommendRoutePost recommendRoutePost);
+//    Long countByRecommendRoutePost(RecommendRoutePost recommendRoutePost);
 
-    List<Like> findAllByRecommendRoutePost(RecommendRoutePost recommendRoutePost);
-
-    List<Like> findAllByPost(Post post);
+//    List<Like> findAllByRecommendRoutePost(RecommendRoutePost recommendRoutePost);
+//
+//    List<Like> findAllByPost(Post post);
 
     Boolean existsByPostAndMember(Post post, Member member);
 
     Boolean existsByRecommendRoutePostAndMember(RecommendRoutePost recommendRoutePost, Member member);
 
-    void deleteByRecommendRoutePostAndMember(RecommendRoutePost recommendRoutePost, Member member);
-
-    void deleteByPostAndMember(Post post, Member member);
+//    void deleteByRecommendRoutePostAndMember(RecommendRoutePost recommendRoutePost, Member member);
+//
+//    void deleteByPostAndMember(Post post, Member member);
 }

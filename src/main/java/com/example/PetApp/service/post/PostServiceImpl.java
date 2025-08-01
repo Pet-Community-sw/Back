@@ -74,7 +74,7 @@ public class PostServiceImpl implements PostService {
             post.setViewCount(post.getViewCount()+1);
         }
 
-        return PostMapper.toGetPostResponseDto(post, member, likeRepository.countByPost(post), likeRepository.existsByPostAndMember(post, member));
+        return PostMapper.toGetPostResponseDto(post, member, likeRepository.countByPost(postId), likeRepository.existsByPostAndMember(post, member));
     }
 
     @Transactional
