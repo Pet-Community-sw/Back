@@ -24,9 +24,9 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @GetMapping("/{recommendRoutePostId}")
-    private List<GetCommentsResponseDto> getComments(@PathVariable Long recommendRoutePostId, Authentication authentication) {
-        return commentService.getComments(recommendRoutePostId, AuthUtil.getEmail(authentication));
+    @GetMapping("/{postId}")
+    private List<GetCommentsResponseDto> getComments(@PathVariable Long postId, Authentication authentication) {
+        return commentService.getComments(postId, AuthUtil.getEmail(authentication));
     }
 
     @PostMapping()

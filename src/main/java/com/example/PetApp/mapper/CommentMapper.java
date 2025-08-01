@@ -3,8 +3,7 @@ package com.example.PetApp.mapper;
 import com.example.PetApp.domain.Comment;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.post.Commentable;
-import com.example.PetApp.domain.post.NormalPost;
-import com.example.PetApp.domain.post.RecommendRoutePost;
+import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.dto.commment.CommentDto;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
 import com.example.PetApp.util.TimeAgoUtil;
@@ -18,18 +17,10 @@ public class CommentMapper {
         return getCommentsResponseDtos(post.getComments(), member);
     }
 
-    public static Comment toEntity(CommentDto commentDto, NormalPost normalPost, Member member) {
+    public static Comment toEntity(CommentDto commentDto, Post post, Member member) {
         return Comment.builder()
                 .content(commentDto.getContent())
-                .post(normalPost)
-                .member(member)
-                .build();
-    }
-
-    public static Comment toEntity(CommentDto commentDto,RecommendRoutePost recommendRoutePost, Member member) {
-        return Comment.builder()
-                .content(commentDto.getContent())
-                .recommendRoutePost(recommendRoutePost)
+                .post(post)
                 .member(member)
                 .build();
     }

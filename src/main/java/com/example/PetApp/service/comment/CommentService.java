@@ -16,5 +16,5 @@ public interface CommentService {
 
     void updateComment(Long commentId, UpdateCommentDto updateCommentDto, String  email);
 
-    List<GetCommentsResponseDto> getComments(Long recommendRoutePostId, String email);
+    List<GetCommentsResponseDto> getComments(Long postId, String email);
 }

@@ -1,6 +1,7 @@
 package com.example.PetApp.domain;
 
 import com.example.PetApp.domain.post.NormalPost;
+import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.domain.post.RecommendRoutePost;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
@@ -34,13 +35,9 @@ public class Comment extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private Long likeCount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "post_id")
-    private NormalPost post;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recommend_route_post_id")
-    private RecommendRoutePost recommendRoutePost;
+    private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
