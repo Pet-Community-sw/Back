@@ -1,8 +1,12 @@
 package com.example.PetApp.domain.post;
 
+import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.domain.embedded.Location;
+import com.example.PetApp.domain.like.DelegateWalkPostLike;
+import com.example.PetApp.domain.like.Like;
+import com.example.PetApp.domain.like.RecommendRoutePostLike;
 import lombok.*;
 
 import javax.persistence.*;
@@ -72,5 +76,9 @@ public class DelegateWalkPost extends Post{
     private Set<Applicant> applicants = new HashSet<>();
 
 
+    @Override
+    public Like createLike(Member member) {
+        return new DelegateWalkPostLike(member, this);
+    }
 }
 
