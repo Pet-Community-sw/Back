@@ -6,7 +6,6 @@ import com.example.PetApp.domain.embedded.Applicant;
 import com.example.PetApp.domain.embedded.Location;
 import com.example.PetApp.domain.like.DelegateWalkPostLike;
 import com.example.PetApp.domain.like.Like;
-import com.example.PetApp.domain.like.RecommendRoutePostLike;
 import lombok.*;
 
 import javax.persistence.*;

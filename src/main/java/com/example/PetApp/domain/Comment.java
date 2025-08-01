@@ -1,15 +1,14 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.post.NormalPost;
+import com.example.PetApp.domain.post.RecommendRoutePost;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 
 @Entity
@@ -37,7 +36,7 @@ public class Comment extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
-    private Post post;
+    private NormalPost post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recommend_route_post_id")

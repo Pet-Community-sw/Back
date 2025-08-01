@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Builder
-public class NormalPost extends Post{
+public class NormalPost extends Post implements Commentable{
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
@@ -25,4 +25,10 @@ public class NormalPost extends Post{
     public Like createLike(Member member) {
         return new NormalPostLike(member, this);
     }
+
+    @Override
+    public List<Comment> getComments() {
+        return this.comments;
+    }
+
 }

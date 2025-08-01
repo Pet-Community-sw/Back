@@ -1,6 +1,7 @@
 package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.Member;
+import com.example.PetApp.domain.post.Commentable;
 import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
@@ -58,7 +59,7 @@ public class PostMapper {
                 .createdAt(TimeAgoUtil.getTimeAgo(post.getCreatedAt()))
                 .like(isLike)
                 .build();
-        List<GetCommentsResponseDto> commentsResponseDtos = CommentMapper.toGetCommentsResponseDtos(post, member);
+        List<GetCommentsResponseDto> commentsResponseDtos = CommentMapper.toGetCommentsResponseDtos((Commentable)post, member);
 
         return GetPostResponseDto.builder()
                 .content(post.getContent().getContent())

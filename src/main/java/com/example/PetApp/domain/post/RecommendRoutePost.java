@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Builder
-public class RecommendRoutePost extends Post{
+public class RecommendRoutePost extends Post implements Commentable{
 
     @Embedded
     private Location location;
@@ -27,6 +27,11 @@ public class RecommendRoutePost extends Post{
 
     @OneToMany(mappedBy = "recommendRoutePost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
+
+    @Override
+    public List<Comment> getComments() {
+        return this.comments;
+    }
 
     @Override
     public Like createLike(Member member) {
