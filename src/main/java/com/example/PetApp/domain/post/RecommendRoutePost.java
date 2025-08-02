@@ -4,6 +4,7 @@ import com.example.PetApp.domain.Comment;
 import com.example.PetApp.domain.WalkingTogetherMatch;
 import com.example.PetApp.domain.embedded.Location;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-@Builder
+@SuperBuilder//상속받은 필드를 사용하기위한 애노테이션
 public class RecommendRoutePost extends Post implements Commentable{
 
     @Embedded

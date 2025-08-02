@@ -2,6 +2,7 @@ package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.post.Commentable;
+import com.example.PetApp.domain.post.NormalPost;
 import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.commment.GetCommentsResponseDto;
@@ -17,8 +18,8 @@ import java.util.stream.Collectors;
 
 public class PostMapper {
 
-    public static Post toEntity(PostDto postDto, String imageFileName, Member member) {
-        return Post.builder()
+    public static NormalPost toEntity(PostDto postDto, String imageFileName, Member member) {
+        return NormalPost.builder()
                 .content(new Content(postDto.getTitle(), postDto.getContent()))
                 .postImageUrl(imageFileName)
                 .member(member)
@@ -35,7 +36,7 @@ public class PostMapper {
                         .memberImageUrl(post.getMember().getMemberImageUrl())
                         .createdAt(TimeAgoUtil.getTimeAgo(post.getCreatedAt()))
                         .viewCount(post.getViewCount())
-                        .likeCount(likeCountMap.get(post.getPostId()))
+                        .likeCount((long) post.getLikes().size())//변환
                         .title(post.getContent().getTitle())
                         .like(likedPostIds.contains(post.getPostId()))
                         .build()

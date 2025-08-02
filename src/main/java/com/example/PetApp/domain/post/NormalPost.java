@@ -2,6 +2,7 @@ package com.example.PetApp.domain.post;
 
 import com.example.PetApp.domain.Comment;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Builder
+@SuperBuilder
 public class NormalPost extends Post implements Commentable{
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)

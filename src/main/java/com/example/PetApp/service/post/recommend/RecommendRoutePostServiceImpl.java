@@ -1,7 +1,7 @@
 package com.example.PetApp.service.post.recommend;
 
 import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.RecommendRoutePost;
+import com.example.PetApp.domain.post.RecommendRoutePost;
 import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.like.LikeCountDto;
 import com.example.PetApp.dto.recommendroutepost.*;
@@ -38,21 +38,21 @@ public class RecommendRoutePostServiceImpl implements RecommendRoutePostService{
         Member member = memberRepository.findByEmail(email).get();
         RecommendRoutePost recommendRoutePost = RecommendRoutePostMapper.toEntity(createRecommendRoutePostDto, member);
         RecommendRoutePost savedRecommendRoutePost = recommendRoutePostRepository.save(recommendRoutePost);
-        return new CreateRecommendRoutePostResponseDto(savedRecommendRoutePost.getRecommendRouteId());
+        return new CreateRecommendRoutePostResponseDto(savedRecommendRoutePost.getPostId());
     }
 
     @Transactional(readOnly = true)//페이징 처리를 해야됨. 40개 정도 내보내면 프론트가 페이지 처리할 수 있으려나?
     @Override
     public List<GetRecommendRoutePostsResponseDto> getRecommendRoutePosts(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, int page, String email) {
         log.info("getRecommendRoutePostsByLocation 요청 email : {}", email);
-        Member member = memberRepository.findByEmail(email).get();
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("해당 회원은 없습니다."));
         Pageable pageable = PageRequest.of(page, 10);
         List<RecommendRoutePost> recommendRoutePosts = recommendRoutePostRepository
                 .findByRecommendRoutePostByLocation(minLongitude - 0.01, minLatitude - 0.01, maxLongitude + 0.01, maxLatitude + 0.01, pageable)
                 .getContent();
         return RecommendRoutePostMapper.toRecommendRoutePostsList(recommendRoutePosts,
                 getLikeCountMap(recommendRoutePosts),
-                likeRepository.findLikedRecommendIds(member, recommendRoutePosts),
+                likeRepository.findLikedPostIds(member, recommendRoutePosts),
                 member);
     }
 

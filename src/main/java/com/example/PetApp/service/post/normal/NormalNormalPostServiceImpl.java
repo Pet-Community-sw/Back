@@ -1,6 +1,7 @@
 package com.example.PetApp.service.post.normal;
 
 import com.example.PetApp.domain.Member;
+import com.example.PetApp.domain.post.NormalPost;
 import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.like.LikeCountDto;
@@ -13,7 +14,7 @@ import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.PostMapper;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
-import com.example.PetApp.repository.jpa.PostRepository;
+import com.example.PetApp.repository.jpa.NormalPostRepository;
 import com.example.PetApp.util.imagefile.FileUploadUtil;
 import com.example.PetApp.util.imagefile.FileImageKind;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
     @Value("${spring.dog.post.image.upload}")
     private String postUploadDir;
 
-    private final PostRepository postRepository;
+    private final NormalPostRepository normalPostRepository;
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
 
@@ -46,7 +47,7 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
         log.info("getPosts 요청 : {}", email);
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("해당 유저가 없습니다."));
         PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "postId"));
-        List<Post> posts = postRepository.findAll(pageRequest).getContent();
+        List<NormalPost> posts = normalPostRepository.findAll(pageRequest).getContent();
 
         return PostMapper.toPostListResponseDto(posts, getLikeCountMap(posts), getLikedPostIds(member, posts));
     }
@@ -58,8 +59,8 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
         log.info("createPost 요청 email : {}", email);
         Member member = memberRepository.findByEmail(email).get();
         String imageFileName = FileUploadUtil.fileUpload(createPostDto.getPostImageFile(), postUploadDir, FileImageKind.POST);
-        Post post = PostMapper.toEntity(createPostDto, imageFileName, member);
-        Post savedPost = postRepository.save(post);
+        NormalPost normalPost = PostMapper.toEntity(createPostDto, imageFileName, member);
+        NormalPost savedPost = normalPostRepository.save(normalPost);
         return new CreatePostResponseDto(savedPost.getPostId());
     }
 
@@ -67,7 +68,7 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
     @Override
     public GetPostResponseDto getPost(Long postId, String email) {
         log.info("getPost 요청 email : {}",email);
-        Post post = postRepository.findById(postId)
+        NormalPost post = normalPostRepository.findById(postId)
                 .orElseThrow(()->new NotFoundException("해당 게시물은 없습니다."));
         Member member = memberRepository.findByEmail(email).get();
         if (!(post.getMember().equals(member))) {//조회수
@@ -82,19 +83,19 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
     public void deletePost(Long postId, String email) {
         log.info("deletePost 요청 email : {}, postId : {}", email, postId);
         Member member = memberRepository.findByEmail(email).get();
-        Post post = postRepository.findById(postId)
+        NormalPost post = normalPostRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
         if (!(post.getMember().equals(member))) {
             throw new ForbiddenException("삭제 권한이 없습니다.");
         }
-        postRepository.deleteById(postId);
+        normalPostRepository.deleteById(postId);
     }
 
     @Transactional
     @Override
     public void updatePost(Long postId, PostDto updatePostDto, String email) {
         Member member = memberRepository.findByEmail(email).get();
-        Post post = postRepository.findById(postId)
+        NormalPost post = normalPostRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
         if (!(post.getMember().equals(member))) {
             throw new ForbiddenException("수정 권한이 없습니다.");

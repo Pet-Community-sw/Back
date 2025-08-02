@@ -1,7 +1,7 @@
 package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.Member;
-import com.example.PetApp.domain.RecommendRoutePost;
+import com.example.PetApp.domain.post.RecommendRoutePost;
 import com.example.PetApp.domain.embedded.Location;
 import com.example.PetApp.domain.embedded.Content;
 import com.example.PetApp.dto.recommendroutepost.CreateRecommendRoutePostDto;
@@ -28,17 +28,17 @@ public class RecommendRoutePostMapper {
                                                                                     Member member) {
         return recommendRoutePosts.stream()
                 .map(recommendRoutePost -> GetRecommendRoutePostsResponseDto.builder()
-                        .recommendRoutePostId(recommendRoutePost.getRecommendRouteId())
+                        .recommendRoutePostId(recommendRoutePost.getPostId())
                         .title(recommendRoutePost.getContent().getTitle())
                         .memberId(recommendRoutePost.getMember().getMemberId())
                         .memberName(recommendRoutePost.getMember().getName())
                         .memberImageUrl(recommendRoutePost.getMember().getMemberImageUrl())
-                        .likeCount(likeCountMap.getOrDefault(recommendRoutePost.getRecommendRouteId(), 0L))
+                        .likeCount(likeCountMap.getOrDefault(recommendRoutePost.getPostId(), 0L))
                         .locationLongitude(recommendRoutePost.getLocation().getLocationLongitude())
                         .locationLatitude(recommendRoutePost.getLocation().getLocationLatitude())
                         .createdAt(TimeAgoUtil.getTimeAgo(recommendRoutePost.getCreatedAt()))
                         .isOwner(member.getMemberId().equals(recommendRoutePost.getMember().getMemberId()))
-                        .isLike(likedRecommendPostIds.contains(recommendRoutePost.getRecommendRouteId()))
+                        .isLike(likedRecommendPostIds.contains(recommendRoutePost.getPostId()))
                         .build()
                 )
                 .collect(Collectors.toList());
@@ -47,7 +47,7 @@ public class RecommendRoutePostMapper {
 
     public static GetRecommendPostResponseDto toGetRecommendPostResponseDto(Member member, RecommendRoutePost post, Long likeCount, boolean isLike) {
         return GetRecommendPostResponseDto.builder()
-                .recommendRoutePostId(post.getRecommendRouteId())
+                .recommendRoutePostId(post.getPostId())
                 .title(post.getContent().getTitle())
                 .content(post.getContent().getContent())
                 .memberId(post.getMember().getMemberId())
