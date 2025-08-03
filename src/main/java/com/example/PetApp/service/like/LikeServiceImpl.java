@@ -3,7 +3,7 @@ package com.example.PetApp.service.like;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.like.Like;
 import com.example.PetApp.domain.post.Post;
-import com.example.PetApp.dto.like.LikeListDto;
+import com.example.PetApp.dto.like.LikeCountDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.LikeMapper;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -38,6 +39,17 @@ public class LikeServiceImpl implements LikeService {
         log.info("getLikes 요청 postId : {}", postId);
         Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
         return LikeMapper.toLikeResponseDto(post.getLikes());
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public <T extends Post> Map<Long, Long> getLikeCountMap(List<T> posts) {
+        List<Long> postIds = posts.stream().map(Post::getPostId).toList();
+        List<LikeCountDto> likeCountDtos = likeRepository.countByPostIds(postIds);
+        return likeCountDtos.stream().collect(Collectors.toMap(
+                LikeCountDto::getPostId,
+                LikeCountDto::getLikeCount
+        ));
     }
 
     @Transactional

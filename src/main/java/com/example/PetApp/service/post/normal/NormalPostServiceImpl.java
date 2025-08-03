@@ -3,6 +3,8 @@ package com.example.PetApp.service.post.normal;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.post.NormalPost;
 import com.example.PetApp.domain.embedded.Content;
+import com.example.PetApp.domain.post.Post;
+import com.example.PetApp.dto.like.LikeCountDto;
 import com.example.PetApp.dto.post.CreatePostResponseDto;
 import com.example.PetApp.dto.post.PostDto;
 import com.example.PetApp.dto.post.GetPostResponseDto;
@@ -11,8 +13,8 @@ import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.mapper.PostMapper;
 import com.example.PetApp.query.QueryService;
 import com.example.PetApp.repository.jpa.LikeRepository;
-import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.NormalPostRepository;
+import com.example.PetApp.service.like.LikeService;
 import com.example.PetApp.util.imagefile.FileUploadUtil;
 import com.example.PetApp.util.imagefile.FileImageKind;
 import lombok.RequiredArgsConstructor;
@@ -25,19 +27,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NormalNormalPostServiceImpl implements NormalPostService {
+public class NormalPostServiceImpl implements NormalPostService {
 
     @Value("${spring.dog.post.image.upload}")
     private String postUploadDir;
 
-    private final QueryService queryService;
     private final NormalPostRepository normalPostRepository;
     private final LikeRepository likeRepository;
+    private final LikeService likeService;
+    private final QueryService queryService;
     private final RedisTemplate<String, Long> likeRedisTemplate;
 
     @Transactional(readOnly = true)
@@ -48,19 +52,7 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
         PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "postId"));
         List<NormalPost> normalPosts = normalPostRepository.findAll(pageRequest).getContent();
         Set<Long> members = likeRedisTemplate.opsForSet().members("member:likes:" + member.getMemberId());
-        return PostMapper.toPostListResponseDto(normalPosts, members);
-    }
-
-
-    @Transactional
-    @Override
-    public CreatePostResponseDto createPost(PostDto createPostDto, String email)  {
-        log.info("createPost 요청 email : {}", email);
-        Member member = queryService.findByMember(email);
-        String imageFileName = FileUploadUtil.fileUpload(createPostDto.getPostImageFile(), postUploadDir, FileImageKind.POST);
-        NormalPost normalPost = PostMapper.toEntity(createPostDto, imageFileName, member);
-        NormalPost savedPost = normalPostRepository.save(normalPost);
-        return new CreatePostResponseDto(savedPost.getPostId());
+        return PostMapper.toPostListResponseDto(normalPosts, likeService.getLikeCountMap(normalPosts),members);
     }
 
     @Transactional
@@ -74,6 +66,17 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
         }
 
         return PostMapper.toGetPostResponseDto(normalPost, member, likeRepository.countByPost(normalPost), likeRepository.existsByPostAndMember(normalPost, member));
+    }
+
+    @Transactional
+    @Override
+    public CreatePostResponseDto createPost(PostDto createPostDto, String email)  {
+        log.info("createPost 요청 email : {}", email);
+        Member member = queryService.findByMember(email);
+        String imageFileName = FileUploadUtil.fileUpload(createPostDto.getPostImageFile(), postUploadDir, FileImageKind.POST);
+        NormalPost normalPost = PostMapper.toEntity(createPostDto, imageFileName, member);
+        NormalPost savedPost = normalPostRepository.save(normalPost);
+        return new CreatePostResponseDto(savedPost.getPostId());
     }
 
     @Transactional
@@ -103,5 +106,6 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
         normalPost.setPostImageUrl(imageFileName);
         normalPost.setContent(new Content(updatePostDto.getTitle(), updatePostDto.getContent()));
     }
+
 }
 

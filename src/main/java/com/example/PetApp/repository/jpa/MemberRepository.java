@@ -20,8 +20,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(String email);
 
     Optional<Member> findByPhoneNumber(String phoneNumber);
-
-    @Query("select new com.example.PetApp.dto.like.LikeListDto(m.memberId, m.memberImageUrl, m.name) " +
-            "from Member m where m.memberId in :memberIds")
-    List<LikeListDto> findLikesMembers(@Param("memberIds") Collection<Long> memberIds);
 }

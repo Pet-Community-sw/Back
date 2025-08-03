@@ -11,6 +11,7 @@ import com.example.PetApp.util.TimeAgoUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RecommendRoutePostMapper {
@@ -24,7 +25,7 @@ public class RecommendRoutePostMapper {
 
     public static List<GetRecommendRoutePostsResponseDto> toRecommendRoutePostsList(List<RecommendRoutePost> recommendRoutePosts,
                                                                                     Map<Long, Long> likeCountMap,
-                                                                                    List<Long> likedRecommendPostIds,
+                                                                                    Set<Long> likedRecommendPostIds,
                                                                                     Member member) {
         return recommendRoutePosts.stream()
                 .map(recommendRoutePost -> GetRecommendRoutePostsResponseDto.builder()

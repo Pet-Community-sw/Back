@@ -3,24 +3,25 @@ package com.example.PetApp.service.post.recommend;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.post.RecommendRoutePost;
 import com.example.PetApp.domain.embedded.Content;
-import com.example.PetApp.dto.like.LikeCountDto;
 import com.example.PetApp.dto.recommendroutepost.*;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.RecommendRoutePostMapper;
+import com.example.PetApp.query.QueryService;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
+import com.example.PetApp.service.like.LikeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +31,15 @@ public class RecommendRoutePostServiceImpl implements RecommendRoutePostService{
     private final RecommendRoutePostRepository recommendRoutePostRepository;
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
+    private final LikeService likeService;
+    private final QueryService queryService;
+    private final RedisTemplate<String, Long> likeRedisTemplate;
 
     @Transactional
     @Override
     public CreateRecommendRoutePostResponseDto createRecommendRoutePost(CreateRecommendRoutePostDto createRecommendRoutePostDto, String email) {
         log.info("createRecommendRoutePost 요청 email : {}", email);
-        Member member = memberRepository.findByEmail(email).get();
+        Member member = queryService.findByMember(email);
         RecommendRoutePost recommendRoutePost = RecommendRoutePostMapper.toEntity(createRecommendRoutePostDto, member);
         RecommendRoutePost savedRecommendRoutePost = recommendRoutePostRepository.save(recommendRoutePost);
         return new CreateRecommendRoutePostResponseDto(savedRecommendRoutePost.getPostId());
@@ -45,44 +49,34 @@ public class RecommendRoutePostServiceImpl implements RecommendRoutePostService{
     @Override
     public List<GetRecommendRoutePostsResponseDto> getRecommendRoutePosts(Double minLongitude, Double minLatitude, Double maxLongitude, Double maxLatitude, int page, String email) {
         log.info("getRecommendRoutePostsByLocation 요청 email : {}", email);
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("해당 회원은 없습니다."));
+        Member member = queryService.findByMember(email);
         Pageable pageable = PageRequest.of(page, 10);
         List<RecommendRoutePost> recommendRoutePosts = recommendRoutePostRepository
                 .findByRecommendRoutePostByLocation(minLongitude - 0.01, minLatitude - 0.01, maxLongitude + 0.01, maxLatitude + 0.01, pageable)
                 .getContent();
-        return RecommendRoutePostMapper.toRecommendRoutePostsList(recommendRoutePosts,
-                getLikeCountMap(recommendRoutePosts),
-                likeRepository.findLikedPostIds(member, recommendRoutePosts),
-                member);
+        Set<Long> memberIds = likeRedisTemplate.opsForSet().members("member:likes:" + member.getMemberId());
+        return RecommendRoutePostMapper.toRecommendRoutePostsList(recommendRoutePosts, likeService.getLikeCountMap(recommendRoutePosts), memberIds, member);
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<GetRecommendRoutePostsResponseDto> getRecommendRoutePosts(Double longitude, Double latitude, int page, String email) {
         log.info("getRecommendRoutePostsByPlace 요청 email : {}", email);
-        Member member = memberRepository.findByEmail(email).get();
+        Member member = queryService.findByMember(email);
         Pageable pageable = PageRequest.of(page, 10);
         List<RecommendRoutePost> recommendRoutePosts = recommendRoutePostRepository.findByRecommendRoutePostByPlace(longitude, latitude, pageable).getContent();
 
-        return RecommendRoutePostMapper.toRecommendRoutePostsList(recommendRoutePosts,
-                getLikeCountMap(recommendRoutePosts),
-                likeRepository.findLikedRecommendIds(member, recommendRoutePosts),
-                member);
+        Set<Long> memberIds = likeRedisTemplate.opsForSet().members("member:likes:" + member.getMemberId());
+        return RecommendRoutePostMapper.toRecommendRoutePostsList(recommendRoutePosts, likeService.getLikeCountMap(recommendRoutePosts), memberIds, member);
     }
 
     @Transactional(readOnly = true)
     @Override
     public GetRecommendPostResponseDto getRecommendRoutePost(Long recommendRoutePostId, String email) {
         log.info("getRecommendRoutePost 요청 email : {}", email);
-        Member member = memberRepository.findByEmail(email).get();
-        RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(recommendRoutePostId)
-                .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시물은 없습니다."));
-        return RecommendRoutePostMapper.toGetRecommendPostResponseDto(member,
-                recommendRoutePost,
-                likeRepository.countByRecommendRoutePost(recommendRoutePost),
-                likeRepository.existsByRecommendRoutePostAndMember(recommendRoutePost, member)
-        );
-
+        Member member = queryService.findByMember(email);
+        RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(recommendRoutePostId).orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시물은 없습니다."));
+        return RecommendRoutePostMapper.toGetRecommendPostResponseDto(member, recommendRoutePost, likeRepository.countByPost(recommendRoutePost), likeRepository.existsByPostAndMember(recommendRoutePost, member));
     }
 
     @Transactional
@@ -109,14 +103,6 @@ public class RecommendRoutePostServiceImpl implements RecommendRoutePostService{
             throw new ForbiddenException("삭제 권한이 없습니다.");
         }
         recommendRoutePostRepository.deleteById(recommendRoutePostId);
-    }
-
-    public Map<Long, Long> getLikeCountMap(List<RecommendRoutePost> recommendRoutePosts) {
-        List<LikeCountDto> likeCountDtos = likeRepository.countByRecommendRoutePost(recommendRoutePosts);
-        return likeCountDtos.stream().collect(Collectors.toMap(
-                LikeCountDto::getPostId,
-                LikeCountDto::getLikeCount
-        ));
     }
 
 }

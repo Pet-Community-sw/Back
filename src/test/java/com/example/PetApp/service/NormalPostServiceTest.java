@@ -10,7 +10,7 @@ import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
-import com.example.PetApp.service.post.normal.NormalNormalPostServiceImpl;
+import com.example.PetApp.service.post.normal.NormalPostServiceImpl;
 import com.example.PetApp.util.Mapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 public class NormalPostServiceTest {
 
     @InjectMocks
-    private NormalNormalPostServiceImpl normalPostServiceImpl;
+    private NormalPostServiceImpl normalPostServiceImpl;
 
     @Mock
     private PostRepository postRepository;

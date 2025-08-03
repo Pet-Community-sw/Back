@@ -24,7 +24,7 @@ public class PostMapper {
                 .build();
     }
 
-    public static <T extends Post> List<PostResponseDto> toPostListResponseDto(List<T> posts, Collection<Long> likedPostIds) {
+    public static <T extends Post> List<PostResponseDto> toPostListResponseDto(List<T> posts, Map<Long, Long> likeCountMap, Collection<Long> likedPostIds) {
         return posts.stream()
                 .map(post -> PostResponseDto.builder()
                         .postId(post.getPostId())
@@ -34,7 +34,7 @@ public class PostMapper {
                         .memberImageUrl(post.getMember().getMemberImageUrl())
                         .createdAt(TimeAgoUtil.getTimeAgo(post.getCreatedAt()))
                         .viewCount(post.getViewCount())
-                        .likeCount((long) post.getLikes().size())//변환
+                        .likeCount(likeCountMap.getOrDefault(post.getPostId(), 0L))
                         .title(post.getContent().getTitle())
                         .like(likedPostIds.contains(post.getPostId()))
                         .build()
