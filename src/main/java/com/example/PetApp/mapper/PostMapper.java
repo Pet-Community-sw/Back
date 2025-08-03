@@ -26,7 +26,7 @@ public class PostMapper {
                 .build();
     }
 
-    public static List<PostResponseDto> toPostListResponseDto(List<Post> posts, Map<Long, Long> likeCountMap, Set<Long> likedPostIds) {
+    public static List<PostResponseDto> toPostListResponseDto(List<Post> posts, Set<Long> likedPostIds) {
         return posts.stream()
                 .map(post -> PostResponseDto.builder()
                         .postId(post.getPostId())

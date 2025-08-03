@@ -6,6 +6,7 @@ import com.example.PetApp.domain.like.Like;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -44,6 +45,7 @@ public abstract class Post extends BaseTimeEntity {
     private Member member;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 100)
     private List<Like> likes = new ArrayList<>();
 
 //    public abstract Like createLike(Member member);//게시글에서 Like생성 책임 위임

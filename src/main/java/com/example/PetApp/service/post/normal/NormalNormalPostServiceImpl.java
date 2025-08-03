@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -47,9 +46,9 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
         log.info("getPosts 요청 : {}", email);
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("해당 유저가 없습니다."));
         PageRequest pageRequest = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "postId"));
-        List<NormalPost> posts = normalPostRepository.findAll(pageRequest).getContent();
+        List<NormalPost> normalPosts = normalPostRepository.findAll(pageRequest).getContent();
 
-        return PostMapper.toPostListResponseDto(posts, getLikeCountMap(posts), getLikedPostIds(member, posts));
+        return PostMapper.toPostListResponseDto(normalPosts, getLikedPostIds(member, normalPosts));
     }
 
 
@@ -106,15 +105,6 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
 
         post.setPostImageUrl(imageFileName);
         post.setContent(new Content(updatePostDto.getTitle(), updatePostDto.getContent()));
-    }
-
-    private  Map<Long, Long> getLikeCountMap(List<Post> posts) {
-        List<LikeCountDto> likeCountDtos = likeRepository.countByPosts(posts);
-        return likeCountDtos.stream()
-                .collect(Collectors.toMap(
-                        LikeCountDto::getPostId,
-                        LikeCountDto::getLikeCount
-                ));
     }
 
     private Set<Long> getLikedPostIds(Member member, List<Post> posts) {
