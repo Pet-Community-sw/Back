@@ -62,6 +62,7 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
         String imageFileName = FileUploadUtil.fileUpload(createPostDto.getPostImageFile(), postUploadDir, FileImageKind.POST);
         NormalPost normalPost = PostMapper.toEntity(createPostDto, imageFileName, member);
         NormalPost savedPost = normalPostRepository.save(normalPost);
+        likeRedisTemplate.opsForSet().add("member:likes:" + savedPost.getPostId(), -1L);
         return new CreatePostResponseDto(savedPost.getPostId());
     }
 
@@ -90,6 +91,7 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
             throw new ForbiddenException("삭제 권한이 없습니다.");
         }
         normalPostRepository.deleteById(postId);
+        likeRedisTemplate.opsForSet().remove("member:likes:" + postId);
     }
 
     @Transactional
