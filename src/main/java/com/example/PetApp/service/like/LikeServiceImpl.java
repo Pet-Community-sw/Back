@@ -36,14 +36,8 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public LikeResponseDto getLikes(Long postId) {
         log.info("getLikes 요청 postId : {}", postId);
-        Set<Long> memberIds = likeRedisTemplate.opsForSet().members("post:likes:" + postId);
-        if (memberIds == null) {
-            throw new NotFoundException("해당 게시물은 없습니다.");
-        } else if (memberIds.size() == 1) {
-            return LikeMapper.toLikeResponseDto(Collections.emptyList());
-        }
-        List<LikeListDto> likesMembers = memberRepository.findLikesMembers(memberIds);
-        return LikeMapper.toLikeResponseDto(likesMembers);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
+        return LikeMapper.toLikeResponseDto(post.getLikes());
     }
 
     @Transactional
@@ -65,7 +59,7 @@ public class LikeServiceImpl implements LikeService {
     private ResponseEntity<String> deleteLike(Like like) {
         log.info("좋아요 삭제");
         likeRepository.delete(like);
-        likeRedisTemplate.opsForSet().remove("post:likes:" + like.getPost().getPostId(), like.getMember().getMemberId());
+        likeRedisTemplate.opsForSet().remove("post:likes:" + like.getMember().getMemberId(), like.getPost().getPostId());
         return ResponseEntity.ok("좋아요 삭제했습니다.");
     }
 
@@ -74,7 +68,7 @@ public class LikeServiceImpl implements LikeService {
         Like like = LikeMapper.toEntity(member, post);
         post.getLikes().add(like);
         likeRepository.save(like);
-        likeRedisTemplate.opsForSet().add("post:likes:" + post.getPostId(), member.getMemberId());
+        likeRedisTemplate.opsForSet().add("post:likes:" + member.getMemberId(), post.getPostId());
 
         sendNotification(post, member);
 
