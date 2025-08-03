@@ -3,6 +3,7 @@ package com.example.PetApp.service.like;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.like.Like;
 import com.example.PetApp.domain.post.Post;
+import com.example.PetApp.dto.like.LikeListDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.LikeMapper;
@@ -16,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.*;
 
 
 @Slf4j
@@ -35,9 +36,14 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public LikeResponseDto getLikes(Long postId) {
         log.info("getLikes 요청 postId : {}", postId);
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
-        return LikeMapper.toLikeResponseDto(post.getLikes());
+        Set<Long> memberIds = likeRedisTemplate.opsForSet().members("post:likes:" + postId);
+        if (memberIds == null) {
+            throw new NotFoundException("해당 게시물은 없습니다.");
+        } else if (memberIds.size() == 1) {
+            return LikeMapper.toLikeResponseDto(Collections.emptyList());
+        }
+        List<LikeListDto> likesMembers = memberRepository.findLikesMembers(memberIds);
+        return LikeMapper.toLikeResponseDto(likesMembers);
     }
 
     @Transactional
@@ -59,7 +65,7 @@ public class LikeServiceImpl implements LikeService {
     private ResponseEntity<String> deleteLike(Like like) {
         log.info("좋아요 삭제");
         likeRepository.delete(like);
-        likeRedisTemplate.opsForSet().remove("member:likes:" + like.getMember(), like.getPost().getPostId());
+        likeRedisTemplate.opsForSet().remove("post:likes:" + like.getPost().getPostId(), like.getMember().getMemberId());
         return ResponseEntity.ok("좋아요 삭제했습니다.");
     }
 
@@ -68,7 +74,7 @@ public class LikeServiceImpl implements LikeService {
         Like like = LikeMapper.toEntity(member, post);
         post.getLikes().add(like);
         likeRepository.save(like);
-        likeRedisTemplate.opsForSet().add("member:likes:" + member.getMemberId(), post.getPostId());
+        likeRedisTemplate.opsForSet().add("post:likes:" + post.getPostId(), member.getMemberId());
 
         sendNotification(post, member);
 

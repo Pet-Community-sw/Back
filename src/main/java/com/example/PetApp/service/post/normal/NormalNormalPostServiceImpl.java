@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ public class NormalNormalPostServiceImpl implements NormalPostService {
     private final NormalPostRepository normalPostRepository;
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
+    private final RedisTemplate<String, Long> likeRedisTemplate;
 
     @Transactional(readOnly = true)
     @Override
