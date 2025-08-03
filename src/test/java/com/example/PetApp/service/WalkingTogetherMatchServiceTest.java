@@ -2,6 +2,7 @@ package com.example.PetApp.service;
 
 import com.example.PetApp.domain.*;
 import com.example.PetApp.domain.embedded.Content;
+import com.example.PetApp.domain.post.RecommendRoutePost;
 import com.example.PetApp.dto.chatroom.CreateChatRoomResponseDto;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostDto;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostResponseDto;

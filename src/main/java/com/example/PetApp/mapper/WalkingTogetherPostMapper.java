@@ -2,7 +2,7 @@ package com.example.PetApp.mapper;
 
 import com.example.PetApp.domain.PetBreed;
 import com.example.PetApp.domain.Profile;
-import com.example.PetApp.domain.RecommendRoutePost;
+import com.example.PetApp.domain.post.RecommendRoutePost;
 import com.example.PetApp.domain.WalkingTogetherMatch;
 import com.example.PetApp.dto.walkingtogetherpost.CreateWalkingTogetherPostDto;
 import com.example.PetApp.dto.walkingtogetherpost.GetWalkingTogetherPostResponseDto;

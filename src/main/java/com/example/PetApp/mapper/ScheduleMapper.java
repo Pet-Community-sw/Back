@@ -1,6 +1,6 @@
 package com.example.PetApp.mapper;
 
-import com.example.PetApp.domain.DelegateWalkPost;
+import com.example.PetApp.domain.post.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.WalkingTogetherMatch;

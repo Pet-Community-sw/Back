@@ -1,6 +1,6 @@
 package com.example.PetApp.service.schedule;
 
-import com.example.PetApp.domain.DelegateWalkPost;
+import com.example.PetApp.domain.post.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.WalkingTogetherMatch;
@@ -30,11 +30,8 @@ import java.util.stream.Collectors;
 public class ScheduleServiceImpl implements ScheduleService {
 
     private final ProfileRepository profileRepository;
-
     private final MemberRepository memberRepository;
-
     private final WalkingTogetherPostRepository walkingTogetherPostRepository;
-
     private final DelegateWalkPostRepository delegateWalkPostRepository;
 
     @Transactional(readOnly = true)
@@ -50,7 +47,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                     walkingTogetherPostRepository.findAllByProfileContainsAndScheduledTimeBetween(profile.get(), timeDto.getStart(), timeDto.getEnd());
             List<GetSchedulesResponseDto> list = walkingTogetherMatchList.stream()
                     .map(walkingTogetherPost -> ScheduleMapper.toGetSchedulesResponseDto(profile.get(), walkingTogetherPost)
-            ).collect(Collectors.toList());
+            ).toList();
             getSchedulesResponseDtos.addAll(list);
 
         }
@@ -61,7 +58,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         List<GetSchedulesResponseDto> list = delegateWalkPostList.stream()
                 .map(delegateWalkPost -> ScheduleMapper.toGetSchedulesResponseDto(member, delegateWalkPost)
-                ).collect(Collectors.toList());
+                ).toList();
         getSchedulesResponseDtos.addAll(list);
 
         return getSchedulesResponseDtos;

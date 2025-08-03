@@ -11,9 +11,7 @@ import com.example.PetApp.dto.post.PostDto;
 import com.example.PetApp.dto.post.PostResponseDto;
 import com.example.PetApp.util.TimeAgoUtil;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PostMapper {
@@ -26,7 +24,7 @@ public class PostMapper {
                 .build();
     }
 
-    public static List<PostResponseDto> toPostListResponseDto(List<Post> posts, Set<Long> likedPostIds) {
+    public static <T extends Post> List<PostResponseDto> toPostListResponseDto(List<T> posts, Collection<Long> likedPostIds) {
         return posts.stream()
                 .map(post -> PostResponseDto.builder()
                         .postId(post.getPostId())
