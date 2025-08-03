@@ -12,6 +12,8 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -52,6 +54,16 @@ public class RedisConfig {
         locationRedisTemplate.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
         return locationRedisTemplate;
     }
+
+    @Bean
+    public RedisTemplate<String, Long> likeRedisTemplate() {
+        RedisTemplate<String, Long> likeRedisTemplate = new RedisTemplate<>();
+        likeRedisTemplate.setConnectionFactory(redisConnectionFactory());
+        likeRedisTemplate.setKeySerializer(new StringRedisSerializer());
+        likeRedisTemplate.setValueSerializer(new GenericToStringSerializer<>(Long.class));
+        return likeRedisTemplate;
+    }
+
     @Bean
     public ChannelTopic chatRoomChannelTopic() {
         return new ChannelTopic("chatRoom");//나중에 chatRoomId로 바꿔보자.

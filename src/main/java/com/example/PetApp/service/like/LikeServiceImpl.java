@@ -10,6 +10,7 @@ import com.example.PetApp.repository.jpa.*;
 import com.example.PetApp.util.SendNotificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,10 +23,12 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor//like를 superclass로 둠으로써 likeId 겹칠일이없음. 코드 100줄이상 줄임. ㄷㄷ
 public class LikeServiceImpl implements LikeService {
+
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
     private final SendNotificationUtil sendNotificationUtil;
+    private final RedisTemplate<String, Long> likeRedisTemplate;
 
 
     @Transactional(readOnly = true)
@@ -56,17 +59,16 @@ public class LikeServiceImpl implements LikeService {
     private ResponseEntity<String> deleteLike(Like like) {
         log.info("좋아요 삭제");
         likeRepository.delete(like);
+        likeRedisTemplate.opsForSet().remove("member:likes:" + like.getMember(), like.getPost().getPostId());
         return ResponseEntity.ok("좋아요 삭제했습니다.");
     }
 
     private ResponseEntity<String> createLike(Post post, Member member) {
         log.info("좋아요 생성");
-        Like like = Like.builder()
-                .member(member)
-                .post(post)
-                .build();
+        Like like = LikeMapper.toEntity(member, post);
         post.getLikes().add(like);
         likeRepository.save(like);
+        likeRedisTemplate.opsForSet().add("member:likes:" + member.getMemberId(), post.getPostId());
 
         sendNotification(post, member);
 

@@ -1,6 +1,8 @@
 package com.example.PetApp.mapper;
 
+import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.like.Like;
+import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.dto.like.LikeListDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
 
@@ -8,6 +10,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LikeMapper {
+
+    public static Like toEntity(Member member, Post post) {
+        return Like.builder()
+                .member(member)
+                .post(post)
+                .build();
+    }
+
     public static List<LikeListDto> toLikeListDto(List<Like> likes) {
         return likes.stream()
                 .map(like -> LikeListDto.builder()
