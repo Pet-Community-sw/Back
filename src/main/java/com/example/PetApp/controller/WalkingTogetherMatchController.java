@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/walking-together-posts")
-public class WalkingTogetherPostController {
+public class WalkingTogetherMatchController {
 
     private final WalkingTogetherPostService walkingTogetherPostService;
 

@@ -32,7 +32,7 @@ public class ChatRoom extends BaseTimeEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "walking_together_post_id")
-    private WalkingTogetherMatch walkingTogetherMatch;
+    private WalkingTogetherPost walkingTogetherPost;
 
     @Setter
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})

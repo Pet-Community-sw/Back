@@ -3,7 +3,7 @@ package com.example.PetApp.mapper;
 import com.example.PetApp.domain.ChatMessage;
 import com.example.PetApp.domain.ChatRoom;
 import com.example.PetApp.domain.Profile;
-import com.example.PetApp.domain.WalkingTogetherMatch;
+import com.example.PetApp.domain.WalkingTogetherPost;
 import com.example.PetApp.dto.groupchat.ChatMessageDto;
 import com.example.PetApp.dto.groupchat.ChatRoomsResponseDto;
 import com.example.PetApp.dto.groupchat.UpdateChatUnReadCountDto;
@@ -15,14 +15,14 @@ import java.util.stream.Collectors;
 
 public class ChatRoomMapper {
 
-    public static ChatRoom toEntity(WalkingTogetherMatch walkingTogetherMatch, Profile profile) {
+    public static ChatRoom toEntity(WalkingTogetherPost walkingTogetherPost, Profile profile) {
         ChatRoom chatRoom = ChatRoom.builder()
-                .name(walkingTogetherMatch.getProfile().getPetName()+"님의 방")
-                .limitCount(walkingTogetherMatch.getLimitCount())//나중에 게시물에서 인원 수를 고정.
-                .walkingTogetherMatch(walkingTogetherMatch)
+                .name(walkingTogetherPost.getProfile().getPetName()+"님의 방")
+                .limitCount(walkingTogetherPost.getLimitCount())//나중에 게시물에서 인원 수를 고정.
+                .walkingTogetherPost(walkingTogetherPost)
                 //이게 수정에서 가능하려나?
                 .build();
-        chatRoom.addProfiles(walkingTogetherMatch.getProfile());//글 작성자.
+        chatRoom.addProfiles(walkingTogetherPost.getProfile());//글 작성자.
         chatRoom.addProfiles(profile);//신청하는사람.
         return chatRoom;
     }
@@ -45,7 +45,7 @@ public class ChatRoomMapper {
                 .lastMessage(lastMessage)
                 .unReadCount(unReadCount)
                 .lastMessageTime(lastMessageTime)
-                .isOwner(chatRoom.getWalkingTogetherMatch().getProfile().getProfileId().equals(profileId))
+                .isOwner(chatRoom.getWalkingTogetherPost().getProfile().getProfileId().equals(profileId))
                 .build();
     }
 

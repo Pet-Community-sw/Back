@@ -4,7 +4,7 @@ package com.example.PetApp.service;
 import com.example.PetApp.domain.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
-import com.example.PetApp.domain.WalkingTogetherMatch;
+import com.example.PetApp.domain.WalkingTogetherPost;
 import com.example.PetApp.dto.schedule.GetSchedulesResponseDto;
 import com.example.PetApp.dto.schedule.ScheduleType;
 import com.example.PetApp.repository.jpa.DelegateWalkPostRepository;
@@ -55,7 +55,7 @@ public class ScheduleServiceTest {
         Member member = Member.builder().memberId(10L).email("test").build();
         Profile profile = Profile.builder().profileId(profileId).member(member).build();
 
-        WalkingTogetherMatch walkPost = WalkingTogetherMatch.builder()
+        WalkingTogetherPost walkPost = WalkingTogetherPost.builder()
                 .scheduledTime(LocalDateTime.of(2025, 6, 10, 18, 0))
                 .build();
 

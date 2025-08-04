@@ -44,3 +44,4 @@ public class Comment extends BaseTimeEntity {
     private Member member;
 
 }
+

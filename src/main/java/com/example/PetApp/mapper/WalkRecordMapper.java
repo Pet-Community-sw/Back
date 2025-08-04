@@ -1,8 +1,8 @@
 package com.example.PetApp.mapper;
 
-import com.example.PetApp.domain.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.WalkRecord;
+import com.example.PetApp.domain.post.DelegateWalkPost;
 import com.example.PetApp.dto.walkrecord.GetWalkRecordResponseDto;
 import com.example.PetApp.util.CreatedAtUtil;
 

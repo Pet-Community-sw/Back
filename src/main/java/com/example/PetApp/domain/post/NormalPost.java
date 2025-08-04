@@ -10,6 +10,7 @@ import java.util.List;
 
 @Entity
 @DiscriminatorValue("NORMAL")
+@PrimaryKeyJoinColumn(name = "post_id")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

@@ -1,10 +1,10 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.post.DelegateWalkPost;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

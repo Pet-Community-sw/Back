@@ -3,7 +3,7 @@ package com.example.PetApp.service.schedule;
 import com.example.PetApp.domain.post.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
-import com.example.PetApp.domain.WalkingTogetherMatch;
+import com.example.PetApp.domain.WalkingTogetherPost;
 import com.example.PetApp.dto.schedule.GetSchedulesResponseDto;
 import com.example.PetApp.dto.schedule.TimeDto;
 import com.example.PetApp.mapper.ScheduleMapper;
@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -43,9 +42,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         Optional<Profile> profile = profileRepository.findById(profileId);
 
         if (profile.isPresent()) {
-            List<WalkingTogetherMatch> walkingTogetherMatchList =
+            List<WalkingTogetherPost> walkingTogetherPostList =
                     walkingTogetherPostRepository.findAllByProfileContainsAndScheduledTimeBetween(profile.get(), timeDto.getStart(), timeDto.getEnd());
-            List<GetSchedulesResponseDto> list = walkingTogetherMatchList.stream()
+            List<GetSchedulesResponseDto> list = walkingTogetherPostList.stream()
                     .map(walkingTogetherPost -> ScheduleMapper.toGetSchedulesResponseDto(profile.get(), walkingTogetherPost)
             ).toList();
             getSchedulesResponseDtos.addAll(list);

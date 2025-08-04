@@ -1,7 +1,7 @@
 package com.example.PetApp.domain.post;
 
 import com.example.PetApp.domain.Comment;
-import com.example.PetApp.domain.WalkingTogetherMatch;
+import com.example.PetApp.domain.WalkingTogetherPost;
 import com.example.PetApp.domain.embedded.Location;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -11,6 +11,7 @@ import java.util.List;
 
 @Entity
 @DiscriminatorValue("RECOMMEND")
+@PrimaryKeyJoinColumn(name = "post_id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
@@ -21,9 +22,9 @@ public class RecommendRoutePost extends Post implements Commentable{
     private Location location;
 
     @OneToMany(mappedBy = "recommendRoutePost",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WalkingTogetherMatch> walkingTogetherMatch;
+    private List<WalkingTogetherPost> walkingTogetherPosts;
 
-    @OneToMany(mappedBy = "recommendRoutePost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
 
     @Override

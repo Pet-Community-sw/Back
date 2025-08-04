@@ -50,14 +50,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Transactional
     @Override
-    public CreateChatRoomResponseDto createChatRoom(WalkingTogetherMatch walkingTogetherMatch, Profile profile) {
-        Optional<ChatRoom> chatRoom1 = chatRoomRepository.findByWalkingTogetherPost(walkingTogetherMatch);
+    public CreateChatRoomResponseDto createChatRoom(WalkingTogetherPost walkingTogetherPost, Profile profile) {
+        Optional<ChatRoom> chatRoom1 = chatRoomRepository.findByWalkingTogetherPost(walkingTogetherPost);
         if (chatRoom1.isEmpty()) {//채팅방이 없으면 새로운생성 있으면 profiles에 신청자 Profile 추가
-            ChatRoom chatRoom = ChatRoomMapper.toEntity(walkingTogetherMatch, profile);
+            ChatRoom chatRoom = ChatRoomMapper.toEntity(walkingTogetherPost, profile);
             ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
             return new CreateChatRoomResponseDto(savedChatRoom.getChatRoomId(), true);
         } else {
-            if (walkingTogetherMatch.getLimitCount() <= chatRoom1.get().getProfiles().size()) {
+            if (walkingTogetherPost.getLimitCount() <= chatRoom1.get().getProfiles().size()) {
                 throw new ConflictException("인원초과");//채팅방 limitCount설정.
             }
             ChatRoom chatRoom = chatRoom1.get();
@@ -104,7 +104,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .orElseThrow(() -> new NotFoundException("해당 채팅방은 없습니다."));
         Profile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new ForbiddenException("프로필 등록해주세요."));
-        if (!(chatRoom.getWalkingTogetherMatch().getProfile().getProfileId().equals(profile.getProfileId()))) {
+        if (!(chatRoom.getWalkingTogetherPost().getProfile().getProfileId().equals(profile.getProfileId()))) {
             throw new ForbiddenException("수정 권한이 없습니다.");
         }
         chatRoom.setName(updateChatRoomDto.getChatRoomName());

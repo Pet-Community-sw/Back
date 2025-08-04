@@ -1,6 +1,6 @@
 package com.example.PetApp.service.chatroom;
 
-import com.example.PetApp.domain.WalkingTogetherMatch;
+import com.example.PetApp.domain.WalkingTogetherPost;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.chatroom.CreateChatRoomResponseDto;
 import com.example.PetApp.dto.groupchat.ChatMessageResponseDto;
@@ -15,7 +15,7 @@ public interface ChatRoomService {
 
     List<ChatRoomsResponseDto> getChatRooms(Long profileId);
 
-    CreateChatRoomResponseDto createChatRoom(WalkingTogetherMatch walkingTogetherMatch, Profile profile);
+    CreateChatRoomResponseDto createChatRoom(WalkingTogetherPost walkingTogetherPost, Profile profile);
 
     void updateChatRoom(Long chatRoomId, UpdateChatRoomDto updateChatRoomDto, Long profileId);
 

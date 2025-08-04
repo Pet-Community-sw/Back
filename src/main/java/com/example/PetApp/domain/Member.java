@@ -1,5 +1,6 @@
 package com.example.PetApp.domain;
 
+import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.domain.superclass.BaseTimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -62,10 +63,6 @@ public class Member extends BaseTimeEntity {//수정 필요
     @Builder.Default
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts=new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RecommendRoutePost> recommendRoutePosts=new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "member",cascade = CascadeType.ALL, orphanRemoval = true)

@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class WalkingTogetherMatchServiceTest {
+public class WalkingTogetherPostServiceTest {
     @InjectMocks
     private WalkingTogetherPostServiceImpl walkingTogetherPostServiceImpl;
     @Mock
@@ -81,7 +81,7 @@ public class WalkingTogetherMatchServiceTest {
                 .avoidBreeds(Set.of(petBreed))
                 .build();
 
-        WalkingTogetherMatch walkingTogetherMatch = WalkingTogetherMatch.builder()
+        WalkingTogetherPost walkingTogetherPost = WalkingTogetherPost.builder()
                 .walkingTogetherPostId(1L)
                 .profile(profile)
                 .scheduledTime(LocalDateTime.now())
@@ -90,10 +90,10 @@ public class WalkingTogetherMatchServiceTest {
                 .avoidBreeds(Set.of(1L))
                 .build();
 
-        ReflectionTestUtils.setField(walkingTogetherMatch, "createdAt", LocalDateTime.now());
+        ReflectionTestUtils.setField(walkingTogetherPost, "createdAt", LocalDateTime.now());
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
-        when(walkingTogetherPostRepository.findById(walkingTogetherPostId)).thenReturn(Optional.of(walkingTogetherMatch));
+        when(walkingTogetherPostRepository.findById(walkingTogetherPostId)).thenReturn(Optional.of(walkingTogetherPost));
         when(petBreedRepository.findByName(any())).thenReturn(Optional.of(petBreed));
 
 
@@ -156,7 +156,7 @@ public class WalkingTogetherMatchServiceTest {
                 .name("푸들")
                 .build();
 
-        WalkingTogetherMatch post1 = WalkingTogetherMatch.builder()
+        WalkingTogetherPost post1 = WalkingTogetherPost.builder()
                 .walkingTogetherPostId(101L)
                 .profile(profile)
                 .recommendRoutePost(recommendRoutePost)
@@ -164,7 +164,7 @@ public class WalkingTogetherMatchServiceTest {
                 .build();
         ReflectionTestUtils.setField(post1, "createdAt", LocalDateTime.now());
 
-        WalkingTogetherMatch post2 = WalkingTogetherMatch.builder()
+        WalkingTogetherPost post2 = WalkingTogetherPost.builder()
                 .walkingTogetherPostId(102L)
                 .profile(profile)
                 .recommendRoutePost(recommendRoutePost)
@@ -172,7 +172,7 @@ public class WalkingTogetherMatchServiceTest {
                 .build();
         ReflectionTestUtils.setField(post2, "createdAt", LocalDateTime.now());
 
-        List<WalkingTogetherMatch> postList = List.of(post1, post2);
+        List<WalkingTogetherPost> postList = List.of(post1, post2);
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
@@ -231,7 +231,7 @@ public class WalkingTogetherMatchServiceTest {
         Long recommendRoutePostId = 2L;
 
         CreateWalkingTogetherPostDto dto = CreateWalkingTogetherPostDto.builder()
-                .recommendRoutePostId(recommendRoutePostId)
+                .recommendRouteMatchId(recommendRoutePostId)
                 .scheduledTime(LocalDateTime.now().plusDays(1))
                 .limitCount(3)
                 .build();
@@ -243,7 +243,7 @@ public class WalkingTogetherMatchServiceTest {
 
         when(recommendRoutePostRepository.findById(recommendRoutePostId)).thenReturn(Optional.of(recommendRoutePost));
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
-        when(walkingTogetherPostRepository.save(any(WalkingTogetherMatch.class))).thenReturn(WalkingTogetherMatch.builder().walkingTogetherPostId(100L).build());
+        when(walkingTogetherPostRepository.save(any(WalkingTogetherPost.class))).thenReturn(WalkingTogetherPost.builder().walkingTogetherPostId(100L).build());
 //        when(walkingTogetherPostRepository.save(any(WalkingTogetherPost.class))).thenAnswer(invocation -> {
 //            WalkingTogetherPost walkingTogetherPost = invocation.getArgument(0);
 //            return walkingTogetherPost.toBuilder().walkingTogetherPostId(100L).build();
@@ -259,7 +259,7 @@ public class WalkingTogetherMatchServiceTest {
 
         verify(recommendRoutePostRepository).findById(recommendRoutePostId);
         verify(profileRepository).findById(profileId);
-        verify(walkingTogetherPostRepository).save(any(WalkingTogetherMatch.class));
+        verify(walkingTogetherPostRepository).save(any(WalkingTogetherPost.class));
     }
 
     @Test
@@ -286,7 +286,7 @@ public class WalkingTogetherMatchServiceTest {
                 .profileId(1L)
                 .build();
 
-        CreateWalkingTogetherPostDto createWalkingTogetherPostDto=CreateWalkingTogetherPostDto.builder()
+        CreateWalkingTogetherPostDto createWalkingTogetherPostDto = CreateWalkingTogetherPostDto.builder()
                 .recommendRoutePostId(1L)
                 .build();
 
@@ -307,7 +307,7 @@ public class WalkingTogetherMatchServiceTest {
         Long walkingTogetherPostId = 1L;
         Long profileId = 2L;
 
-        WalkingTogetherMatch post = WalkingTogetherMatch.builder()
+        WalkingTogetherPost post = WalkingTogetherPost.builder()
                 .walkingTogetherPostId(walkingTogetherPostId)
                 .profiles(new HashSet<>()) // 아직 매칭 안 된 상태
                 .avoidBreeds(new HashSet<>()) // 피해야 할 종 없음
@@ -375,7 +375,7 @@ public class WalkingTogetherMatchServiceTest {
         Set<Long> profiles = new HashSet<>();
         profiles.add(profileId);
 
-        WalkingTogetherMatch post = WalkingTogetherMatch.builder()
+        WalkingTogetherPost post = WalkingTogetherPost.builder()
                 .profiles(profiles)
                 .build();
 
@@ -396,7 +396,7 @@ public class WalkingTogetherMatchServiceTest {
         Long walkingTogetherPostId = 1L;
         Long profileId = 2L;
 
-        WalkingTogetherMatch post = WalkingTogetherMatch.builder()
+        WalkingTogetherPost post = WalkingTogetherPost.builder()
                 .profiles(new HashSet<>())
                 .avoidBreeds(new HashSet<>())
                 .build();
@@ -425,7 +425,7 @@ public class WalkingTogetherMatchServiceTest {
                 .name("도베르만")
                 .build();
 
-        WalkingTogetherMatch post = WalkingTogetherMatch.builder()
+        WalkingTogetherPost post = WalkingTogetherPost.builder()
                 .profiles(new HashSet<>())
                 .avoidBreeds(profiles) // 피해야 할 종에 포함됨
                 .build();

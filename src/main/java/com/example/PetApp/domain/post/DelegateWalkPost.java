@@ -16,6 +16,7 @@ import java.util.Set;
 
 @Entity
 @DiscriminatorValue("DELEGATE")
+@PrimaryKeyJoinColumn(name = "post_id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @SuperBuilder

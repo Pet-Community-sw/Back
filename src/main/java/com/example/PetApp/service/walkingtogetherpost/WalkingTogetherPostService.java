@@ -12,7 +12,6 @@ import java.util.List;
 @Service
 public interface WalkingTogetherPostService {
 
-
     CreateWalkingTogetherPostResponseDto createWalkingTogetherPost(CreateWalkingTogetherPostDto createWalkingTogetherPostDto, Long profileId);
 
     void deleteWalkingTogetherPost(Long walkingTogetherPostId, Long profileId);
@@ -23,5 +22,5 @@ public interface WalkingTogetherPostService {
 
     CreateChatRoomResponseDto startMatch(Long walkingTogetherPostId, Long profileId);
 
-    List<GetWalkingTogetherPostResponseDto> getWalkingTogetherPosts(Long recommendRoutePostId, Long profileId);
+    List<GetWalkingTogetherPostResponseDto> getWalkingTogetherPosts(Long walkingTogetherPostId, Long profileId);
 }
