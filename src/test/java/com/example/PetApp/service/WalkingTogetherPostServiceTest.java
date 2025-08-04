@@ -146,7 +146,7 @@ public class WalkingTogetherPostServiceTest {
         Long recommendRoutePostId = 2L;
 
         RecommendRoutePost recommendRoutePost = RecommendRoutePost.builder()
-                .recommendRouteId(recommendRoutePostId)
+                .postId(recommendRoutePostId)
                 .member(Member.builder().memberId(1L).build())
                 .content(new Content("산책길추천 1", "좋은 산책길"))
                 .build();
@@ -231,13 +231,13 @@ public class WalkingTogetherPostServiceTest {
         Long recommendRoutePostId = 2L;
 
         CreateWalkingTogetherPostDto dto = CreateWalkingTogetherPostDto.builder()
-                .recommendRouteMatchId(recommendRoutePostId)
+                .recommendRoutePostId(recommendRoutePostId)
                 .scheduledTime(LocalDateTime.now().plusDays(1))
                 .limitCount(3)
                 .build();
 
         RecommendRoutePost recommendRoutePost = RecommendRoutePost.builder()
-                .recommendRouteId(recommendRoutePostId)
+                .postId(recommendRoutePostId)
                 .content(new Content("산책길추천 1", "좋은 산책길"))
                 .build();
 

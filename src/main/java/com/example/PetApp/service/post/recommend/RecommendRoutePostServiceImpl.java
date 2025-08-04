@@ -51,10 +51,10 @@ public class RecommendRoutePostServiceImpl implements RecommendRoutePostService{
         log.info("getRecommendRoutePostsByLocation 요청 email : {}", email);
         Member member = queryService.findByMember(email);
         Pageable pageable = PageRequest.of(page, 10);
+        Set<Long> memberIds = likeRedisTemplate.opsForSet().members("member:likes:" + member.getMemberId());
         List<RecommendRoutePost> recommendRoutePosts = recommendRoutePostRepository
                 .findByRecommendRoutePostByLocation(minLongitude - 0.01, minLatitude - 0.01, maxLongitude + 0.01, maxLatitude + 0.01, pageable)
                 .getContent();
-        Set<Long> memberIds = likeRedisTemplate.opsForSet().members("member:likes:" + member.getMemberId());
         return RecommendRoutePostMapper.toRecommendRoutePostsList(recommendRoutePosts, likeService.getLikeCountMap(recommendRoutePosts), memberIds, member);
     }
 
@@ -64,9 +64,9 @@ public class RecommendRoutePostServiceImpl implements RecommendRoutePostService{
         log.info("getRecommendRoutePostsByPlace 요청 email : {}", email);
         Member member = queryService.findByMember(email);
         Pageable pageable = PageRequest.of(page, 10);
+        Set<Long> memberIds = likeRedisTemplate.opsForSet().members("member:likes:" + member.getMemberId());
         List<RecommendRoutePost> recommendRoutePosts = recommendRoutePostRepository.findByRecommendRoutePostByPlace(longitude, latitude, pageable).getContent();
 
-        Set<Long> memberIds = likeRedisTemplate.opsForSet().members("member:likes:" + member.getMemberId());
         return RecommendRoutePostMapper.toRecommendRoutePostsList(recommendRoutePosts, likeService.getLikeCountMap(recommendRoutePosts), memberIds, member);
     }
 

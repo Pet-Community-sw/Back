@@ -2,6 +2,7 @@ package com.example.PetApp.service;
 
 import com.example.PetApp.domain.*;
 import com.example.PetApp.domain.embedded.Content;
+import com.example.PetApp.domain.post.DelegateWalkPost;
 import com.example.PetApp.dto.review.*;
 import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.ForbiddenException;

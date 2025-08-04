@@ -5,10 +5,8 @@ import com.example.PetApp.domain.post.NormalPost;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.NormalPostRepository;
-import com.example.PetApp.repository.jpa.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 @Component
 @RequiredArgsConstructor
