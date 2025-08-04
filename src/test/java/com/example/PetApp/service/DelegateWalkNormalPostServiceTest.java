@@ -1,11 +1,12 @@
 package com.example.PetApp.service;
 
 import com.example.PetApp.domain.embedded.Applicant;
-import com.example.PetApp.domain.DelegateWalkPost;
+import com.example.PetApp.domain.post.DelegateWalkPost;
 import com.example.PetApp.domain.Member;
 import com.example.PetApp.domain.Profile;
 import com.example.PetApp.domain.embedded.Location;
 import com.example.PetApp.domain.embedded.Content;
+import com.example.PetApp.domain.post.DelegateWalkStatus;
 import com.example.PetApp.dto.delegateWalkpost.*;
 import com.example.PetApp.dto.memberchat.CreateMemberChatRoomResponseDto;
 import com.example.PetApp.exception.ConflictException;
@@ -78,7 +79,7 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         when(profileRepository.findById(profileId)).thenReturn(Optional.of(profile));
-        when(delegateWalkPostRepository.save(any(DelegateWalkPost.class))).thenReturn(DelegateWalkPost.builder().delegateWalkPostId(1L).build());
+        when(delegateWalkPostRepository.save(any(DelegateWalkPost.class))).thenReturn(DelegateWalkPost.builder().postId(1L).build());
 //        when(delegateWalkPostRepository.save(any(DelegateWalkPost.class))).thenAnswer(invocation -> {
 //            DelegateWalkPost delegateWalkPost = invocation.getArgument(0);
 //            return delegateWalkPost.toBuilder().delegateWalkPostId(1L).build();
@@ -124,7 +125,7 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         DelegateWalkPost post1 = DelegateWalkPost.builder()
-                .delegateWalkPostId(1L)
+                .postId(1L)
                 .content(new Content("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
@@ -134,7 +135,7 @@ DelegateWalkNormalPostServiceTest {
 
 
         DelegateWalkPost post2 = DelegateWalkPost.builder()
-                .delegateWalkPostId(2L)
+                .postId(2L)
                 .content(new Content("산책 대행 2", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
@@ -181,7 +182,7 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         DelegateWalkPost post1 = DelegateWalkPost.builder()
-                .delegateWalkPostId(1L)
+                .postId(1L)
                 .content(new Content("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
@@ -189,7 +190,7 @@ DelegateWalkNormalPostServiceTest {
         ReflectionTestUtils.setField(post1, "createdAt", LocalDateTime.now());
 
         DelegateWalkPost post2 = DelegateWalkPost.builder()
-                .delegateWalkPostId(2L)
+                .postId(2L)
                 .content(new Content("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
@@ -229,7 +230,7 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         DelegateWalkPost post = DelegateWalkPost.builder()
-                .delegateWalkPostId(postId)
+                .postId(postId)
                 .content(new Content("산책 대행 1", "내용 1"))
                 .profile(profile)
                 .location(new Location(127.01, 22.56))
@@ -279,7 +280,7 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
-                .delegateWalkPostId(delegateWalkPostId)
+                .postId(delegateWalkPostId)
                 .requireProfile(true)
                 .build();
 
@@ -379,7 +380,7 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
-                .delegateWalkPostId(2L)
+                .postId(2L)
                 .profile(fakeProfile)
                 .build();
 
@@ -411,8 +412,8 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
-                .delegateWalkPostId(delegateWalkPostId)
-                .status(DelegateWalkPost.DelegateWalkStatus.RECRUITING)
+                .postId(delegateWalkPostId)
+                .status(DelegateWalkStatus.RECRUITING)
                 .applicants(new HashSet<>())
                 .profile(fakeProfile)
                 .build();
@@ -455,8 +456,8 @@ DelegateWalkNormalPostServiceTest {
         Long postId = 1L;
         Member member = Member.builder().memberId(10L).email(email).build();
         DelegateWalkPost post = DelegateWalkPost.builder()
-                .delegateWalkPostId(postId)
-                .status(DelegateWalkPost.DelegateWalkStatus.RECRUITING)
+                .postId(postId)
+                .status(DelegateWalkStatus.RECRUITING)
                 .applicants(new HashSet<>())
                 .build();
 
@@ -482,8 +483,8 @@ DelegateWalkNormalPostServiceTest {
         Member member = Member.builder().memberId(memberId).email(email).build();
         Applicant applicant = Applicant.builder().memberId(memberId).content("이전에 지원").build();
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
-                .delegateWalkPostId(postId)
-                .status(DelegateWalkPost.DelegateWalkStatus.RECRUITING)
+                .postId(postId)
+                .status(DelegateWalkStatus.RECRUITING)
                 .applicants(new HashSet<>(Set.of(applicant)))
                 .build();
 
@@ -509,8 +510,8 @@ DelegateWalkNormalPostServiceTest {
         Long postId = 1L;
         Member member = Member.builder().memberId(10L).email(email).build();
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
-                .delegateWalkPostId(postId)
-                .status(DelegateWalkPost.DelegateWalkStatus.COMPLETED)
+                .postId(postId)
+                .status(DelegateWalkStatus.COMPLETED)
                 .applicants(new HashSet<>())
                 .build();
 
@@ -554,9 +555,9 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         DelegateWalkPost post = DelegateWalkPost.builder()
-                .delegateWalkPostId(delegateWalkPostId)
+                .postId(delegateWalkPostId)
                 .profile(profile)
-                .status(DelegateWalkPost.DelegateWalkStatus.RECRUITING)
+                .status(DelegateWalkStatus.RECRUITING)
                 .applicants(new HashSet<>(Set.of(applicant)))
                 .build();
 
@@ -574,7 +575,7 @@ DelegateWalkNormalPostServiceTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.getMemberChatRoomId()).isEqualTo(1L);
-        assertThat(post.getStatus()).isEqualTo(DelegateWalkPost.DelegateWalkStatus.COMPLETED);
+        assertThat(post.getStatus()).isEqualTo(DelegateWalkStatus.COMPLETED);
         assertThat(post.getSelectedApplicantMemberId()).isEqualTo(applicantMemberId);
 
     }
@@ -641,9 +642,9 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
-                .delegateWalkPostId(delegateWalkPostId)
+                .postId(delegateWalkPostId)
                 .profile(profile)
-                .status(DelegateWalkPost.DelegateWalkStatus.RECRUITING)
+                .status(DelegateWalkStatus.RECRUITING)
                 .applicants(new HashSet<>(Set.of(
                         Applicant.builder().memberId(applicantMemberId).build()
                 )))
@@ -681,9 +682,9 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
-                .delegateWalkPostId(delegateWalkPostId)
+                .postId(delegateWalkPostId)
                 .profile(postProfile)
-                .status(DelegateWalkPost.DelegateWalkStatus.RECRUITING)
+                .status(DelegateWalkStatus.RECRUITING)
                 .applicants(new HashSet<>())
                 .build();
 
@@ -713,7 +714,7 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
-                .delegateWalkPostId(2L)
+                .postId(2L)
                 .profile(profile)
                 .content(new Content("산책 대행 1", "내용 1"))
                 .build();
@@ -803,7 +804,7 @@ DelegateWalkNormalPostServiceTest {
                 .build();
 
         DelegateWalkPost delegateWalkPost = DelegateWalkPost.builder()
-                .delegateWalkPostId(2L)
+                .postId(2L)
                 .profile(profile)
                 .content(new Content("산책 대행 1", "내용 1"))
                 .build();
