@@ -23,12 +23,6 @@ public class DelegateWalkPostController {
 
     private final DelegateWalkPostService delegateWalkPostService;
 
-
-    @GetMapping("/check")
-    public ResponseEntity<?> checkProfile(Authentication authentication) {
-        return delegateWalkPostService.checkProfile(AuthUtil.getProfileId(authentication));
-    }
-
     @PostMapping
     public CreateDelegateWalkPostResponseDto createDelegateWalkPost(@RequestBody @Valid CreateDelegateWalkPostDto createDelegateWalkPostDto, Authentication authentication) {
         return delegateWalkPostService.createDelegateWalkPost(createDelegateWalkPostDto, AuthUtil.getProfileId(authentication));

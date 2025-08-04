@@ -8,6 +8,7 @@ import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.exception.UnAuthorizedException;
 import com.example.PetApp.mapper.MemberMapper;
+import com.example.PetApp.query.MemberQueryService;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RoleRepository;
 import com.example.PetApp.service.email.EmailService;
@@ -33,6 +34,7 @@ public class MemberServiceImpl implements MemberService{
     @Value("${spring.dog.member.image.upload}")
     private String memberUploadDir;
 
+    private final MemberQueryService memberQueryService;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
@@ -57,8 +59,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public LoginResponseDto login(LoginDto loginDto, HttpServletResponse response) {
         log.info("login 요청 : {}", loginDto.toString());
-        Member member = memberRepository.findByEmail(loginDto.getEmail())
-                .orElseThrow(() -> new NotFoundException("이메일 혹은 비밀번호가 일치하지 않습니다."));
+        Member member = memberQueryService.findByMember(loginDto.getEmail());
         if (!passwordEncoder.matches(loginDto.getPassword(),member.getPassword())) {
             throw new UnAuthorizedException("이메일 혹은 비밀번호가 일치하지 않습니다.");
         }
@@ -85,8 +86,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public void sendEmail(SendEmailDto sendEmailDto) {
         log.info("sendEmail 요청 : {}",sendEmailDto.getEmail());
-        Member member = memberRepository.findByEmail(sendEmailDto.getEmail())
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 이메일입니다."));
+        Member member = memberQueryService.findByMember(sendEmailDto.getEmail());
         emailService.sendMail(member.getEmail());
     }
 
@@ -99,14 +99,14 @@ public class MemberServiceImpl implements MemberService{
 
     @Transactional(readOnly = true)
     public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email).orElseThrow(()->new NotFoundException("없는 유저입니다."));
+        return memberQueryService.findByMember(email);
     }
 
     @Transactional
     @Override
     public void resetPassword(ResetPasswordDto resetPasswordDto, String email) {
         log.info("resetPassword 요청 email : {}, newPassword : {}", email, resetPasswordDto.getNewPassword());
-        Member member = memberRepository.findByEmail(email).get();
+        Member member = memberQueryService.findByMember(email);
         if (passwordEncoder.matches(resetPasswordDto.getNewPassword(),member.getPassword())) {
             throw new IllegalArgumentException("전 비밀번호와 다르게 설정해야합니다.");
         } else {
@@ -118,9 +118,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public GetMemberResponseDto getMember(Long memberId, String email) {
         log.info("getMember 요청 : {}", memberId);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException("해당 유저는 없습니다."));
-
+        Member member = memberQueryService.findByMember(email);
         return MemberMapper.toGetMemberResponseDto(member);
     }
 
@@ -128,8 +126,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public void deleteMember(String email) {
         log.info("deleteMember 요청 email:{}", email);
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("없는 회원입니다."));
+        Member member = memberQueryService.findByMember(email);
         memberRepository.delete(member);
     }
 

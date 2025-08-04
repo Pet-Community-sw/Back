@@ -28,8 +28,6 @@ public interface DelegateWalkPostService {
 
     Set<Applicant> getApplicants(Long delegateWalkPostId, Long profileId);
 
-    ResponseEntity<?> checkProfile(Long profileId);
-
     CreateMemberChatRoomResponseDto selectApplicant(Long delegateWalkPostId, Long memberId, String email);
 
     CreateWalkRecordResponseDto grantAuthorize(Long delegateWalkPostId, Long profileId);

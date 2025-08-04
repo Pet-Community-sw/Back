@@ -7,7 +7,7 @@ import com.example.PetApp.dto.recommendroutepost.CreateRecommendRoutePostRespons
 import com.example.PetApp.dto.recommendroutepost.GetRecommendRoutePostsResponseDto;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.RecommendRoutePostMapper;
-import com.example.PetApp.query.QueryService;
+import com.example.PetApp.query.MemberQueryService;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
 import com.example.PetApp.service.like.LikeService;
@@ -46,7 +46,7 @@ public class RecommendRoutePostServiceTest {
     @Mock
     private LikeService likeService;
     @Mock
-    private QueryService queryService;
+    private MemberQueryService memberQueryService;
     @Mock
     private RedisTemplate<String, Long> likeRedisTemplate;
 
@@ -77,7 +77,7 @@ public class RecommendRoutePostServiceTest {
     @DisplayName("createRecommendRoutePost_성공")
     void createRecommendRoutePost_success() {
         //given
-        when(queryService.findByMember(email)).thenReturn(member);
+        when(memberQueryService.findByMember(email)).thenReturn(member);
         when(recommendRoutePostRepository.save(any(RecommendRoutePost.class))).thenAnswer(invocation -> {
             RecommendRoutePost savedPost = invocation.getArgument(0);
             savedPost.setPostId(100L);
@@ -89,7 +89,7 @@ public class RecommendRoutePostServiceTest {
 
         //then
         assertThat(responseDto.getRecommendRoutePostId()).isEqualTo(100L);
-        verify(queryService).findByMember(email);
+        verify(memberQueryService).findByMember(email);
         verify(recommendRoutePostRepository).save(any(RecommendRoutePost.class));
     }
 
@@ -97,20 +97,20 @@ public class RecommendRoutePostServiceTest {
     @DisplayName("createRecommendRoutePost_실패_회원을 찾을 수 없는경우")
     void createRecommendRoutePost_fail_memberNotFound() {
         //given
-        when(queryService.findByMember(anyString())).thenThrow(new NotFoundException("해당 유저는 없습니다."));
+        when(memberQueryService.findByMember(anyString())).thenThrow(new NotFoundException("해당 유저는 없습니다."));
 
         //when&then
         assertThatThrownBy(() -> recommendRoutePostService.createRecommendRoutePost(createRecommendRoutePostDto, email))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("해당 유저는 없습니다.");
 
-        verify(queryService).findByMember(email);
+        verify(memberQueryService).findByMember(email);
     }
 
     @Test
     @DisplayName("getRecommendRoutePosts_성공")
     void getRecommendRoutePosts_success() {
-        // Given
+        //given
         List<RecommendRoutePost> posts = List.of(
                 RecommendRoutePost.builder().postId(101L).build(),
                 RecommendRoutePost.builder().postId(102L).build()
@@ -138,7 +138,7 @@ public class RecommendRoutePostServiceTest {
         );
 
         // Mocking
-        when(queryService.findByMember(email)).thenReturn(member);
+        when(memberQueryService.findByMember(email)).thenReturn(member);
         when(recommendRoutePostRepository.findByRecommendRoutePostByLocation(anyDouble(), anyDouble(), anyDouble(), anyDouble(), any(Pageable.class)))
                 .thenReturn(postPage);
 
@@ -164,7 +164,7 @@ public class RecommendRoutePostServiceTest {
             assertThat(result.get(1).getRecommendRoutePostId()).isEqualTo(102L);
             assertThat(result.get(1).isLike()).isFalse();
 
-            verify(queryService).findByMember(email);
+            verify(memberQueryService).findByMember(email);
             verify(recommendRoutePostRepository).findByRecommendRoutePostByLocation(anyDouble(), anyDouble(), anyDouble(), anyDouble(), any(Pageable.class));
             verify(likeRedisTemplate).opsForSet();
             verify(boundSetOperations).members("member:likes:" + member.getMemberId());
