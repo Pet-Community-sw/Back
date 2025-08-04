@@ -14,8 +14,6 @@ import com.example.PetApp.query.DelegateWalkPostQueryService;
 import com.example.PetApp.query.MemberQueryService;
 import com.example.PetApp.query.ProfileQueryService;
 import com.example.PetApp.repository.jpa.DelegateWalkPostRepository;
-import com.example.PetApp.repository.jpa.MemberRepository;
-import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.service.memberchatRoom.MemberChatRoomService;
 import com.example.PetApp.service.walkrecord.WalkRecordService;
 import com.example.PetApp.util.SendNotificationUtil;
@@ -89,11 +87,7 @@ public class DelegateWalkPostServiceImpl implements DelegateWalkPostService {
         Member member = memberQueryService.findByMember(email);
         Member applicantMember = memberQueryService.findByMember(memberId);
         DelegateWalkPost delegateWalkPost = delegateWalkPostQueryService.findByDelegateWalkPost(delegateWalkPostId);
-        if (!(delegateWalkPost.getProfile().getMember().equals(member))) {
-            throw new ForbiddenException("권한 없음.");
-        } else if (delegateWalkPost.getApplicants().stream().noneMatch(applicant -> applicant.getMemberId().equals(memberId))) {
-            throw new ConflictException("해당 지원자는 없습니다.");
-        }
+        validateSelect(memberId, delegateWalkPost, member);
         delegateWalkPost.setStatus(DelegateWalkStatus.COMPLETED);
         delegateWalkPost.setSelectedApplicantMemberId(memberId);
         //켈린더에 넣는 로직필요.
@@ -158,6 +152,16 @@ public class DelegateWalkPostServiceImpl implements DelegateWalkPostService {
         Member member = memberQueryService.findByMember(email);
         DelegateWalkPost delegateWalkPost = delegateWalkPostQueryService.findByDelegateWalkPost(delegateWalkPostId);
 
+        validateApply(delegateWalkPost, member);
+        delegateWalkPost.getApplicants().add(Applicant.builder()
+                .memberId(member.getMemberId())
+                .content(content)
+                .build());
+        sendToDelegateWalkPostNotification(member, delegateWalkPost);
+        return new ApplyToDelegateWalkPostResponseDto(member.getMemberId());
+    }
+
+    private static void validateApply(DelegateWalkPost delegateWalkPost, Member member) {
         if (DelegateWalkPostMapper.filter(delegateWalkPost, member)) {
             throw new ForbiddenException("프로필 등록해주세요.");
         } else if (delegateWalkPost.getApplicants().stream().
@@ -166,12 +170,14 @@ public class DelegateWalkPostServiceImpl implements DelegateWalkPostService {
         } else if (delegateWalkPost.getStatus() == DelegateWalkStatus.COMPLETED) {
             throw new ConflictException("모집 완료 게시글입니다.");
         }
-        delegateWalkPost.getApplicants().add(Applicant.builder()
-                .memberId(member.getMemberId())
-                .content(content)
-                .build());
-        sendToDelegateWalkPostNotification(member, delegateWalkPost);
-        return new ApplyToDelegateWalkPostResponseDto(member.getMemberId());
+    }
+
+    private static void validateSelect(Long memberId, DelegateWalkPost delegateWalkPost, Member member) {
+        if (!(delegateWalkPost.getProfile().getMember().equals(member))) {
+            throw new ForbiddenException("권한 없음.");
+        } else if (delegateWalkPost.getApplicants().stream().noneMatch(applicant -> applicant.getMemberId().equals(memberId))) {
+            throw new ConflictException("해당 지원자는 없습니다.");
+        }
     }
 
     private void sendToDelegateWalkPostNotification(Member member, DelegateWalkPost delegateWalkPost) {
