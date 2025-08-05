@@ -88,13 +88,17 @@ public class WalkRecordServiceImpl implements WalkRecordService{
         walkRecord.setWalkStatus(WalkRecord.WalkStatus.FINISH);
         walkRecord.setFinishTime(LocalDateTime.now());
 
+        updateWalkRecordPathData(walkRecordId, walkRecord);
+        sendNotificationUtil.sendNotification(walkRecord.getDelegateWalkPost().getProfile().getMember(),
+                walkRecord.getMember().getName()+"님이 산책을 마쳤습니다. 후기를 작성해주세요.");
+    }
+
+    private void updateWalkRecordPathData(Long walkRecordId, WalkRecord walkRecord) {
         List<String> paths = stringRedisTemplate.opsForList().range("walk:path:" + walkRecordId, 0, -1);
         Double totalDistance = DistanceUtil.calculateTotalDistance(paths);
         walkRecord.setWalkDistance(totalDistance);
         walkRecord.setPathPoints(paths);
         stringRedisTemplate.delete("walk:path:" + walkRecordId);
-        sendNotificationUtil.sendNotification(walkRecord.getDelegateWalkPost().getProfile().getMember(),
-                walkRecord.getMember().getName()+"님이 산책을 마쳤습니다. 후기를 작성해주세요.");
     }
 
     private static void validateMember(boolean walkRecord) {
