@@ -47,7 +47,7 @@ public class ReviewServiceImpl implements ReviewService{
         if (walkRecord.getWalkStatus() != WalkRecord.WalkStatus.FINISH) {
             throw new ConflictException("산책을 다해야 후기를 작성할 수 있습니다.");
         } else if (!(walkRecord.getMember().equals(member))) {
-            throw new ForbiddenException("권한 없음.");
+            throw new ForbiddenException("권한이 없습니다.");
         }
         Review savedReview = reviewRepository.save(ReviewMapper.toEntity(walkRecord, createReviewDto));
         return new CreateReviewResponseDto(savedReview.getReviewId());
