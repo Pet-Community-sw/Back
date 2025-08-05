@@ -10,11 +10,14 @@ import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.MemberChatRoomMapper;
+import com.example.PetApp.query.MemberChatRoomQueryService;
+import com.example.PetApp.query.MemberQueryService;
 import com.example.PetApp.repository.jpa.MemberChatRoomRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.service.chatting.ChattingReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,26 +32,18 @@ import java.util.stream.Collectors;
 public class MemberChatRoomServiceImpl implements MemberChatRoomService {
 
     private final MemberChatRoomRepository memberChatRoomRepository;
-    private final MemberRepository memberRepository;
-    private final StringRedisTemplate redisTemplate;
     private final ChattingReader chattingReader;
+    private final StringRedisTemplate redisTemplate;
+    private final MemberQueryService memberQueryService;
+    private final MemberChatRoomQueryService memberChatRoomQueryService;
 
     @Transactional(readOnly = true)
     @Override
     public List<MemberChatRoomsResponseDto> getMemberChatRooms(String email) {
-        Member member = memberRepository.findByEmail(email).get();
+        Member member = memberQueryService.findByMember(email);
         List<MemberChatRoom> memberChatRooms = memberChatRoomRepository.findAllByMembersContains(member);
 
-        return memberChatRooms.stream()
-                .map(memberChatRoom -> {
-                    Member anotherMember = filterMember(memberChatRoom.getMembers(), member);
-                    String roomName = anotherMember.getName();
-                    String roomImageUrl = anotherMember.getMemberImageUrl();
-                    String lastMessage = redisTemplate.opsForValue().get("memberChat:lastMessage" + memberChatRoom.getMemberChatRoomId());
-                    String count = redisTemplate.opsForValue().get("unReadMemberChat:" + memberChatRoom.getMemberChatRoomId() + ":" + member.getMemberId());
-                    String lastMessageTime = redisTemplate.opsForValue().get("memberChat:lastMessageTime:" + memberChatRoom.getMemberChatRoomId());
-                    return MemberChatRoomMapper.toMemberChatRoomsResponseDto(roomName, roomImageUrl, lastMessage, count, lastMessageTime);
-                }).collect(Collectors.toList());
+        return getMemberChatRoomsResponseDtos(memberChatRooms, member);
     }
 
     @Transactional
@@ -62,9 +57,8 @@ public class MemberChatRoomServiceImpl implements MemberChatRoomService {
     @Transactional
     @Override
     public CreateMemberChatRoomResponseDto createMemberChatRoom(Long memberId, String email) {
-        Member fromMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없습니다."));
-        Member member = memberRepository.findByEmail(email).get();
+        Member fromMember = memberQueryService.findByMember(memberId);
+        Member member = memberQueryService.findByMember(email);
         MemberChatRoom memberChatRoom = getMemberChatRoom(fromMember, member);
         MemberChatRoom newMemberChatRoom = memberChatRoomRepository.save(memberChatRoom);
         return new CreateMemberChatRoomResponseDto(newMemberChatRoom.getMemberChatRoomId());
@@ -88,9 +82,8 @@ public class MemberChatRoomServiceImpl implements MemberChatRoomService {
     @Transactional
     @Override
     public void deleteMemberChatRoom(Long memberChatRoomId, String email) {
-        Member member = memberRepository.findByEmail(email).get();
-        MemberChatRoom memberChatRoom = memberChatRoomRepository.findById(memberChatRoomId)
-                .orElseThrow(() -> new NotFoundException("해당 채팅방을 찾을 수 없습니다."));
+        Member member = memberQueryService.findByMember(email);
+        MemberChatRoom memberChatRoom = memberChatRoomQueryService.findByMemberChatRoom(memberChatRoomId);
         if (!(memberChatRoom.getMembers().contains(member))) {
             throw new ForbiddenException("권한이 없습니다.");
         }
@@ -100,7 +93,7 @@ public class MemberChatRoomServiceImpl implements MemberChatRoomService {
     @Transactional(readOnly = true)
     @Override
     public ChatMessageResponseDto getMessages(Long memberChatRoomId, String email, int page) {
-        Member member = memberRepository.findByEmail(email).get();
+        Member member = memberQueryService.findByMember(email);
         return chattingReader.getMessages(memberChatRoomId, member.getMemberId(), ChatMessage.ChatRoomType.ONE, page);
     }
 
@@ -112,5 +105,19 @@ public class MemberChatRoomServiceImpl implements MemberChatRoomService {
             }
         }
         return returnMember;
+    }
+
+    @NotNull
+    private List<MemberChatRoomsResponseDto> getMemberChatRoomsResponseDtos(List<MemberChatRoom> memberChatRooms, Member member) {
+        return memberChatRooms.stream()
+                .map(memberChatRoom -> {
+                    Member anotherMember = filterMember(memberChatRoom.getMembers(), member);
+                    String roomName = anotherMember.getName();
+                    String roomImageUrl = anotherMember.getMemberImageUrl();
+                    String lastMessage = redisTemplate.opsForValue().get("memberChat:lastMessage" + memberChatRoom.getMemberChatRoomId());
+                    String count = redisTemplate.opsForValue().get("unReadMemberChat:" + memberChatRoom.getMemberChatRoomId() + ":" + member.getMemberId());
+                    String lastMessageTime = redisTemplate.opsForValue().get("memberChat:lastMessageTime:" + memberChatRoom.getMemberChatRoomId());
+                    return MemberChatRoomMapper.toMemberChatRoomsResponseDto(roomName, roomImageUrl, lastMessage, count, lastMessageTime);
+                }).collect(Collectors.toList());
     }
 }
