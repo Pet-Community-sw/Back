@@ -7,6 +7,8 @@ import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.ChatRoomMapper;
+import com.example.PetApp.query.ChatRoomQueryService;
+import com.example.PetApp.query.ProfileQueryService;
 import com.example.PetApp.repository.jpa.ChatRoomRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.mongo.ChatMessageRepository;
@@ -30,17 +32,17 @@ import static com.example.PetApp.domain.ChatMessage.*;
 public class ChatRoomServiceImpl implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
-    private final ProfileRepository profileRepository;
-    private final StringRedisTemplate redisTemplate;
     private final ChatMessageRepository chatMessageRepository;
     private final ChattingReader chattingReader;
+    private final StringRedisTemplate redisTemplate;
+    private final ProfileQueryService profileQueryService;
+    private final ChatRoomQueryService chatRoomQueryService;
 
 
     @Transactional(readOnly = true)
     @Override
     public List<ChatRoomsResponseDto> getChatRooms(Long profileId) {
-        Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new ForbiddenException("권한이 없습니다."));
+        Profile profile = profileQueryService.findByProfile(profileId);
         List<ChatRoom> chatRoomList = chatRoomRepository.findAllByProfilesContains(profile);
         return chatRoomList.stream()
                 .map(chatRoom -> toChatRoomsResponseDtoWithRedis(chatRoom, profile.getProfileId()))
@@ -81,10 +83,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Transactional
     @Override
     public void deleteChatRoom(Long chatRoomId, Long profileId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new NotFoundException("해당 채팅방은 없습니다."));
-        Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new ForbiddenException("프로필 등록해주세요."));
+        ChatRoom chatRoom = chatRoomQueryService.findByChatRoom(chatRoomId);
+        Profile profile = profileQueryService.findByProfile(profileId);
         List<Profile> profiles = chatRoom.getProfiles();
         if (!(profiles.contains(profile))) {
             throw new ForbiddenException("권한이 없습니다.");
@@ -100,12 +100,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Transactional
     @Override//방장만 수정할 수 있도록 설정.
     public void updateChatRoom(Long chatRoomId, UpdateChatRoomDto updateChatRoomDto, Long profileId) {
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new NotFoundException("해당 채팅방은 없습니다."));
-        Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new ForbiddenException("프로필 등록해주세요."));
+        ChatRoom chatRoom = chatRoomQueryService.findByChatRoom(chatRoomId);
+        Profile profile = profileQueryService.findByProfile(profileId);
         if (!(chatRoom.getWalkingTogetherPost().getProfile().getProfileId().equals(profile.getProfileId()))) {
-            throw new ForbiddenException("수정 권한이 없습니다.");
+            throw new ForbiddenException("권한이 없습니다.");
         }
         chatRoom.setName(updateChatRoomDto.getChatRoomName());
         chatRoom.setLimitCount(updateChatRoomDto.getLimitCount());
