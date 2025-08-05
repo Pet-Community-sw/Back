@@ -8,6 +8,9 @@ import com.example.PetApp.dto.commment.*;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.CommentMapper;
+import com.example.PetApp.query.CommentQueryService;
+import com.example.PetApp.query.MemberQueryService;
+import com.example.PetApp.query.PostQueryService;
 import com.example.PetApp.repository.jpa.CommentRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.PostRepository;
@@ -25,17 +28,19 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final SendNotificationUtil sendNotificationUtil;
+    private final MemberQueryService memberQueryService;
+    private final PostQueryService postQueryService;
+    private final CommentQueryService commentQueryService;
 
     @Transactional(readOnly = true)
     @Override
     public List<GetCommentsResponseDto> getComments(Long postId, String email) {
         log.info("getComments 요청 email : {}, postId : {}", email, postId);
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("해당 회원은 없습니다."));
+        Member member = memberQueryService.findByMember(email);
+        Post post = postQueryService.findByPost(postId);
 
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException("해당 게시글은 없습니다."));
         return CommentMapper.toGetCommentsResponseDtos((Commentable) post, member);
     }
 
@@ -43,8 +48,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CreateCommentResponseDto createComment(CommentDto commentDto, String email) {
         log.info("createComment 요청 email : {}", email);
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("해당 회원은 없습니다."));
-        Post post = postRepository.findById(commentDto.getPostId()).orElseThrow(() -> new NotFoundException("해당 게시글을 찾을 수 없습니다."));
+        Member member = memberQueryService.findByMember(email);
+        Post post = postQueryService.findByPost(commentDto.getPostId());
 
         Comment comment = CommentMapper.toEntity(commentDto, post, member);
         commentRepository.save(comment);
@@ -57,12 +62,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteComment(Long commentId, String email) {
         log.info("deleteComment 요청 email : {}, commentId : {}", email, commentId);
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("해당 회원은 없습니다."));
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException("해당 댓글은 없습니다."));
-        if (!(comment.getMember().equals(member))) {
-            throw new ForbiddenException("삭제 권한이 없습니다.");
-        }
+        Member member = memberQueryService.findByMember(email);
+        Comment comment = commentQueryService.findByComment(commentId);
+        validateMember(comment, member);
         commentRepository.deleteById(commentId);
     }
 
@@ -70,14 +72,16 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void updateComment(Long commentId, UpdateCommentDto updateCommentDto, String email) {
         log.info("updateComment 요청 email : {}, commentId : {}", email, commentId);
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NotFoundException("해당 댓글은 없습니다."));
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("해당 회원은 없습니다."));
+        Member member = memberQueryService.findByMember(email);
+        Comment comment = commentQueryService.findByComment(commentId);
+        validateMember(comment, member);
+        comment.setContent(updateCommentDto.getContent());
 
+    }
+
+    private static void validateMember(Comment comment, Member member) {
         if (!(comment.getMember().equals(member))) {
-            throw new ForbiddenException("수정 권한이 없습니다.");
-        } else {
-            comment.setContent(updateCommentDto.getContent());
+            throw new ForbiddenException("권한이 없습니다.");
         }
     }
 
