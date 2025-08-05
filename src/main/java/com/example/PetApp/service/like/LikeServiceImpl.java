@@ -5,8 +5,9 @@ import com.example.PetApp.domain.like.Like;
 import com.example.PetApp.domain.post.Post;
 import com.example.PetApp.dto.like.LikeCountDto;
 import com.example.PetApp.dto.like.LikeResponseDto;
-import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.LikeMapper;
+import com.example.PetApp.query.MemberQueryService;
+import com.example.PetApp.query.PostQueryService;
 import com.example.PetApp.repository.jpa.*;
 import com.example.PetApp.util.SendNotificationUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,18 +27,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor//like를 superclass로 둠으로써 likeId 겹칠일이없음. 코드 100줄이상 줄임. ㄷㄷ
 public class LikeServiceImpl implements LikeService {
 
-    private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
     private final SendNotificationUtil sendNotificationUtil;
     private final RedisTemplate<String, Long> likeRedisTemplate;
+    private final PostQueryService postQueryService;
+    private final MemberQueryService memberQueryService;
 
 
     @Transactional(readOnly = true)
     @Override
     public LikeResponseDto getLikes(Long postId) {
         log.info("getLikes 요청 postId : {}", postId);
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
+        Post post = postQueryService.findByPost(postId);
         return LikeMapper.toLikeResponseDto(post.getLikes());
     }
 
@@ -56,10 +57,8 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public ResponseEntity<String> createAndDeleteLike(Long postId, String email) {
         log.info("createAndDeleteLike 요청 postId : {}", postId);
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("회원이 존재하지 않습니다."));
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("해당 게시물은 없습니다."));
+        Member member = memberQueryService.findByMember(email);
+        Post post = postQueryService.findByPost(postId);
         Optional<Like> existingLike = post.getLikes().stream()
                 .filter(like -> like.getMember().equals(member))
                 .findFirst();
