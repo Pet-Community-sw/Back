@@ -10,6 +10,10 @@ import com.example.PetApp.exception.ConflictException;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.ReviewMapper;
+import com.example.PetApp.query.MemberQueryService;
+import com.example.PetApp.query.ProfileQueryService;
+import com.example.PetApp.query.ReviewQueryService;
+import com.example.PetApp.query.WalkRecordQueryService;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.ProfileRepository;
 import com.example.PetApp.repository.jpa.ReviewRepository;
@@ -29,24 +33,23 @@ import static com.example.PetApp.domain.Review.*;
 public class ReviewServiceImpl implements ReviewService{
 
     private final ReviewRepository reviewRepository;
-    private final WalkRecordRepository walkRecordRepository;
-    private final MemberRepository memberRepository;
-    private final ProfileRepository profileRepository;
+    private final ReviewQueryService reviewQueryService;
+    private final WalkRecordQueryService walkRecordQueryService;
+    private final MemberQueryService memberQueryService;
+    private final ProfileQueryService profileQueryService;
 
     @Transactional
     @Override
     public CreateReviewResponseDto createReview(CreateReviewDto createReviewDto, String email) {
         log.info("createReview 요청 walkRecord : {}, email : {}", createReviewDto.getWalkRecordId(), email);
-        WalkRecord walkRecord = walkRecordRepository.findById(createReviewDto.getWalkRecordId())
-                .orElseThrow(() -> new NotFoundException("해당 산책기록은 없습니다."));
-        Member member = memberRepository.findByEmail(email).get();
+        Member member = memberQueryService.findByMember(email);
+        WalkRecord walkRecord = walkRecordQueryService.findByWalkRecord(createReviewDto.getWalkRecordId());
         if (walkRecord.getWalkStatus() != WalkRecord.WalkStatus.FINISH) {
             throw new ConflictException("산책을 다해야 후기를 작성할 수 있습니다.");
         } else if (!(walkRecord.getMember().equals(member))) {
             throw new ForbiddenException("권한 없음.");
         }
-        Review review = ReviewMapper.toEntity(walkRecord, createReviewDto);
-        Review savedReview = reviewRepository.save(review);
+        Review savedReview = reviewRepository.save(ReviewMapper.toEntity(walkRecord, createReviewDto));
         return new CreateReviewResponseDto(savedReview.getReviewId());
     }
 
@@ -54,9 +57,8 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public GetReviewListResponseDto getReviewListByMember(Long memberId, String email) {
         log.info("getReviewListByMember 요청 memberId : {}, email : {}", memberId, email);
-        Member member = memberRepository.findByEmail(email).get();
-        Member ownerMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException("해당 유저는 없습니다."));
+        Member member = memberQueryService.findByMember(email);
+        Member ownerMember = memberQueryService.findByMember(memberId);
         List<Review> reviewList = reviewRepository.findAllByMemberAndReviewType(member, ReviewType.PROFILE_TO_MEMBER);
         return ReviewMapper.toGetReviewListResponseDto(reviewList, ownerMember.getMemberId(), ownerMember.getName(), ownerMember.getMemberImageUrl(), ReviewMapper.toGetReviewList(reviewList, member));
     }
@@ -65,9 +67,8 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public GetReviewListResponseDto getReviewListByProfile(Long profileId, String email) {
         log.info("getReviewListByProfile 요청 profileId : {}, email : {}", profileId, email);
-        Member member = memberRepository.findByEmail(email).get();
-        Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new NotFoundException("해당 프로필이 없습니다."));
+        Member member = memberQueryService.findByMember(email);
+        Profile profile = profileQueryService.findByProfile(profileId);
         List<Review> reviewList = reviewRepository.findAllByProfileAndReviewType(profile, ReviewType.MEMBER_TO_PROFILE);
         return ReviewMapper.toGetReviewListResponseDto(reviewList, profile.getProfileId(), profile.getPetName(), profile.getPetImageUrl(), ReviewMapper.toGetReviewList(reviewList, member));
 
@@ -78,9 +79,8 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public GetReviewResponseDto getReview(Long reviewId, String email) {
         log.info("getReview 요청 reviewId : {}, email : {}", reviewId,email);
-        Member member = memberRepository.findByEmail(email).get();
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new NotFoundException("해당 산책기록은 없습니다."));
+        Member member = memberQueryService.findByMember(email);
+        Review review = reviewQueryService.findByReview(reviewId);
         return ReviewMapper.toGetReviewResponseDto(review, member);
     }
 
@@ -104,9 +104,8 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     private Review findReviewWithAuth(Long reviewId, String email) {
-        Member member = memberRepository.findByEmail(email).get();
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new NotFoundException("해당 리뷰가 없습니다."));
+        Member member = memberQueryService.findByMember(email);
+        Review review = reviewQueryService.findByReview(reviewId);
 
         if (review.getReviewType() == ReviewType.MEMBER_TO_PROFILE) {
             if (!review.getMember().equals(member)) {

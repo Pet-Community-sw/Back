@@ -52,7 +52,6 @@ public class ProfileServiceImpl implements ProfileService {
         Profile profile = ProfileMapper.toEntity(profileDto, member, imageFileName, petBreed);
         validateBreed(profileDto, profile);
         profileRepository.save(profile);
-        log.info("imageUrl: {}", imageFileName);
 
         return new CreateProfileResponseDto(profile.getProfileId());
     }
