@@ -9,6 +9,8 @@ import com.example.PetApp.dto.walkrecord.GetWalkRecordResponseDto;
 import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.WalkRecordMapper;
+import com.example.PetApp.query.MemberQueryService;
+import com.example.PetApp.query.WalkRecordQueryService;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.WalkRecordRepository;
 import com.example.PetApp.util.DistanceUtil;
@@ -28,16 +30,16 @@ import java.util.List;
 public class WalkRecordServiceImpl implements WalkRecordService{
 
     private final WalkRecordRepository walkRecordRepository;
-    private final MemberRepository memberRepository;
     private final StringRedisTemplate stringRedisTemplate;
     private final SendNotificationUtil sendNotificationUtil;
+    private final MemberQueryService memberQueryService;
+    private final WalkRecordQueryService walkRecordQueryService;
 
     @Transactional
     @Override
     public CreateWalkRecordResponseDto createWalkRecord(DelegateWalkPost delegateWalkPost) {
         log.info("createWalkRecord 요청");
-        Member member = memberRepository.findById(delegateWalkPost.getSelectedApplicantMemberId())
-                .orElseThrow(()->new NotFoundException("해당 대리산책자 유저가 없습니다."));
+        Member member = memberQueryService.findByMember(delegateWalkPost.getSelectedApplicantMemberId());
         WalkRecord walkRecord = WalkRecordMapper.toEntity(delegateWalkPost, member);
         WalkRecord savedWalkRecord = walkRecordRepository.save(walkRecord);
         sendNotificationUtil.sendNotification(member, "산책 권한이 부여 되었습니다.");
@@ -48,8 +50,7 @@ public class WalkRecordServiceImpl implements WalkRecordService{
     @Override
     public GetWalkRecordResponseDto getWalkRecord(Long walkRecordId, String email) {
         log.info("getWalkRecord 요청 walkRecordId : {}, email : {}", walkRecordId, email);
-        WalkRecord walkRecord = walkRecordRepository.findById(walkRecordId)
-                .orElseThrow(() -> new NotFoundException("해당 산책기록은 없습니다."));
+        WalkRecord walkRecord = walkRecordQueryService.findByWalkRecord(walkRecordId);
         return WalkRecordMapper.toGetWalkRecordResponseDto(walkRecord);
     }
 
@@ -57,12 +58,9 @@ public class WalkRecordServiceImpl implements WalkRecordService{
     @Override
     public GetWalkRecordLocationResponseDto getWalkRecordLocation(Long walkRecordId, String email) {
         log.info("getWalkRecordLocation 요청 walkRecordId : {}, email : {}", walkRecordId, email);
-        Member member = memberRepository.findByEmail(email).get();
-        WalkRecord walkRecord = walkRecordRepository.findById(walkRecordId)
-                .orElseThrow(() -> new NotFoundException("해당 산책기록이 없습니다."));
-        if (!(walkRecord.getDelegateWalkPost().getProfile().getMember().equals(member))) {
-            throw new ForbiddenException("권한 없음.");
-        }
+        Member member = memberQueryService.findByMember(email);
+        WalkRecord walkRecord = walkRecordQueryService.findByWalkRecord(walkRecordId);
+        validateMember(walkRecord.getDelegateWalkPost().getProfile().getMember().equals(member));
         String lastLocation = stringRedisTemplate.opsForList().index("walk:path:" + walkRecordId, -1);
         return new GetWalkRecordLocationResponseDto(lastLocation);
     }
@@ -71,12 +69,9 @@ public class WalkRecordServiceImpl implements WalkRecordService{
     @Override
     public void updateStartWalkRecord(Long walkRecordId, String email) {
         log.info("updateStartWalkRecord 요청 walkRecordId : {}, email : {}",walkRecordId, email);
-        Member member = memberRepository.findByEmail(email).get();
-        WalkRecord walkRecord = walkRecordRepository.findById(walkRecordId)
-                .orElseThrow(() -> new NotFoundException("해당 산책기록은 없습니다."));
-        if (!(walkRecord.getDelegateWalkPost().getSelectedApplicantMemberId().equals(member.getMemberId()))) {
-            throw new ForbiddenException("권한 없음.");
-        }
+        Member member = memberQueryService.findByMember(email);
+        WalkRecord walkRecord = walkRecordQueryService.findByWalkRecord(walkRecordId);
+        validateMember(walkRecord.getDelegateWalkPost().getSelectedApplicantMemberId().equals(member.getMemberId()));
         walkRecord.setWalkStatus(WalkRecord.WalkStatus.START);
         walkRecord.setStartTime(LocalDateTime.now());
         sendNotificationUtil.sendNotification(walkRecord.getDelegateWalkPost().getProfile().getMember(),
@@ -87,12 +82,9 @@ public class WalkRecordServiceImpl implements WalkRecordService{
     @Override
     public void updateFinishWalkRecord(Long walkRecordId, String email) {
         log.info("updateFinishWalkRecord 요청 walkRecordId : {}, email : {}",walkRecordId, email);
-        Member member = memberRepository.findByEmail(email).get();
-        WalkRecord walkRecord = walkRecordRepository.findById(walkRecordId)
-                .orElseThrow(() -> new NotFoundException("해당 산책기록은 없습니다."));
-        if (!(walkRecord.getDelegateWalkPost().getSelectedApplicantMemberId().equals(member.getMemberId()))) {
-            throw new ForbiddenException("권한 없음.");
-        }
+        Member member = memberQueryService.findByMember(email);
+        WalkRecord walkRecord = walkRecordQueryService.findByWalkRecord(walkRecordId);
+        validateMember(walkRecord.getDelegateWalkPost().getSelectedApplicantMemberId().equals(member.getMemberId()));
         walkRecord.setWalkStatus(WalkRecord.WalkStatus.FINISH);
         walkRecord.setFinishTime(LocalDateTime.now());
 
@@ -103,5 +95,11 @@ public class WalkRecordServiceImpl implements WalkRecordService{
         stringRedisTemplate.delete("walk:path:" + walkRecordId);
         sendNotificationUtil.sendNotification(walkRecord.getDelegateWalkPost().getProfile().getMember(),
                 walkRecord.getMember().getName()+"님이 산책을 마쳤습니다. 후기를 작성해주세요.");
+    }
+
+    private static void validateMember(boolean walkRecord) {
+        if (!walkRecord) {
+            throw new ForbiddenException("권한 없음.");
+        }
     }
 }
