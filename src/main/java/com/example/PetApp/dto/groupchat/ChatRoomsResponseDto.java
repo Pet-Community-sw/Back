@@ -1,16 +1,16 @@
 package com.example.PetApp.dto.groupchat;
 
-import com.example.PetApp.domain.ChatRoom;
-import com.example.PetApp.domain.Profile;
 import com.example.PetApp.dto.profile.ChatRoomProfilesResponseDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class ChatRoomsResponseDto {
 

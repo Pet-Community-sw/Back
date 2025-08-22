@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import static com.example.PetApp.domain.Review.*;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
