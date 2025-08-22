@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class UpdateChatRoomList {
     private Long chatRoomId;

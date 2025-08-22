@@ -1,9 +1,11 @@
 package com.example.PetApp.dto.like;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class LikeListDto {
 

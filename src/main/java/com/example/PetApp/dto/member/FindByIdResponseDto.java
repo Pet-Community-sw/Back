@@ -1,10 +1,12 @@
 package com.example.PetApp.dto.member;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class FindByIdResponseDto {
     private String email;
 }

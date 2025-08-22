@@ -1,16 +1,16 @@
 package com.example.PetApp.dto.walkingtogetherpost;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UpdateWalkingTogetherPostDto {
 
     @NotNull(message = "함께 산책해요 시간은 필수입니다.")

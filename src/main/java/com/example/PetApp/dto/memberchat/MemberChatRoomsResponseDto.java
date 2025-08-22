@@ -1,11 +1,13 @@
 package com.example.PetApp.dto.memberchat;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class MemberChatRoomsResponseDto {
 

@@ -1,14 +1,14 @@
 package com.example.PetApp.dto.groupchat;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ChatMessageResponseDto {
 
     private Long chatRoomId;

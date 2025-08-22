@@ -1,12 +1,12 @@
 package com.example.PetApp.dto.review;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CreateReviewResponseDto {
     private Long reviewId;
 

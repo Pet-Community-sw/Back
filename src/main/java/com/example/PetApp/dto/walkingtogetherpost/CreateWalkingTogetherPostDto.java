@@ -6,7 +6,8 @@ import lombok.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@Getter//추후에 날짜와 시간으로 값 내려받기
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

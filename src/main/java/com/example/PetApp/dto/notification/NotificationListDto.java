@@ -1,13 +1,14 @@
 package com.example.PetApp.dto.notification;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class NotificationListDto {
 
     private String message;
