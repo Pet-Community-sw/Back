@@ -8,6 +8,7 @@ import com.example.PetApp.exception.ForbiddenException;
 import com.example.PetApp.exception.NotFoundException;
 import com.example.PetApp.mapper.RecommendRoutePostMapper;
 import com.example.PetApp.query.MemberQueryService;
+import com.example.PetApp.query.RecommendRoutePostQueryService;
 import com.example.PetApp.repository.jpa.LikeRepository;
 import com.example.PetApp.repository.jpa.MemberRepository;
 import com.example.PetApp.repository.jpa.RecommendRoutePostRepository;
@@ -29,10 +30,10 @@ import java.util.Set;
 public class RecommendRoutePostServiceImpl implements RecommendRoutePostService{
 
     private final RecommendRoutePostRepository recommendRoutePostRepository;
-    private final MemberRepository memberRepository;
     private final LikeRepository likeRepository;
     private final LikeService likeService;
     private final MemberQueryService memberQueryService;
+    private final RecommendRoutePostQueryService recommendRoutePostQueryService;
     private final RedisTemplate<String, Long> likeRedisTemplate;
 
     @Transactional
@@ -75,7 +76,7 @@ public class RecommendRoutePostServiceImpl implements RecommendRoutePostService{
     public GetRecommendPostResponseDto getRecommendRoutePost(Long recommendRoutePostId, String email) {
         log.info("getRecommendRoutePost 요청 email : {}", email);
         Member member = memberQueryService.findByMember(email);
-        RecommendRoutePost recommendRoutePost = recommendRoutePostRepository.findById(recommendRoutePostId).orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시물은 없습니다."));
+        RecommendRoutePost recommendRoutePost = recommendRoutePostQueryService.findByRecommendRoutePost(recommendRoutePostId);
         return RecommendRoutePostMapper.toGetRecommendPostResponseDto(member, recommendRoutePost, likeRepository.countByPost(recommendRoutePost), likeRepository.existsByPostAndMember(recommendRoutePost, member));
     }
 
@@ -83,26 +84,26 @@ public class RecommendRoutePostServiceImpl implements RecommendRoutePostService{
     @Override
     public void updateRecommendRoutePost(Long recommendRoutePostId, UpdateRecommendRoutePostDto updateRecommendRoutePostDto, String email) {
         log.info("updateRecommendRoutePost 요청 recommendRoutePostId : {}, email : {}", recommendRoutePostId, email);
-        Member member = memberRepository.findByEmail(email).get();
-        RecommendRoutePost post = recommendRoutePostRepository.findById(recommendRoutePostId)
-                .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
-        if (!(post.getMember().equals(member))) {
-            throw new ForbiddenException("수정 권한이 없습니다.");
-        }
-        post.setContent(new Content(updateRecommendRoutePostDto.getTitle(), updateRecommendRoutePostDto.getContent()));
+        Member member = memberQueryService.findByMember(email);
+        RecommendRoutePost recommendRoutePost = recommendRoutePostQueryService.findByRecommendRoutePost(recommendRoutePostId);
+        validateMember(recommendRoutePost, member);
+        recommendRoutePost.setContent(new Content(updateRecommendRoutePostDto.getTitle(), updateRecommendRoutePostDto.getContent()));
     }
 
     @Transactional
     @Override
     public void deleteRecommendRoutePost(Long recommendRoutePostId, String email) {
         log.info("deleteRecommendRoutePost 요청 recommendRoutePostId : {}, email : {}", recommendRoutePostId, email);
-        Member member = memberRepository.findByEmail(email).get();
-        RecommendRoutePost post = recommendRoutePostRepository.findById(recommendRoutePostId)
-                .orElseThrow(() -> new NotFoundException("해당 산책길 추천 게시글은 없습니다."));
-        if (!(post.getMember().equals(member))) {
-            throw new ForbiddenException("삭제 권한이 없습니다.");
-        }
+        Member member = memberQueryService.findByMember(email);
+        RecommendRoutePost recommendRoutePost = recommendRoutePostQueryService.findByRecommendRoutePost(recommendRoutePostId);
+        validateMember(recommendRoutePost, member);
         recommendRoutePostRepository.deleteById(recommendRoutePostId);
+    }
+
+    private static void validateMember(RecommendRoutePost recommendRoutePost, Member member) {
+        if (!(recommendRoutePost.getMember().equals(member))) {
+            throw new ForbiddenException("권한이 없습니다.");
+        }
     }
 
 }
