@@ -1,0 +1,51 @@
+
+    services:
+      mysql:
+        image: mysql:8.0  #도커허브에서 있는 이미지
+        container_name: pet-app-mysql #컨테이너 이름
+        restart: always #컨테이너가 꺼지면 항상 다시 시작 서버 재부팅 시 자동 기동
+        environment:
+          MYSQL_ROOT_PASSWORD: fpdlswj365
+          MYSQL_DATABASE: memberdb
+          MYSQL_USER: sunjae
+          MYSQL_PASSWORD: fpdlswj365
+          TZ: Asia/Seoul
+        ports:
+          - "3307:3306" #로컬 3307포트로 들어 연결을 컨테이너 내부 mysql3306 포트로 전달
+        command: [
+          "--default-authentication-plugin=mysql_native_password",
+          "--character-set-server=utf8mb4",
+          "--collation-server=utf8mb4_unicode_ci"
+        ]
+        volumes:
+          - mysql-data:/var/lib/mysql
+        healthcheck:
+          test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pfpdlswj365" ]
+          interval: 10s
+          timeout: 5s
+          retries: 10
+
+    volumes:
+      mysql-data:
+#      app:
+#        image: eclipse-temurin:17-jdk
+#        container_name: batch-app
+#        restart: always
+#        depends_on:
+#          mysql:
+#            condition: service_healthy #mysql service가 healthcheck 통과 후에 app을 실
+#        working_dir: /app
+#        volumes:
+#        - ./build/libs/kotlin-batch-0.0.1-SNAPSHOT.jar:/app/app.jar:ro  # ← 정확한 파일만 마운트
+#        command: ["java", "-jar", "/app/app.jar"]
+#        environment:
+#          SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3307/memberdb?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf8&serverTimezone=Asia/Seoul
+#          SPRING_DATASOURCE_USERNAME: sunjae
+#          SPRING_DATASOURCE_PASSWORD: fpdlswj365
+#          SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#          SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
+#          TZ: Asia/Seoul
+#        ports:
+
+#          - "8080:8080"
+
